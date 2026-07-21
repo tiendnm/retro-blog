@@ -2,7 +2,7 @@
 
 > Một blog headless mang phong cách retro — **Astro** (site) + **Directus** (headless CMS) + **PostgreSQL**, đóng gói bằng **Docker**.
 
-> **Trạng thái:** 🟢 Sprint 3 — Reader Experience (giao diện đọc thống nhất: layout shell, post card, prose, responsive + a11y baseline). Chưa mở rộng chức năng.
+> **Trạng thái:** 🟢 Sprint 4 — Fixture Framework & Dogfooding (dataset ~100 bài + edge/stress để kiểm thử ở quy mô thật). Reader/API/Content Model không đổi.
 > **Cập nhật lần cuối:** 2026-07-22
 
 ---
@@ -67,6 +67,14 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
    > Artifacts: `services/directus/snapshots/schema.yaml` · `services/directus/apply-permissions.sh` · `services/directus/seed/seed-dev.mjs`.
    > `permissions:apply` / `seed:dev` cần `ADMIN_EMAIL`/`ADMIN_PASSWORD` trong `.env` (dùng Admin API; `seed:dev` cần Node 18+ trên host).
 
+   **Fixture dogfooding (tuỳ chọn, DEV-only)** — dataset lớn để kiểm thử ở quy mô:
+   ```bash
+   pnpm fixtures:load  -- --profile large   # ~100 bài (normal); có small/medium/large/stress
+   pnpm fixtures:load  -- --set edge        # bộ ca biên (10) · --set stress (3)
+   pnpm fixtures:reset -- --set edge        # xoá riêng theo slug (không đụng content khác)
+   ```
+   > Framework: `services/directus/fixtures/` ([DESIGN.md](./services/directus/fixtures/DESIGN.md)). Deterministic (`--seed`), reset theo slug, **guard chỉ chạy với Directus localhost**.
+
 5. **Truy cập**
 
    | Dịch vụ | URL | Ghi chú |
@@ -107,7 +115,8 @@ Bắt đầu từ [docs/README.md](./docs/README.md).
 | Sprint 1 | Nền tảng local chạy được (infra + plumbing) | 🟢 Hoàn thành |
 | Sprint 2 | Vertical slice MVP nội dung (Roadmap M2) | 🟢 Hoàn thành |
 | Sprint 3 | Reader Experience (Presentation Layer) | 🟢 Hoàn thành |
-| Sprint 4 | _(chưa bắt đầu)_ | ⏳ |
+| Sprint 4 | Fixture Framework & Dogfooding | 🟢 Hoàn thành |
+| Sprint 5 | _(chưa bắt đầu)_ | ⏳ |
 
 ## License
 

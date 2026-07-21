@@ -15,6 +15,8 @@
 - **Tái tạo schema** trên một Directus (volume trống): `pnpm schema:apply` (hoặc `docker compose exec directus npx directus schema apply --yes //directus/snapshots/schema.yaml`).
 - Snapshot **không** phụ thuộc export thủ công UI; là nguồn tái lập cho mọi môi trường. Cập nhật schema → export lại snapshot & commit.
 
+> 🧪 **Dữ liệu dev:** seed tối thiểu `services/directus/seed/seed-dev.mjs` (`pnpm seed:dev`) · **Fixture dogfooding** (dataset ~100 bài + edge/stress, deterministic, DEV-only) ở `services/directus/fixtures/` — xem [DESIGN.md](../services/directus/fixtures/DESIGN.md) (Sprint 4). Loader là adapter Directus duy nhất; generator/content độc lập backend.
+
 ## 1. Ánh xạ Content Type → Collection (Sprint 2)
 
 > Ánh xạ từ [03c §2](./03c-content-model.md). **Tag: ngoài Sprint 2.**
