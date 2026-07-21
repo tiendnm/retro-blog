@@ -58,7 +58,8 @@
 | PostCard (list item) | **Option B**: thumbnail hỗ trợ (nhỏ, trái) + text chủ đạo; không cover → text-only, không placeholder — `PostCard.astro` | 🟢 Phase 2 |
 | CoverImage (ảnh) | Render ảnh nếu có `src`; không thì rỗng (không placeholder/ảnh mặc định) — `CoverImage.astro` | 🟢 Phase 2 |
 | Empty state (list) | Khối `.empty-state` khi list rỗng | 🟢 Phase 2 |
-| Post layout (detail) | | ⏳ Phase 3 |
+| Post layout (detail) | `.post` = reading column (giới hạn `--reading-width`) + header + cover (`CoverImage`) + `.prose` | 🟢 Phase 3 |
+| Prose (markdown) | `.prose` — style TẬP TRUNG cho toàn bộ HTML markdown (heading/list/blockquote/code/table/hr/img); vertical rhythm nhất quán | 🟢 Phase 3 |
 | Tag / Category badge · Pagination | ngoài Sprint 3 | — |
 
 ## 4. Bố cục & Responsive

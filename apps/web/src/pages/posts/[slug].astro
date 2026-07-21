@@ -2,6 +2,7 @@
 // Trang CHI TIẾT bài viết. Route tĩnh dựng từ danh sách slug đã publish (SSG,
 // ADR-0006). Chỉ dùng thin client → DTO PostDetail; KHÔNG gọi Directus trực tiếp.
 import Base from '../../layouts/Base.astro';
+import CoverImage from '../../components/CoverImage.astro';
 import { formatDate } from '../../lib/format';
 import { getAllPublishedPostSlugs, getPostBySlug } from '../../lib/directus';
 import { marked } from 'marked';
@@ -22,21 +23,27 @@ const bodyHtml = post.body ? await marked.parse(post.body) : '';
 ---
 
 <Base title={`${post.title} — Retro Blog`} description={post.excerpt ?? undefined}>
-  <article>
-    <h1>{post.title}</h1>
-    <p class="meta">
-      Bởi {post.author.name}
-      {
-        post.category && (
-          <>
-            {' · '}
-            <a href={`/category/${post.category.slug}`}>{post.category.name}</a>
-          </>
-        )
-      }
-      {post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
-    </p>
-    {post.cover && <img src={post.cover.url} alt={post.cover.alt} />}
-    <div class="post-body" set:html={bodyHtml}></div>
+  <article class="post">
+    <header class="post__header">
+      <h1>{post.title}</h1>
+      <p class="meta">
+        Bởi {post.author.name}
+        {
+          post.category && (
+            <>
+              {' · '}
+              <a href={`/category/${post.category.slug}`}>{post.category.name}</a>
+            </>
+          )
+        }
+        {post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
+      </p>
+    </header>
+    {
+      post.cover && (
+        <CoverImage class="post__cover" src={post.cover.url} alt={post.cover.alt} />
+      )
+    }
+    <div class="prose" set:html={bodyHtml}></div>
   </article>
 </Base>
