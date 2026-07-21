@@ -1,0 +1,4 @@
+# pnpm workspace — chỉ khai báo các ứng dụng Node chạy được.
+# services/directus là cấu hình cho container (không phải package Node) → không đưa vào đây.
+packages:
+  - "apps/*"

@@ -1,0 +1,33 @@
+# ─── Dependencies ───
+node_modules/
+.pnpm-store/
+
+# ─── Env & secrets (KHÔNG commit giá trị thật; chỉ .env.example được track) ───
+.env
+.env.local
+.env.*.local
+# override global ~/.gitignore_global (có '.env.*') để GIỮ track file template:
+!.env.example
+
+# ─── Astro ───
+apps/web/dist/
+apps/web/.astro/
+.output/
+
+# ─── Build / cache / logs ───
+dist/
+build/
+.cache/
+*.log
+logs/
+
+# ─── Directus (dữ liệu/uploads local nếu bind-mount; named volume do Docker quản lý) ───
+services/directus/uploads/
+services/directus/database/
+
+# ─── OS / editor ───
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json

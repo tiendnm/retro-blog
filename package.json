@@ -1,0 +1,16 @@
+{
+  "name": "retro-blog",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Retro Blog — nền tảng blog headless (Astro + Directus + PostgreSQL). Tài liệu: ./docs.",
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "up": "docker compose up -d",
+    "down": "docker compose down",
+    "logs": "docker compose logs -f",
+    "ps": "docker compose ps"
+  }
+}
