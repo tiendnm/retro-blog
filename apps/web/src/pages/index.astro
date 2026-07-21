@@ -10,8 +10,13 @@ const { items } = await listPublishedPosts({ pageSize: 50 });
 
 <Base title="Retro Blog — Bài viết mới nhất" description="Blog headless phong cách retro.">
   <h1>Bài viết mới nhất</h1>
-  {items.length === 0 && <p>Chưa có bài viết nào được xuất bản.</p>}
-  <ul class="post-list">
-    {items.map((post) => <PostCard post={post} />)}
-  </ul>
+  {
+    items.length === 0 ? (
+      <p class="empty-state">Chưa có bài viết nào được xuất bản.</p>
+    ) : (
+      <ul class="post-list">
+        {items.map((post) => <PostCard post={post} />)}
+      </ul>
+    )
+  }
 </Base>

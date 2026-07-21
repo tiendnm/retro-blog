@@ -55,9 +55,10 @@
 | Header / Nav | Gọn, tĩnh: **Brand + Home** (không hero/menu động) — `Header.astro` | 🟢 Phase 1 |
 | Footer | Nhẹ: thông tin cơ bản (© + tagline) — `Footer.astro` | 🟢 Phase 1 |
 | Base layout | skip-link → Header → `main#main` → Footer (landmark ngữ nghĩa) | 🟢 Phase 1 |
-| PostCard (list item) | | ⏳ Phase 2 |
+| PostCard (list item) | **Option B**: thumbnail hỗ trợ (nhỏ, trái) + text chủ đạo; không cover → text-only, không placeholder — `PostCard.astro` | 🟢 Phase 2 |
+| CoverImage (ảnh) | Render ảnh nếu có `src`; không thì rỗng (không placeholder/ảnh mặc định) — `CoverImage.astro` | 🟢 Phase 2 |
+| Empty state (list) | Khối `.empty-state` khi list rỗng | 🟢 Phase 2 |
 | Post layout (detail) | | ⏳ Phase 3 |
-| CoverImage (ảnh) | Chuẩn bị component hiển thị ảnh (không chốt layout thumbnail) | ⏳ Phase 2 |
 | Tag / Category badge · Pagination | ngoài Sprint 3 | — |
 
 ## 4. Bố cục & Responsive

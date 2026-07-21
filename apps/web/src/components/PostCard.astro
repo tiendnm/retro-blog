@@ -1,26 +1,33 @@
 ---
-// Component hiển thị 1 mục bài viết. CHỈ nhận DTO `PostSummary` — KHÔNG gọi
-// Directus, KHÔNG biết hình dạng dữ liệu gốc (Req: component chỉ làm việc với DTO).
+// PostCard — Homepage/Category list item. Option B (Product Review):
+// thumbnail HỖ TRỢ bên trái (nhỏ, không nổi bật) + body text chủ đạo.
+// Không cover → card tự chuyển text-only (body là con flex duy nhất → full width),
+// KHÔNG placeholder. Chỉ nhận DTO `PostSummary` — không gọi Directus.
 import type { PostSummary } from '../lib/types';
 import { formatDate } from '../lib/format';
+import CoverImage from './CoverImage.astro';
 
 interface Props {
   post: PostSummary;
 }
 const { post } = Astro.props;
+const href = `/posts/${post.slug}`;
 ---
 
 <li class="post-card">
   {
     post.cover && (
-      <a href={`/posts/${post.slug}`}>
-        <img src={post.cover.url} alt={post.cover.alt} width="200" loading="lazy" />
+      <a class="post-card__thumb" href={href} tabindex="-1" aria-hidden="true">
+        {/* Trang trí trong ngữ cảnh card (tiêu đề là link chính) → alt rỗng */}
+        <CoverImage src={post.cover.url} alt="" />
       </a>
     )
   }
-  <h2><a href={`/posts/${post.slug}`}>{post.title}</a></h2>
-  {post.excerpt && <p>{post.excerpt}</p>}
-  <p class="meta">
-    Bởi {post.author.name}{post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
-  </p>
+  <div class="post-card__body">
+    <h2><a href={href}>{post.title}</a></h2>
+    {post.excerpt && <p>{post.excerpt}</p>}
+    <p class="meta">
+      Bởi {post.author.name}{post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
+    </p>
+  </div>
 </li>

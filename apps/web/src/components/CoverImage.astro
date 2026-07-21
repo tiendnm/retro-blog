@@ -1,0 +1,23 @@
+---
+// CoverImage — hiển thị ảnh NẾU có `src`; nếu không có thì render RỖNG.
+// KHÔNG placeholder, KHÔNG ảnh mặc định (quyết định Product Review Phase 2).
+// Dùng cho: thumbnail card (alt="" — trang trí) & ảnh bìa detail (Phase 3, alt thật).
+interface Props {
+  src: string | null | undefined;
+  alt?: string;
+  class?: string;
+}
+const { src, alt = '', class: className } = Astro.props;
+---
+
+{
+  src && (
+    <img
+      src={src}
+      alt={alt}
+      class={className}
+      loading="lazy"
+      decoding="async"
+    />
+  )
+}
