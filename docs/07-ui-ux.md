@@ -52,12 +52,13 @@
 
 | Component | Mô tả | Trạng thái |
 |---|---|---|
-| Header / Nav | | ⏳ |
-| PostCard (list item) | | ⏳ |
-| Post layout (detail) | | ⏳ |
-| Tag / Category badge | | ⏳ |
-| Pagination | | ⏳ |
-| Footer | | ⏳ |
+| Header / Nav | Gọn, tĩnh: **Brand + Home** (không hero/menu động) — `Header.astro` | 🟢 Phase 1 |
+| Footer | Nhẹ: thông tin cơ bản (© + tagline) — `Footer.astro` | 🟢 Phase 1 |
+| Base layout | skip-link → Header → `main#main` → Footer (landmark ngữ nghĩa) | 🟢 Phase 1 |
+| PostCard (list item) | | ⏳ Phase 2 |
+| Post layout (detail) | | ⏳ Phase 3 |
+| CoverImage (ảnh) | Chuẩn bị component hiển thị ảnh (không chốt layout thumbnail) | ⏳ Phase 2 |
+| Tag / Category badge · Pagination | ngoài Sprint 3 | — |
 
 ## 4. Bố cục & Responsive
 

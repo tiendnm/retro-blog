@@ -106,15 +106,51 @@ h3 { font-size: var(--text-xl); line-height: var(--leading-tight); }
   }
 }
 
-/* ---- Utility classes hiện có (tokenized — GIỮ diện mạo Sprint 2) --------- */
+/* ---- Layout shell (Sprint 3 Phase 1) — content first, chrome second ----- */
+
+/* Skip-link: ẩn tới khi nhận tiêu điểm bàn phím */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  padding: var(--space-2) var(--space-3);
+  text-decoration: none;
+}
+.skip-link:focus {
+  left: var(--space-2);
+  top: var(--space-2);
+}
+
+/* Main: cho phép footer nằm đáy trên trang ngắn (empty state) */
+main {
+  display: block;
+  min-height: 60vh;
+}
+
+/* Header GỌN: brand trái, nav phải, 1 hàng */
 .site-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
   border-bottom: 2px dashed var(--color-accent);
   margin-bottom: var(--space-6);
   padding-bottom: var(--space-2);
 }
-.site-header a {
-  text-decoration: none;
+.site-header .brand {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
   letter-spacing: 1px;
+  text-decoration: none;
+}
+.site-nav {
+  display: flex;
+  gap: var(--space-4);
+  font-size: var(--text-sm);
 }
 
 .meta {
