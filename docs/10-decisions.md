@@ -67,3 +67,6 @@ Tạo ADR khi quyết định: khó đảo ngược, ảnh hưởng nhiều ph�
 | 2026-07-21 | **[S2-P3] Siết Public field allowlist** (bỏ `fields:['*']`) — field nội bộ tương lai không tự lộ ra Public API | Yêu cầu bảo mật Phase 3; defense-in-depth | Tech Lead |
 | 2026-07-21 | **[S2-P3] Render Markdown body bằng `marked` + `set:html`**; sanitize HTML để hardening sau | Editor là nguồn tin cậy (MVP, không nhận input công khai); `marked` gọn, đủ cho blog | Sprint 2 |
 | 2026-07-21 | **[S2-P3] Render = SSG static** (`output` mặc định) + `getStaticPaths`, KHÔNG adapter | Đúng ADR-0006; blog tĩnh, không cần server runtime | Sprint 2 |
+| 2026-07-22 | **[S3] Sprint 3 = Reader Experience — CHỈ Presentation**, không mở rộng chức năng; đóng băng 03d/03c/03e + thin client `directus.ts`/`types.ts` | Nâng trải nghiệm đọc trước Launch; chống scope creep | Tech Lead |
+| 2026-07-22 | **[S3-P0] Design Foundation:** CSS tokens (typography scale · spacing · container · color AA) ở `apps/web/src/styles/global.css`; **KHÔNG khóa phong cách thị giác cuối** | Dựng nền nhất quán; retro style hoàn thiện dần sau review giao diện thực tế | Tech Lead |
+| 2026-07-22 | **[S3-P0] Nav tĩnh Brand+Home** (không menu category động); **layout thumbnail homepage hoãn** (chỉ chuẩn bị component ảnh) — quyết sau với Product Owner | Giữ presentation-only; không thêm operation vào 03d/thin client | Tech Lead |

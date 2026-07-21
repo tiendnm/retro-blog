@@ -1,6 +1,6 @@
 # 07 — UI / UX & Design System
 
-> **Trạng thái:** 🔴 Chưa bắt đầu · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chưa gán)_
+> **Trạng thái:** 🟡 Đang làm (Sprint 3 Phase 0 — Design Foundation) · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-22 · **Người duyệt:** _(chờ review)_
 >
 > 🎯 **Mục đích:** Định nghĩa *ngôn ngữ thiết kế* của Retro Blog — phong cách retro, design tokens, thành phần UI, và nguyên tắc trải nghiệm. Đảm bảo giao diện nhất quán và tái sử dụng được.
 > 🔗 **Liên quan:** [01-requirements](./01-requirements.md) · [15-seo-accessibility](./15-seo-accessibility.md) · [09-coding-standards](./09-coding-standards.md)
@@ -11,17 +11,42 @@
 
 > Phong cách "retro" cụ thể là gì? (vd: pixel/8-bit, vintage print, 90s web...). Cảm giác muốn tạo ra?
 
-- TODO.
+- **Hướng (provisional — CHƯA khóa):** vintage print / máy đánh chữ — nền giấy ngả vàng, phông monospace, đường kẻ nét đứt, bảng màu ấm trầm.
+- ⚠️ **Phong cách thị giác cuối cùng chưa chốt ở Sprint 3**; hoàn thiện dần sau khi review giao diện thực tế với Product Owner ([sprint-3 plan §4](./sprints/sprint-3-implementation-plan.md)). Phase 0 chỉ dựng **nền tokens** (§2).
 
-## 2. Design Tokens
+## 2. Design Tokens (Design Foundation — Phase 0)
 
-| Nhóm | Token | Giá trị (dự kiến) | Ghi chú |
-|---|---|---|---|
-| Màu (Color) | primary / bg / text / accent | TBD | Đảm bảo tương phản AA |
-| Typography | font chữ (retro/pixel), scale | TBD | Cân nhắc hiệu năng font |
-| Spacing | thang cách (4/8px...) | TBD | |
-| Radius / Border | bo góc, viền | TBD | |
-| Shadow / Effect | hiệu ứng retro | TBD | |
+> **SSOT giá trị:** [`apps/web/src/styles/global.css`](../apps/web/src/styles/global.css) (`:root`). Bảng dưới là bản chụp *provisional* — tinh chỉnh dần, **không** phải phong cách chốt. Là **nền** để các phase sau bám vào; nhất quán (không hardcode rải rác).
+
+### 2.1. Màu (Color) — kiểm tương phản trên `--color-bg` (AA ≥ 4.5:1)
+| Token | Giá trị | Tương phản / vai trò |
+|---|---|---|
+| `--color-bg` | `#f4f1e8` | nền giấy |
+| `--color-surface` | `#efe8d6` | nền phụ (khối/card) |
+| `--color-text` | `#2b2b2b` | chữ chính — ~12.6:1 (AAA) |
+| `--color-muted` | `#595959` | chữ phụ — ~6.2:1 (AA) |
+| `--color-accent` | `#7b2d26` | nhấn/link — ~8.3:1 (AAA) |
+| `--color-accent-strong` | `#5c211c` | trạng thái đậm |
+| `--color-border` | `#d9d2c0` | viền/đường kẻ |
+
+### 2.2. Typography
+| Token | Giá trị | Ghi chú |
+|---|---|---|
+| `--font-body` / `--font-heading` | `= --font-mono` | **system stack** (không web font ngoài) |
+| `--font-mono` / `--font-serif` / `--font-sans` | Courier / Georgia / system-ui | sẵn để đổi |
+| `--text-xs … --text-3xl` | `0.833 · 0.9 · 1 · 1.125 · 1.35 · 1.6 · 1.95` rem | thang ~1.2 |
+| `--leading-tight / body / relaxed` | `1.25 / 1.65 / 1.8` | |
+| `--weight-normal / bold` | `400 / 700` | |
+
+### 2.3. Spacing (thang 4px) · Container · Border
+| Token | Giá trị |
+|---|---|
+| `--space-1 … --space-16` | `0.25 · 0.5 · 0.75 · 1 · 1.5 · 2 · 3 · 4` rem |
+| `--container-max` / `--container-pad-x` | `720px` / `1.25rem` |
+| `--reading-width` | `68ch` *(áp dụng thân bài ở Phase 3)* |
+| `--border-width` / `--radius-sm` | `1px` / `2px` |
+
+> **Shadow / Effect retro:** chưa định nghĩa (chờ chốt phong cách — ngoài Phase 0).
 
 ## 3. Kho thành phần (Component Inventory)
 

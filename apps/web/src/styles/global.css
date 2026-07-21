@@ -1,0 +1,147 @@
+/* ============================================================================
+   Retro Blog — DESIGN FOUNDATION (Sprint 3 Phase 0)
+   CHỈ nền tokens + base element. KHÔNG khóa phong cách thị giác cuối cùng —
+   các giá trị dưới đây là "provisional", tinh chỉnh dần sau khi review giao
+   diện thực tế. Component redesign: các phase sau. Tài liệu: docs/07-ui-ux.md §2.
+   ============================================================================ */
+
+:root {
+  /* ---- Color — kiểm tương phản trên --color-bg (AA ≥ 4.5:1) ------------- */
+  --color-bg: #f4f1e8;            /* nền giấy */
+  --color-surface: #efe8d6;       /* nền phụ (khối/card) */
+  --color-text: #2b2b2b;          /* chữ chính  — ~12.6:1 (AAA) */
+  --color-muted: #595959;         /* chữ phụ    — ~6.2:1  (AA)  */
+  --color-accent: #7b2d26;        /* nhấn/link  — ~8.3:1  (AAA) */
+  --color-accent-strong: #5c211c;
+  --color-border: #d9d2c0;
+
+  /* ---- Typography ------------------------------------------------------- */
+  --font-mono: "Courier New", Courier, monospace;
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body: var(--font-mono);      /* provisional: giữ chất retro hiện tại */
+  --font-heading: var(--font-mono);
+
+  /* type scale — base 1rem, tỉ lệ ~1.2 */
+  --text-xs: 0.833rem;
+  --text-sm: 0.9rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.35rem;
+  --text-2xl: 1.6rem;
+  --text-3xl: 1.95rem;
+
+  --leading-tight: 1.25;
+  --leading-body: 1.65;
+  --leading-relaxed: 1.8;
+
+  --weight-normal: 400;
+  --weight-bold: 700;
+
+  /* ---- Spacing — thang 4px --------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ---- Container / width ------------------------------------------------ */
+  --container-max: 720px;         /* bề rộng trang */
+  --container-pad-x: 1.25rem;
+  --reading-width: 68ch;          /* độ rộng dòng thân bài (áp dụng ở Phase 3) */
+
+  /* ---- Border ----------------------------------------------------------- */
+  --border-width: 1px;
+  --radius-sm: 2px;
+}
+
+/* ---- Base reset & element defaults (nền — chưa redesign component) ------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-4) var(--container-pad-x) var(--space-12);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: var(--leading-body);
+  font-size: var(--text-base);
+}
+
+a {
+  color: var(--color-accent);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+h1 { font-size: var(--text-3xl); line-height: var(--leading-tight); }
+h2 { font-size: var(--text-2xl); line-height: var(--leading-tight); }
+h3 { font-size: var(--text-xl); line-height: var(--leading-tight); }
+
+/* a11y foundation: tiêu điểm bàn phím luôn thấy rõ */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- Utility classes hiện có (tokenized — GIỮ diện mạo Sprint 2) --------- */
+.site-header {
+  border-bottom: 2px dashed var(--color-accent);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-2);
+}
+.site-header a {
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+
+.meta {
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.post-list {
+  list-style: none;
+  padding: 0;
+}
+.post-card {
+  border-bottom: var(--border-width) solid var(--color-border);
+  padding: var(--space-4) 0;
+}
+.post-card h2 {
+  margin: var(--space-1) 0;
+}
+
+.post-body {
+  margin-top: var(--space-6);
+}
+
+.site-footer {
+  border-top: 2px dashed var(--color-accent);
+  margin-top: var(--space-8);
+  padding-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
