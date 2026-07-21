@@ -76,6 +76,14 @@ const CODE = [
 
 const fill = (tpl, o) => tpl.replaceAll('{c}', o.c).replaceAll('{s}', o.s).replaceAll('{y}', String(o.y));
 
+// Ảnh minh hoạ trong BODY (không phải cover): SVG "sơ đồ" gốc, nhúng data-URI
+// (không asset ngoài). Deterministic theo label. Phủ phần tử .prose img.
+function retroSvg(label) {
+  const safe = String(label).replace(/&/g, 'và').replace(/[<>]/g, '');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="180"><rect width="100%" height="100%" fill="#efe8d6"/><rect x="8" y="8" width="464" height="164" fill="none" stroke="#7b2d26" stroke-width="3" stroke-dasharray="8 6"/><text x="50%" y="50%" fill="#2b2b2b" font-family="monospace" font-size="20" text-anchor="middle" dominant-baseline="middle">${safe}</text></svg>`;
+  return 'data:image/svg+xml;base64,' + Buffer.from(svg, 'utf8').toString('base64');
+}
+
 function paragraphs(rng, ctx, n) {
   return pickSome(rng, PARA, n).map((t) => fill(t, ctx));
 }
@@ -113,6 +121,7 @@ export function produceBody(sk, rng, ctx) {
     if (sk.length === 'long' && i === 0) {
       out.push('```' + pick(rng, CODE) + '\n```');
       out.push(specTable(subjects));
+      out.push(`![Sơ đồ minh hoạ ${subj.s}](${retroSvg(subj.s)})`);
     }
   }
   out.push('---');

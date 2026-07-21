@@ -27,6 +27,8 @@ INT 0x21
 | chuột bi | 1980 |
 | máy in kim | 1970 |
 
+![Sơ đồ minh hoạ bàn phím cơ IBM Model M](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0ODAiIGhlaWdodD0iMTgwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWZlOGQ2Ii8+PHJlY3QgeD0iOCIgeT0iOCIgd2lkdGg9IjQ2NCIgaGVpZ2h0PSIxNjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmQyNiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI4IDYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZmlsbD0iIzJiMmIyYiIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+YsOgbiBwaMOtbSBjxqEgSUJNIE1vZGVsIE08L3RleHQ+PC9zdmc+)
+
 ## Trải nghiệm sử dụng
 
 Ra mắt khoảng năm 1985, bàn phím cơ IBM Model M phản ánh rõ những ràng buộc kỹ thuật của thời đại: tài nguyên eo hẹp buộc kỹ sư phải tối ưu từng chi tiết.

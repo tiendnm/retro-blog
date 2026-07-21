@@ -27,6 +27,8 @@ Vài điểm đáng chú ý:
 | card VGA | 1987 |
 | chip Voodoo của 3dfx | 1996 |
 
+![Sơ đồ minh hoạ card VGA](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0ODAiIGhlaWdodD0iMTgwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZWZlOGQ2Ii8+PHJlY3QgeD0iOCIgeT0iOCIgd2lkdGg9IjQ2NCIgaGVpZ2h0PSIxNjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdiMmQyNiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtZGFzaGFycmF5PSI4IDYiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZmlsbD0iIzJiMmIyYiIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSI+Y2FyZCBWR0E8L3RleHQ+PC9zdmc+)
+
 ## Di sản để lại
 
 Người dùng ngày ấy quen với việc tự tay cấu hình, và card VGA là một ví dụ điển hình cho tinh thần vọc vạch đó.
