@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "set": "edge",
+  "seed": 42,
+  "contentProvider": "fixed",
+  "coverProvider": "none",
+  "authors": [
+    {
+      "key": "edge-author",
+      "name": "Ban Kiểm Thử Biên",
+      "slug": "edge-author",
+      "bio": "Tài khoản fixture cho các ca biên (edge cases)."
+    }
+  ],
+  "categories": [
+    {
+      "key": "edge-cat",
+      "name": "Ca Biên",
+      "slug": "edge-cat",
+      "description": "Nhóm bài kiểm thử ca biên giao diện."
+    }
+  ],
+  "covers": [],
+  "posts": [
+    {
+      "key": "edge-01",
+      "slug": "edge-long-title",
+      "title": "Bài viết có tiêu đề cực kỳ dài để kiểm thử khả năng ngắt dòng của thẻ tiêu đề trên cả card danh sách lẫn trang chi tiết khi văn bản vượt quá nhiều dòng liên tục mà không xuống hàng tự nhiên",
+      "excerpt": "Ca biên: title rất dài.",
+      "bodyPath": "body/edge-long-title.md",
+      "authorKey": "edge-author",
+      "categoryKey": "edge-cat",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-05-01T09:00:00.000Z",
+      "set": "edge",
+      "edgeType": "title rất dài"
+    },
+    {
+      "key": "edge-02",
+      "slug": "edge-no-category",
+      "title": "Bài không thuộc chuyên mục nào",
+      "excerpt": "Ca biên: không category.",
+      "bodyPath": "body/edge-no-category.md",
+      "authorKey": "edge-author",
+      "categoryKey": null,
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-04-29T09:00:00.000Z",
+      "set": "edge",
+      "edgeType": "không category"
+    },
+    {
+      "key": "edge-03",
+      "slug": "edge-deep-nested-list",
+      "title": "Danh sách lồng nhau rất sâu",
+      "excerpt": "Ca biên: nested list sâu.",
+      "bodyPath": "body/edge-deep-nested-list.md",
+      "authorKey": "edge-author",
+      "categoryKey": "edge-cat",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-04-27T09:00:00.000Z",
+      "set": "edge",
+      "edgeType": "nested list sâu"
+    },
+    {
+      "key": "edge-04",
+      "slug": "edge-many-headings",
+      "title": "Bài có rất nhiều heading",
+      "excerpt": "Ca biên: nhiều heading.",
+      "bodyPath": "body/edge-many-headings.md",
+      "authorKey": "edge-author",
+      "categoryKey": "edge-cat",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-04-25T09:00:00.000Z",
+      "set": "edge",
+      "edgeType": "nhiều heading"
+    },
+    {
+      "key": "edge-05",
+      "slug": "edge-long-slug-nay-la-mot-duong-dan-rat-dai-de-kiem-thu-hien-thi-va-tran-ngang-tren-thanh-dia-chi-va-trong-cac-lien-ket",
+      "title": "Bài có slug rất dài",
+      "excerpt": "Ca biên: slug dài.",
+      "bodyPath": "body/edge-long-slug-nay-la-mot-duong-dan-rat-dai-de-kiem-thu-hien-thi-va-tran-ngang-tren-thanh-dia-chi-va-trong-cac-lien-ket.md",
+      "authorKey": "edge-author",
+      "categoryKey": "edge-cat",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-04-23T09:00:00.000Z",
+      "set": "edge",
+      "edgeType": "slug dài"
+    },
+    {
+      "key": "edge-06",
+      "slug": "edge-empty-excerpt",
+      "title": "Bài không có tóm tắt",
+      "excerpt": "",
+      "bodyPath": "body/edge-empty-excerpt.md",
+      "authorKey": "edge-author",
+      "categoryKey": "edge-cat",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-04-21T09:00:00.000Z",
+      "set": "edge",
+      "edgeType": "excerpt rỗng"
+    },
+    {
+      "key": "edge-07",
+      "slug": "edge-unicode",
+      "title": "Ký tự đặc biệt 🖥️ 日本語 Ω≈ç√∫ 中文 ①②③",
+      "excerpt": "Ca biên: unicode nặng.",
+      "bodyPath": "body/edge-unicode.md",
+      "authorKey": "edge-author",
+      "categoryKey": "edge-cat",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-04-19T09:00:00.000Z",
+      "set": "edge",
+      "edgeType": "unicode nặng"
+    },
+    {
+      "key": "edge-08",
+      "slug": "edge-long-word",
+      "title": "Bài có một từ siêu dài",
+      "excerpt": "Ca biên: một-từ-siêu-dài.",
+      "bodyPath": "body/edge-long-word.md",
+      "authorKey": "edge-author",
+      "categoryKey": "edge-cat",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-04-17T09:00:00.000Z",
+      "set": "edge",
+      "edgeType": "một-từ-siêu-dài"
+    },
+    {
+      "key": "edge-09",
+      "slug": "edge-image-only",
+      "title": "Bài chỉ có ảnh",
+      "excerpt": "Ca biên: đoạn chỉ ảnh.",
+      "bodyPath": "body/edge-image-only.md",
+      "authorKey": "edge-author",
+      "categoryKey": "edge-cat",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-04-15T09:00:00.000Z",
+      "set": "edge",
+      "edgeType": "đoạn chỉ ảnh"
+    },
+    {
+      "key": "edge-10",
+      "slug": "edge-many-links",
+      "title": "Bài có rất nhiều liên kết",
+      "excerpt": "Ca biên: nhiều link.",
+      "bodyPath": "body/edge-many-links.md",
+      "authorKey": "edge-author",
+      "categoryKey": "edge-cat",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-04-13T09:00:00.000Z",
+      "set": "edge",
+      "edgeType": "nhiều link"
+    }
+  ]
+}

@@ -9,6 +9,8 @@ import { makeRng } from './rng.mjs';
 import { slugify, pad2 } from './model.mjs';
 import { CATEGORIES, AUTHORS } from './taxonomy.mjs';
 import { normalCount } from './profiles.mjs';
+import * as edgeSet from './sets/edge.mjs';
+import * as stressSet from './sets/stress.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CONTENT_DIR = resolve(HERE, '../content');
@@ -78,10 +80,32 @@ function buildSkeleton(count) {
   return posts;
 }
 
+// Bộ CỐ ĐỊNH (edge/stress) — nội dung hand-crafted, author/category riêng, cover=none.
+async function genFixed(setName, args) {
+  const mod = setName === 'edge' ? edgeSet : stressSet;
+  const { author, category, posts, bodies } = mod.build();
+  const outDir = resolve(CONTENT_DIR, setName);
+  const bodyDir = resolve(outDir, 'body');
+  if (existsSync(outDir)) rmSync(outDir, { recursive: true, force: true });
+  mkdirSync(bodyDir, { recursive: true });
+  for (const [slug, md] of Object.entries(bodies)) writeFileSync(resolve(bodyDir, `${slug}.md`), md, 'utf8');
+  const manifest = {
+    version: MANIFEST_VERSION, set: setName, seed: args.seed,
+    contentProvider: 'fixed', coverProvider: 'none',
+    authors: [author], categories: [category], covers: [], posts,
+  };
+  writeFileSync(resolve(outDir, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n', 'utf8');
+  console.log(`Generated set="${setName}": ${posts.length} bài (author=${author.slug}, category=${category.slug}), cover=none.`);
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
+  if (args.set === 'edge' || args.set === 'stress') {
+    await genFixed(args.set, args);
+    return;
+  }
   if (args.set !== 'normal') {
-    console.error(`Set "${args.set}" chưa hiện thực (edge/stress: Phase 3).`);
+    console.error(`Set "${args.set}" không hỗ trợ (chỉ normal/edge/stress).`);
     process.exit(1);
   }
   const count = normalCount(args.profile);

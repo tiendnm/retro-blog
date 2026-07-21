@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "set": "stress",
+  "seed": 42,
+  "contentProvider": "fixed",
+  "coverProvider": "none",
+  "authors": [
+    {
+      "key": "stress-author",
+      "name": "Ban Ép Tải",
+      "slug": "stress-author",
+      "bio": "Tài khoản fixture cho các ca ép tải (stress)."
+    }
+  ],
+  "categories": [
+    {
+      "key": "stress-cat",
+      "name": "Ép Tải",
+      "slug": "stress-cat",
+      "description": "Nhóm bài kiểm thử giới hạn render/hiệu năng."
+    }
+  ],
+  "covers": [],
+  "posts": [
+    {
+      "key": "stress-01",
+      "slug": "stress-long-markdown",
+      "title": "Bài markdown cực dài",
+      "excerpt": "Ép tải: markdown rất dài.",
+      "bodyPath": "body/stress-long-markdown.md",
+      "authorKey": "stress-author",
+      "categoryKey": "stress-cat",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-04-01T09:00:00.000Z",
+      "set": "stress",
+      "edgeType": "markdown rất dài"
+    },
+    {
+      "key": "stress-02",
+      "slug": "stress-wide-table",
+      "title": "Bảng rất rộng",
+      "excerpt": "Ép tải: bảng rất rộng.",
+      "bodyPath": "body/stress-wide-table.md",
+      "authorKey": "stress-author",
+      "categoryKey": "stress-cat",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-03-30T09:00:00.000Z",
+      "set": "stress",
+      "edgeType": "bảng rất rộng"
+    },
+    {
+      "key": "stress-03",
+      "slug": "stress-huge-code",
+      "title": "Code block rất lớn",
+      "excerpt": "Ép tải: code block rất lớn.",
+      "bodyPath": "body/stress-huge-code.md",
+      "authorKey": "stress-author",
+      "categoryKey": "stress-cat",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-03-28T09:00:00.000Z",
+      "set": "stress",
+      "edgeType": "code block rất lớn"
+    }
+  ]
+}

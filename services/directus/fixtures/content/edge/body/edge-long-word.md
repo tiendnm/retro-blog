@@ -1,0 +1,5 @@
+Một từ không khoảng trắng rất dài để kiểm tra ngắt dòng/tràn ngang:
+
+phầncứngmáytínhcổđiểnsiêucấpvôcùngdàikhôngcókhoảngtrắngđểkiểmthửngắtdòngvàtrànngangphầncứngmáytínhcổđiểnsiêucấpvôcùngdàikhôngcókhoảngtrắngđểkiểmthửngắtdòngvàtrànngang
+
+Đoạn sau để đối chiếu.
