@@ -2,7 +2,8 @@
 import { defineConfig } from 'astro/config';
 
 // Dev server cấu hình cho Docker: bind 0.0.0.0 để cổng container map ra host.
-// (Sprint 1 — chỉ hạ tầng/plumbing; chưa integration/adapter feature.)
+// Render: SSG static-first (ADR-0006) — output 'static' mặc định, route động
+// dùng getStaticPaths, KHÔNG cần adapter. Dev (`astro dev`) render on-demand.
 export default defineConfig({
   server: {
     host: true,

@@ -8,7 +8,8 @@
 # - Admin  : Administrator role sẵn có (full).
 # - Editor : policy app_access + CRUD posts/authors/categories/directus_files;
 #            KHÔNG quản trị users/roles/policies.
-# - Public : read-only; posts lọc status=published AND published_at <= $NOW.
+# - Public : read-only; posts lọc status=published AND published_at <= $NOW;
+#            field allowlist (KHÔNG '*') → không tự lộ field nội bộ tương lai.
 # ============================================================================
 set -uo pipefail
 BASE="${DIRECTUS_URL:-http://localhost:8055}"
@@ -35,10 +36,15 @@ echo "public policy: $PUB"
 HAS_PUB=$(api GET "/permissions?filter[policy][_eq]=$PUB&filter[collection][_eq]=posts&aggregate[count]=id" | val count id)
 if [ "${HAS_PUB:-0}" = "0" ] || [ -z "$HAS_PUB" ]; then
   echo "-> tạo Public read permissions"
-  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"posts\",\"action\":\"read\",\"fields\":[\"*\"],\"permissions\":{\"_and\":[{\"status\":{\"_eq\":\"published\"}},{\"published_at\":{\"_lte\":\"\$NOW\"}}]}}" >/dev/null
-  for c in authors categories directus_files; do
-    api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"$c\",\"action\":\"read\",\"fields\":[\"*\"],\"permissions\":{}}" >/dev/null
-  done
+  # FIELD ALLOWLIST — CHỈ field cần cho hợp đồng 03d. KHÔNG dùng '*': field nội bộ
+  # thêm về sau sẽ KHÔNG tự động lộ ra Public API (Sprint 2 Phase 3 — bảo mật).
+  # posts: rule status=published AND published_at<=$NOW + allowlist (không có 'status').
+  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"posts\",\"action\":\"read\",\"fields\":[\"id\",\"title\",\"slug\",\"excerpt\",\"body\",\"published_at\",\"author\",\"category\",\"cover\"],\"permissions\":{\"_and\":[{\"status\":{\"_eq\":\"published\"}},{\"published_at\":{\"_lte\":\"\$NOW\"}}]}}" >/dev/null
+  # authors/categories: dữ liệu tham chiếu để render (không lộ bio/description/parent).
+  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"authors\",\"action\":\"read\",\"fields\":[\"id\",\"name\",\"slug\",\"avatar\"],\"permissions\":{}}" >/dev/null
+  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"categories\",\"action\":\"read\",\"fields\":[\"id\",\"name\",\"slug\"],\"permissions\":{}}" >/dev/null
+  # directus_files: chỉ id (dựng URL /assets/<id>) + alt (a11y).
+  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"directus_files\",\"action\":\"read\",\"fields\":[\"id\",\"alt\"],\"permissions\":{}}" >/dev/null
   echo "   done public"
 else
   echo "-> Public permissions đã có, bỏ qua"

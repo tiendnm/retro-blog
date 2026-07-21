@@ -1,0 +1,68 @@
+---
+// Layout tối thiểu — HTML ngữ nghĩa + a11y baseline (lang, heading, alt do page lo).
+// Phong cách retro CƠ BẢN (không polish — theo scope Sprint 2). Không gọi Directus.
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <style is:global>
+      :root {
+        --paper: #f4f1e8;
+        --ink: #2b2b2b;
+        --accent: #7b2d26;
+        --muted: #6b6b6b;
+      }
+      * { box-sizing: border-box; }
+      body {
+        font-family: "Courier New", Courier, monospace;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 1rem 1.25rem 3rem;
+        background: var(--paper);
+        color: var(--ink);
+        line-height: 1.65;
+      }
+      a { color: var(--accent); }
+      img { max-width: 100%; height: auto; }
+      .site-header {
+        border-bottom: 2px dashed var(--accent);
+        margin-bottom: 1.75rem;
+        padding-bottom: 0.5rem;
+      }
+      .site-header a { text-decoration: none; letter-spacing: 1px; }
+      .meta { color: var(--muted); font-size: 0.9rem; }
+      .post-list { list-style: none; padding: 0; }
+      .post-card { border-bottom: 1px solid #d9d2c0; padding: 1rem 0; }
+      .post-card h2 { margin: 0.25rem 0; }
+      .post-body { margin-top: 1.5rem; }
+      .site-footer {
+        border-top: 2px dashed var(--accent);
+        margin-top: 2.5rem;
+        padding-top: 0.75rem;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="/"><strong>▚ RETRO BLOG ▞</strong></a>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <p>Retro Blog — vertical slice Sprint 2. Nội dung do Directus quản trị.</p>
+    </footer>
+  </body>
+</html>

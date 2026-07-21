@@ -62,3 +62,8 @@ Tạo ADR khi quyết định: khó đảo ngược, ảnh hưởng nhiều ph�
 | 2026-07-21 | **[S2-P2] Editor = `app_access` + CRUD 4 content collection**; **không** `admin_access`, không quản trị user/role/policy | Least privilege; tách biên tập khỏi quản trị hệ thống | Sprint 2 |
 | 2026-07-21 | **[S2-P2] curl phải dùng `-g/--globoff`** trong script (fix bug: `[ ]` của `filter[...]` bị curl hiểu là URL-globbing → mọi idempotency check trả rỗng, tạo trùng role) | Đảm bảo script chạy đúng & idempotent trên Git Bash/Windows | Sprint 2 |
 | 2026-07-21 | **[S2-P2] Public đọc toàn bộ `authors`/`categories`/`directus_files`** (không lọc) | Dữ liệu tham chiếu để render bài, không nhạy cảm; đơn giản cho MVP | Sprint 2 |
+| 2026-07-21 | **[S2-P3] Thin fetch client** `apps/web/src/lib/directus.ts` là tầng DUY NHẤT gọi Directus; page/component chỉ nhận DTO ([03d](./03d-api-contract.md)), không chạm JSON Directus | Decoupling (P3): đổi CMS chỉ sửa client; UI ổn định | Tech Lead |
+| 2026-07-21 | **[S2-P3] Client fetch vai Public (KHÔNG token)** → permission enforce published + field allowlist; không nhúng secret | Bảo mật ở tầng permission, không ở client; least privilege | Sprint 2 |
+| 2026-07-21 | **[S2-P3] Siết Public field allowlist** (bỏ `fields:['*']`) — field nội bộ tương lai không tự lộ ra Public API | Yêu cầu bảo mật Phase 3; defense-in-depth | Tech Lead |
+| 2026-07-21 | **[S2-P3] Render Markdown body bằng `marked` + `set:html`**; sanitize HTML để hardening sau | Editor là nguồn tin cậy (MVP, không nhận input công khai); `marked` gọn, đủ cho blog | Sprint 2 |
+| 2026-07-21 | **[S2-P3] Render = SSG static** (`output` mặc định) + `getStaticPaths`, KHÔNG adapter | Đúng ADR-0006; blog tĩnh, không cần server runtime | Sprint 2 |

@@ -1,0 +1,27 @@
+---
+// Trang CHUYÊN MỤC — liệt kê bài đã xuất bản trong 1 category. Route tĩnh (SSG).
+// Chỉ dùng thin client → DTO; KHÔNG gọi Directus trực tiếp.
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getAllCategorySlugs, getCategoryBySlug, listPostsByCategory } from '../../lib/directus';
+
+export async function getStaticPaths() {
+  const slugs = await getAllCategorySlugs();
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const category = await getCategoryBySlug(slug!);
+if (!category) throw new Error(`Không tìm thấy chuyên mục: ${slug}`);
+
+const { items } = await listPostsByCategory(slug!, { pageSize: 50 });
+---
+
+<Base title={`${category.name} — Retro Blog`}>
+  <p class="meta"><a href="/">← Trang chủ</a></p>
+  <h1>Chuyên mục: {category.name}</h1>
+  {items.length === 0 && <p>Chưa có bài viết trong chuyên mục này.</p>}
+  <ul class="post-list">
+    {items.map((post) => <PostCard post={post} />)}
+  </ul>
+</Base>

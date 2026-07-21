@@ -1,0 +1,26 @@
+---
+// Component hiển thị 1 mục bài viết. CHỈ nhận DTO `PostSummary` — KHÔNG gọi
+// Directus, KHÔNG biết hình dạng dữ liệu gốc (Req: component chỉ làm việc với DTO).
+import type { PostSummary } from '../lib/types';
+import { formatDate } from '../lib/format';
+
+interface Props {
+  post: PostSummary;
+}
+const { post } = Astro.props;
+---
+
+<li class="post-card">
+  {
+    post.cover && (
+      <a href={`/posts/${post.slug}`}>
+        <img src={post.cover.url} alt={post.cover.alt} width="200" loading="lazy" />
+      </a>
+    )
+  }
+  <h2><a href={`/posts/${post.slug}`}>{post.title}</a></h2>
+  {post.excerpt && <p>{post.excerpt}</p>}
+  <p class="meta">
+    Bởi {post.author.name}{post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
+  </p>
+</li>

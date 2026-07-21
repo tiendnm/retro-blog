@@ -1,0 +1,42 @@
+---
+// Trang CHI TIẾT bài viết. Route tĩnh dựng từ danh sách slug đã publish (SSG,
+// ADR-0006). Chỉ dùng thin client → DTO PostDetail; KHÔNG gọi Directus trực tiếp.
+import Base from '../../layouts/Base.astro';
+import { formatDate } from '../../lib/format';
+import { getAllPublishedPostSlugs, getPostBySlug } from '../../lib/directus';
+import { marked } from 'marked';
+
+export async function getStaticPaths() {
+  const slugs = await getAllPublishedPostSlugs();
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const post = await getPostBySlug(slug!);
+// getStaticPaths chỉ sinh slug hợp lệ ⇒ nhánh này chỉ là chốt an toàn khi build.
+if (!post) throw new Error(`Không tìm thấy bài đã xuất bản: ${slug}`);
+
+// body là markdown (03c: input-rich-text-md). Nội dung do Editor tin cậy nhập
+// (MVP, không nhận input công khai). Sanitize HTML: hardening tương lai (12-security §8).
+const bodyHtml = post.body ? await marked.parse(post.body) : '';
+---
+
+<Base title={`${post.title} — Retro Blog`} description={post.excerpt ?? undefined}>
+  <article>
+    <h1>{post.title}</h1>
+    <p class="meta">
+      Bởi {post.author.name}
+      {
+        post.category && (
+          <>
+            {' · '}
+            <a href={`/category/${post.category.slug}`}>{post.category.name}</a>
+          </>
+        )
+      }
+      {post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
+    </p>
+    {post.cover && <img src={post.cover.url} alt={post.cover.alt} />}
+    <div class="post-body" set:html={bodyHtml}></div>
+  </article>
+</Base>

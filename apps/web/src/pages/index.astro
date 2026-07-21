@@ -1,42 +1,17 @@
 ---
-// ⚠️ SPRINT 1 — PLUMBING CHECK (Phase 3). KHÔNG phải feature/content model.
-// Chứng minh chuỗi: Browser → Astro (container) → Directus API → PostgreSQL.
-// Fetch server-side tới Directus qua network nội bộ (tên service 'directus').
-const directusUrl = process.env.DIRECTUS_INTERNAL_URL ?? 'http://directus:8055';
+// Trang DANH SÁCH bài viết (thay trang plumbing Sprint 1).
+// Chỉ dùng thin client → nhận DTO PostSummary; KHÔNG gọi Directus trực tiếp.
+import Base from '../layouts/Base.astro';
+import PostCard from '../components/PostCard.astro';
+import { listPublishedPosts } from '../lib/directus';
 
-let directusStatus = 'unknown';
-let ok = false;
-let errorMessage: string | null = null;
-try {
-  const res = await fetch(`${directusUrl}/server/health`);
-  const data = (await res.json()) as { status?: string };
-  directusStatus = data.status ?? 'unknown';
-  ok = res.ok && directusStatus === 'ok';
-} catch (e) {
-  errorMessage = e instanceof Error ? e.message : String(e);
-}
+const { items } = await listPublishedPosts({ pageSize: 50 });
 ---
 
-<!doctype html>
-<html lang="vi">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Retro Blog — plumbing check</title>
-  </head>
-  <body>
-    <main>
-      <h1>Retro Blog — Sprint 1 plumbing check</h1>
-      <p>Chuỗi kết nối: Browser → Astro (container) → Directus API → PostgreSQL</p>
-      <ul>
-        <li>Astro dev server: <strong>OK</strong></li>
-        <li>
-          Directus /server/health:
-          <strong>{errorMessage ? `ERROR: ${errorMessage}` : directusStatus}</strong>
-        </li>
-        <li>Plumbing: <strong>{ok ? 'PASS' : 'FAIL'}</strong></li>
-      </ul>
-      <p><small>Trang kiểm tra hạ tầng — không phải nội dung MVP. Không có content model production.</small></p>
-    </main>
-  </body>
-</html>
+<Base title="Retro Blog — Bài viết mới nhất" description="Blog headless phong cách retro.">
+  <h1>Bài viết mới nhất</h1>
+  {items.length === 0 && <p>Chưa có bài viết nào được xuất bản.</p>}
+  <ul class="post-list">
+    {items.map((post) => <PostCard post={post} />)}
+  </ul>
+</Base>

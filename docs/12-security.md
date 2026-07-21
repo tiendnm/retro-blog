@@ -47,7 +47,9 @@
 
 ## 8. Bảo mật tầng ứng dụng
 
-- TODO _(chống XSS khi render richtext từ CMS, CSRF, security headers, rate limiting)_.
+- **Render Markdown từ CMS (`body`):** Sprint 2 dùng `marked` + `set:html` để hiển thị bài. Nội dung do **Editor tin cậy** nhập (không có input công khai — không comment/không user-generated content ở MVP), nên rủi ro XSS thấp. **Hardening tương lai (bắt buộc trước khi cho tác giả không tin cậy):** sanitize HTML đầu ra (vd allowlist thẻ/thuộc tính) — [10-decisions §5 `[S2-P3]`](./10-decisions.md).
+- **Không tự lộ field nội bộ:** Public API dùng **field allowlist** (không `*`) — field thêm về sau không tự ra Public ([05-cms §2](./05-cms.md), [06-api §1](./06-api.md)).
+- TODO _(CSRF, security headers, rate limiting)_.
 
 ## 9. Logging & Audit
 

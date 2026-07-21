@@ -53,15 +53,16 @@
 
 | Collection | **Public** (read-only) | **Editor** (`app_access`) | **Admin** (`admin_access`) |
 |---|---|---|---|
-| `posts` | read — **lọc `status=published` AND `published_at ≤ $NOW`** | create · read · update · delete | full |
-| `authors` | read (tất cả) | create · read · update · delete | full |
-| `categories` | read (tất cả) | create · read · update · delete | full |
-| `directus_files` | read (tất cả) | create · read · update · delete | full |
+| `posts` | read — **lọc `status=published` AND `published_at ≤ $NOW`**; field: `id,title,slug,excerpt,body,published_at,author,category,cover` | create · read · update · delete | full |
+| `authors` | read (mọi hàng); field: `id,name,slug,avatar` | create · read · update · delete | full |
+| `categories` | read (mọi hàng); field: `id,name,slug` | create · read · update · delete | full |
+| `directus_files` | read (mọi hàng); field: `id,alt` *(đủ cho `/assets/<id>` + a11y)* | create · read · update · delete | full |
 | `directus_users`, `directus_roles`, `directus_policies` | — | — *(chỉ app-baseline: xem hồ sơ của chính mình; **không** tạo/sửa/xoá)* | full |
 
 - **`$NOW`** = biến thời gian động của Directus → thực thi được yêu cầu "chỉ nội dung đã publish **và đã tới giờ**" (lịch phát hành cơ bản) ngay trong rule, không cần job nền.
+- **Field allowlist (không `*`):** Public chỉ đọc đúng field cần cho hợp đồng [03d](./03d-api-contract.md). Field nội bộ thêm về sau (vd `internal_notes`, `status`) **không tự động lộ** — xin field ngoài allowlist → Directus trả `FORBIDDEN`. Đây là ranh giới chống-lộ (Sprint 2 Phase 3).
 - **Editor không quản trị user/role/policy** (không `admin_access`); chỉ thao tác nội dung. **Public không có** create/update/delete ở bất kỳ collection nào; không frontend auth, không public CMS users.
-- `authors`/`categories`/`directus_files` cho Public đọc toàn bộ vì là **dữ liệu tham chiếu** cần để render bài (tên tác giả, danh mục, ảnh cover) — không chứa dữ liệu nhạy cảm.
+- `authors`/`categories`/`directus_files` cho Public đọc **mọi hàng** (dữ liệu tham chiếu để render bài) nhưng **giới hạn field** như trên — không lộ `bio`/`description`/`parent`…
 
 ### 2.2. Tái lập (reproducible) — **không thao tác thủ công**
 
