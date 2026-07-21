@@ -57,11 +57,14 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
    ```
    > Lần đầu mất vài phút (pull image + container web cài Astro). Chờ tới khi trạng thái là `healthy`.
 
-4. **Tạo content model (lần đầu / fresh clone)**
+4. **Tạo content model + phân quyền (lần đầu / fresh clone)**
    ```bash
-   pnpm schema:apply     # áp dụng schema snapshot vào Directus (Sprint 2+)
+   pnpm schema:apply         # áp dụng schema snapshot (collections/fields/relations)
+   pnpm permissions:apply    # cấu hình Roles/Policies/Permissions (Public/Editor)
    ```
-   > Chỉ cần khi Directus còn trống (volume mới). Snapshot: `services/directus/snapshots/schema.yaml`.
+   > Chỉ cần khi Directus còn trống (volume mới). Cả hai **idempotent** — chạy lại an toàn.
+   > Artifacts: `services/directus/snapshots/schema.yaml` · `services/directus/apply-permissions.sh`.
+   > `permissions:apply` cần `ADMIN_EMAIL`/`ADMIN_PASSWORD` trong `.env` (dùng Admin API).
 
 5. **Truy cập**
 

@@ -24,7 +24,10 @@
 
 ## 3. Xác thực & Phân quyền
 
-- TODO _(vai trò Directus [05-cms §2](./05-cms.md), quyền public API tối thiểu, 2FA cho admin)_.
+- **Vai trò Directus** (chi tiết & ma trận: [05-cms §2](./05-cms.md)): **Admin** (`admin_access`, full) · **Editor** (`app_access`, chỉ CRUD nội dung — *không* quản trị user/role/policy) · **Public** (read-only).
+- **Public API tối thiểu (least privilege):** Public chỉ `read`; `posts` bị chặn bằng rule **`status=published` AND `published_at ≤ $NOW`** → bản nháp và bài hẹn giờ tương lai **không** lộ qua API. Đã kiểm thử Phase 2: draft/future → `403`, published → `200`.
+- **Reproducible, không thủ công:** phân quyền nằm ở [`services/directus/apply-permissions.sh`](../services/directus/apply-permissions.sh) (`pnpm permissions:apply`) — không dựa vào thao tác UI. Đây là ranh giới bảo mật cần review khi thay đổi.
+- **Không frontend auth, không public CMS users** (MVP). 2FA cho tài khoản admin: khuyến nghị khi lên production (TODO trước phát hành).
 
 ## 4. Quản lý Secrets
 

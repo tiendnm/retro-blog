@@ -45,14 +45,42 @@
 
 > Mọi collection dùng khoá chính `id` kiểu **uuid** (auto-generate).
 
-## 2. Phân quyền (Roles & Permissions) — **Phase 2**
+## 2. Phân quyền (Roles & Permissions)
 
-> Sẽ hiện thực ở Sprint 2 Phase 2. Dự kiến: **Admin** (quản trị CMS), **Editor** (tạo/sửa/xuất bản posts/authors/categories/files; không quản lý user/role), **Public** (read-only, **chỉ `status=published`**). Không frontend auth, không public CMS users. Chi tiết: [12-security](./12-security.md).
+> Directus 11 dùng mô hình **role → policy → permissions**. Public là *policy mặc định* (`$t:public_label`) gắn với access-row `role=null, user=null`; Admin/Editor là role gắn policy tương ứng.
 
-## 3. Workflow biên tập — **Phase 2**
+### 2.1. Ma trận phân quyền
 
-- Field `status` đã tạo (enum `draft`/`published`, mặc định `draft`) — Phase 1.
-- Luật chuyển `draft → published` (+ `published_at`) và ai được phép: hiện thực ở Phase 2 theo [03b §4](./03b-domain-model.md). In-review/scheduled ngoài Sprint 2.
+| Collection | **Public** (read-only) | **Editor** (`app_access`) | **Admin** (`admin_access`) |
+|---|---|---|---|
+| `posts` | read — **lọc `status=published` AND `published_at ≤ $NOW`** | create · read · update · delete | full |
+| `authors` | read (tất cả) | create · read · update · delete | full |
+| `categories` | read (tất cả) | create · read · update · delete | full |
+| `directus_files` | read (tất cả) | create · read · update · delete | full |
+| `directus_users`, `directus_roles`, `directus_policies` | — | — *(chỉ app-baseline: xem hồ sơ của chính mình; **không** tạo/sửa/xoá)* | full |
+
+- **`$NOW`** = biến thời gian động của Directus → thực thi được yêu cầu "chỉ nội dung đã publish **và đã tới giờ**" (lịch phát hành cơ bản) ngay trong rule, không cần job nền.
+- **Editor không quản trị user/role/policy** (không `admin_access`); chỉ thao tác nội dung. **Public không có** create/update/delete ở bất kỳ collection nào; không frontend auth, không public CMS users.
+- `authors`/`categories`/`directus_files` cho Public đọc toàn bộ vì là **dữ liệu tham chiếu** cần để render bài (tên tác giả, danh mục, ảnh cover) — không chứa dữ liệu nhạy cảm.
+
+### 2.2. Tái lập (reproducible) — **không thao tác thủ công**
+
+> ⚠️ Directus schema snapshot **KHÔNG** bắt roles/policies/permissions. Vì vậy phân quyền được version-control ở **script tái lập**: [`services/directus/apply-permissions.sh`](../services/directus/apply-permissions.sh).
+
+- Áp dụng: `pnpm permissions:apply` (sau khi Directus healthy & `pnpm schema:apply`). Script **idempotent** (bỏ qua phần đã cấu hình), dùng Admin API bằng `ADMIN_EMAIL`/`ADMIN_PASSWORD` từ `.env`.
+- Kết hợp: `schema.yaml` (collections/fields/relations) **+** `apply-permissions.sh` (roles/policies/permissions) = tái lập đầy đủ CMS trên môi trường trống. Chi tiết bảo mật: [12-security §3](./12-security.md).
+
+## 3. Workflow biên tập (draft → published)
+
+Theo máy trạng thái [03b §4](./03b-domain-model.md); field `status` (enum `draft`/`published`, mặc định `draft`) tạo ở Phase 1.
+
+1. Editor **tạo bài** → mặc định `status=draft`, `published_at` trống → **Public không thấy**.
+2. Editor **xuất bản**: đặt `status=published` **và** `published_at` = thời điểm phát hành.
+   - `published_at ≤ hiện tại` → Public **thấy** ngay.
+   - `published_at` ở **tương lai** → Public **chưa thấy** cho tới khi tới giờ (lịch phát hành cơ bản, do rule `$NOW` đảm nhiệm — SSG cần rebuild để phản ánh, xem [ADR-0006](./adr/0006-render-strategy.md)).
+3. Editor **gỡ công khai**: chuyển `published → draft` → Public không còn thấy.
+
+> **Ngoài Sprint 2:** trạng thái `in-review`, scheduled-publish nâng cao (tự rebuild đúng giờ), phê duyệt nhiều cấp.
 
 ## 4. Preview bản nháp
 
