@@ -1,0 +1,84 @@
+# Retro Blog — local infrastructure (Sprint 1, Phase 2)
+# Nguyên tắc: image pin cứng (không 'latest'), env từ .env (không commit secret),
+# named volume cho dữ liệu bền, healthcheck, network nội bộ. Ưu tiên đơn giản & self-host.
+name: retro-blog
+
+services:
+  # ─── Content Store (ADR-0004) ───
+  postgres:
+    image: postgres:16.8-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - retro-net
+    # KHÔNG expose ra host: chỉ Directus truy cập qua network nội bộ (self-host an toàn).
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Headless Content Service (ADR-0003) ───
+  directus:
+    image: directus/directus:11.3.5
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      KEY: ${KEY}
+      SECRET: ${SECRET}
+      DB_CLIENT: ${DB_CLIENT}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      PUBLIC_URL: ${PUBLIC_URL}
+    volumes:
+      - directus_uploads:/directus/uploads
+    ports:
+      - "${DIRECTUS_PORT}:8055"
+    networks:
+      - retro-net
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8055/server/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 40s
+
+  # ─── Presentation / Site (ADR-0002) — Astro trong container Node 22 ───
+  # Gated sau profile 'app': app apps/web được scaffold ở Phase 3, khi đó:
+  #   docker compose --profile app up
+  web:
+    image: node:22.12.0-alpine
+    profiles: ["app"]
+    working_dir: /app
+    depends_on:
+      directus:
+        condition: service_healthy
+    environment:
+      PUBLIC_DIRECTUS_URL: ${PUBLIC_DIRECTUS_URL}
+    volumes:
+      - ./apps/web:/app
+    ports:
+      - "${WEB_PORT}:4321"
+    networks:
+      - retro-net
+    command: sh -c "corepack enable && pnpm install && pnpm dev --host 0.0.0.0"
+
+volumes:
+  pgdata:
+  directus_uploads:
+
+networks:
+  retro-net:
+    driver: bridge

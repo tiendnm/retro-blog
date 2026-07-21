@@ -20,8 +20,8 @@
 | Vai trò / Port ([03](./03-architecture.md)) | Công nghệ | Phiên bản | Trạng thái | ADR | Principle chính |
 |---|---|---|---|---|---|
 | Presentation / Site (Site Generator) | Astro | 5.x | **Accepted** | [0002](./adr/0002-use-astro-site-generator.md) | P1, P3, P5 |
-| Headless Content Service (CMS) | Directus | 11.x (image) | **Accepted** | [0003](./adr/0003-use-directus-headless-cms.md) | P1, P2, P4 |
-| Content Store (Persistence) | PostgreSQL | 16 (image) | **Accepted** | [0004](./adr/0004-use-postgresql-content-store.md) | P4, P6 |
+| Headless Content Service (CMS) | Directus | `11.3.5` (image, pin) | **Accepted** | [0003](./adr/0003-use-directus-headless-cms.md) | P1, P2, P4 |
+| Content Store (Persistence) | PostgreSQL | `16.8-alpine` (image, pin) | **Accepted** | [0004](./adr/0004-use-postgresql-content-store.md) | P4, P6 |
 | Đóng gói & Runtime | Docker Engine + Compose v2 | 29.x | **Accepted** | [0005](./adr/0005-use-docker-packaging.md) | P4, P5 |
 | Edge / Reverse Proxy | _TBD_ | — | ⏳ | _TBD_ | — |
 | Build / Deploy Orchestrator (CI/CD) | _TBD_ | — | ⏳ | _TBD_ | — |
@@ -35,9 +35,9 @@
 |---|---|---|
 | Node.js | **22 LTS** (`engines >=22`, `.nvmrc` 22) | web (Astro) & Directus chạy trong container (Node 22 image) → `docker compose up` không cần Node 22 trên host; chạy Astro trực tiếp trên host thì cài Node 22 (host hiện 20.19.4) |
 | Package manager | **pnpm 10.x** (workspace) | pin qua `packageManager` trong `package.json` |
-| Astro | **5.x** | apps/web |
-| Directus | **11.x** | chạy từ Docker image |
-| PostgreSQL | **16** | chạy từ Docker image |
+| Astro | **5.x** | apps/web (container `node:22.12.0-alpine`) |
+| Directus | **11.3.5** (pin) | image `directus/directus:11.3.5` |
+| PostgreSQL | **16.8-alpine** (pin) | image `postgres:16.8-alpine` |
 | Docker Engine / Compose | **29.x / Compose v2** | đóng gói & runtime |
 
 > Nâng cấp lớn (major) của bất kỳ mục nào → ghi **Decision Log** (hoặc ADR nếu ảnh hưởng kiến trúc).

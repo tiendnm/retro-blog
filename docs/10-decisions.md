@@ -50,3 +50,5 @@ Tạo ADR khi quyết định: khó đảo ngược, ảnh hưởng nhiều ph�
 | 2026-07-21 | **[S1] Versions:** Astro 5.x · Directus 11.x · PostgreSQL 16 · Docker Engine 29/Compose v2 | Bản ổn định/LTS hiện hành, self-host tốt | Sprint 1 |
 | 2026-07-21 | **[S1] Docker Compose:** 1 file root, 3 service (postgres/directus/web) + network + named volumes | Đơn giản, local-friendly (Plan §4) | Sprint 1 |
 | 2026-07-21 | **[S1] Khởi tạo git** (`git init -b main`); thêm `!.env.example` để override `~/.gitignore_global` (`.env.*`) | Nền tảng repo; giữ track file template | Sprint 1 |
+| 2026-07-21 | **[S1-P2] Image pin (đã verify):** `postgres:16.8-alpine` · `directus/directus:11.3.5` · web `node:22.12.0-alpine` | Pin cứng (không `latest`); đã pull & smoke test đạt (2 service healthy, Directus↔PG OK) | Sprint 1 |
+| 2026-07-21 | **[S1-P2] Compose:** postgres không expose host (chỉ nội bộ); Directus `:8055`; web gated sau profile `app` (chưa scaffold Astro) | Self-host an toàn; web bật ở Phase 3 | Sprint 1 |
