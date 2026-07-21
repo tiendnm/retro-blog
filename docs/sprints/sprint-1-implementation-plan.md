@@ -1,6 +1,6 @@
 # 🏗️ Sprint 1 — Implementation Plan
 
-> **Trạng thái:** 🟡 Draft · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chờ review)_
+> **Trạng thái:** 🟢 Hoàn thành (Sprint 1 đóng) · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Kết quả:** [sprint-1-completion-report.md](./sprint-1-completion-report.md)
 >
 > 🎯 **Mục tiêu Sprint 1:** dựng **nền tảng chạy được local** (Astro + Directus + PostgreSQL qua Docker Compose), **chưa làm feature**.
 > 🔗 **Nguồn sự thật (không định nghĩa lại ở đây):** phạm vi → [01a-mvp-scope](../01a-mvp-scope.md) · kiến trúc → [03-architecture](../03-architecture.md) + [03a-principles](../03a-architecture-principles.md) · công nghệ → [10a-tech-stack](../10a-tech-stack.md) + [ADR 0002–0005](../adr/) · mốc → [02-roadmap M1](../02-roadmap.md).

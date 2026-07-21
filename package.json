@@ -8,9 +8,11 @@
     "node": ">=22"
   },
   "scripts": {
-    "up": "docker compose up -d",
-    "down": "docker compose down",
+    "start": "docker compose up -d",
+    "stop": "docker compose stop",
+    "restart": "docker compose restart",
     "logs": "docker compose logs -f",
-    "ps": "docker compose ps"
+    "status": "docker compose ps",
+    "down": "docker compose down"
   }
 }
