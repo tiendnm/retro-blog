@@ -1,0 +1,62 @@
+Bài viết này ghi lại đôi điều về bàn phím cơ IBM Model M, một mảnh ghép thú vị trong lịch sử Ngoại vi.
+
+## Thiết kế
+
+Ra mắt khoảng năm 1985, bàn phím cơ IBM Model M phản ánh rõ những ràng buộc kỹ thuật của thời đại: tài nguyên eo hẹp buộc kỹ sư phải tối ưu từng chi tiết.
+
+Người dùng ngày ấy quen với việc tự tay cấu hình, và bàn phím cơ IBM Model M là một ví dụ điển hình cho tinh thần vọc vạch đó.
+
+Có thể tóm lại như sau:
+
+- Chủ thể tiêu biểu: **bàn phím cơ IBM Model M** (khoảng 1985).
+- Điểm mạnh:
+  - Thiết kế tối giản, dễ bảo trì.
+  - Tương thích ngược tốt trong hệ sinh thái.
+- Hạn chế: tài nguyên hạn hẹp so với ngày nay.
+
+```assembly
+; nạp giá trị vào thanh ghi
+MOV AX, 0x1234
+ADD AX, BX
+INT 0x21
+```
+
+| Chủ thể | Năm ra mắt |
+| --- | --- |
+| bàn phím cơ IBM Model M | 1985 |
+| chuột bi | 1980 |
+| máy in kim | 1970 |
+
+## Trải nghiệm sử dụng
+
+Ra mắt khoảng năm 1985, bàn phím cơ IBM Model M phản ánh rõ những ràng buộc kỹ thuật của thời đại: tài nguyên eo hẹp buộc kỹ sư phải tối ưu từng chi tiết.
+
+Sự bền bỉ của bàn phím cơ IBM Model M khiến không ít máy còn chạy tốt sau hàng chục năm, một điều hiếm thấy ngày nay.
+
+Vài điểm đáng chú ý:
+
+- Chủ thể tiêu biểu: **bàn phím cơ IBM Model M** (khoảng 1985).
+- Điểm mạnh:
+  - Thiết kế tối giản, dễ bảo trì.
+  - Tương thích ngược tốt trong hệ sinh thái.
+- Hạn chế: tài nguyên hạn hẹp so với ngày nay.
+
+> Mỗi tiếng ổ đĩa quay là một mảnh ký ức.
+
+## Thiết kế
+
+Điều đáng nói ở bàn phím cơ IBM Model M không nằm ở sức mạnh thô, mà ở cách nó được thiết kế để làm nhiều nhất với ít nhất.
+
+Đặt cạnh phần cứng hiện đại, bàn phím cơ IBM Model M khiêm tốn về thông số, nhưng lại giàu tính cách và câu chuyện.
+
+Vài điểm đáng chú ý:
+
+- Chủ thể tiêu biểu: **bàn phím cơ IBM Model M** (khoảng 1985).
+- Điểm mạnh:
+  - Thiết kế tối giản, dễ bảo trì.
+  - Tương thích ngược tốt trong hệ sinh thái.
+- Hạn chế: tài nguyên hạn hẹp so với ngày nay.
+
+---
+
+Điều đáng nói ở bàn phím cơ IBM Model M không nằm ở sức mạnh thô, mà ở cách nó được thiết kế để làm nhiều nhất với ít nhất.

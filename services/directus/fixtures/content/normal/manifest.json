@@ -1,0 +1,216 @@
+{
+  "version": 1,
+  "set": "normal",
+  "seed": 42,
+  "contentProvider": "static",
+  "coverProvider": "none",
+  "authors": [
+    {
+      "key": "author-main",
+      "name": "Nguyễn Hoài Cổ",
+      "slug": "nguyen-hoai-co",
+      "bio": "Người sưu tầm và viết về máy tính cổ, dành phần lớn thời gian rảnh để phục chế phần cứng thập niên 80–90."
+    },
+    {
+      "key": "author-guest",
+      "name": "Trần Vi Mạch",
+      "slug": "tran-vi-mach",
+      "bio": "Kỹ sư điện tử yêu thích tháo lắp bo mạch và ghi chép lại từng con chip."
+    }
+  ],
+  "categories": [
+    {
+      "key": "cpu",
+      "name": "CPU",
+      "slug": "cpu",
+      "description": "Bộ vi xử lý và kiến trúc tập lệnh cổ điển."
+    },
+    {
+      "key": "mainboard",
+      "name": "Mainboard",
+      "slug": "mainboard",
+      "description": "Bo mạch chủ, chipset và bus hệ thống."
+    },
+    {
+      "key": "gpu",
+      "name": "GPU",
+      "slug": "gpu",
+      "description": "Đồ hoạ, card màn hình và chip tăng tốc."
+    },
+    {
+      "key": "memory",
+      "name": "Bộ nhớ",
+      "slug": "memory",
+      "description": "RAM, ROM và các loại bộ nhớ."
+    },
+    {
+      "key": "storage",
+      "name": "Lưu trữ",
+      "slug": "storage",
+      "description": "Ổ đĩa, băng từ và thiết bị lưu trữ."
+    },
+    {
+      "key": "operating-system",
+      "name": "Hệ điều hành",
+      "slug": "operating-system",
+      "description": "Các hệ điều hành và môi trường một thời."
+    },
+    {
+      "key": "software",
+      "name": "Phần mềm",
+      "slug": "software",
+      "description": "Ứng dụng, trình biên dịch và tiện ích."
+    },
+    {
+      "key": "sound",
+      "name": "Âm thanh",
+      "slug": "sound",
+      "description": "Card âm thanh và chip tạo tiếng."
+    },
+    {
+      "key": "peripheral",
+      "name": "Ngoại vi",
+      "slug": "peripheral",
+      "description": "Bàn phím, chuột, máy in và thiết bị ngoại vi."
+    },
+    {
+      "key": "networking",
+      "name": "Mạng",
+      "slug": "networking",
+      "description": "Mạng, modem và BBS."
+    }
+  ],
+  "covers": [],
+  "posts": [
+    {
+      "key": "normal-01",
+      "slug": "cpu-01",
+      "title": "CPU: nhìn lại một thời #01",
+      "excerpt": "Ghi chép ngắn về MOS 6502 trong dòng chảy CPU.",
+      "bodyPath": "body/cpu-01.md",
+      "authorKey": "author-main",
+      "categoryKey": "cpu",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-06-15T09:00:00.000Z",
+      "set": "normal"
+    },
+    {
+      "key": "normal-02",
+      "slug": "software-01",
+      "title": "Ghi chép về Phần mềm #01",
+      "excerpt": "Ghi chép ngắn về Turbo Pascal trong dòng chảy Phần mềm.",
+      "bodyPath": "body/software-01.md",
+      "authorKey": "author-main",
+      "categoryKey": "software",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-06-03T09:00:00.000Z",
+      "set": "normal"
+    },
+    {
+      "key": "normal-03",
+      "slug": "gpu-01",
+      "title": "Hoài niệm GPU #01",
+      "excerpt": "Đôi dòng về card VGA — một lát cắt của GPU.",
+      "bodyPath": "body/gpu-01.md",
+      "authorKey": "author-guest",
+      "categoryKey": "gpu",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-05-22T09:00:00.000Z",
+      "set": "normal"
+    },
+    {
+      "key": "normal-04",
+      "slug": "operating-system-01",
+      "title": "Chuyện chưa kể về Hệ điều hành #01",
+      "excerpt": "Đôi dòng về Windows 3.1 — một lát cắt của Hệ điều hành.",
+      "bodyPath": "body/operating-system-01.md",
+      "authorKey": "author-main",
+      "categoryKey": "operating-system",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-05-19T09:00:00.000Z",
+      "set": "normal"
+    },
+    {
+      "key": "normal-05",
+      "slug": "storage-01",
+      "title": "Khám phá Lưu trữ thời kỳ đầu #01",
+      "excerpt": "Ghi chép ngắn về đĩa mềm 3.5 inch trong dòng chảy Lưu trữ.",
+      "bodyPath": "body/storage-01.md",
+      "authorKey": "author-main",
+      "categoryKey": "storage",
+      "coverKey": null,
+      "status": "draft",
+      "publishedAt": null,
+      "set": "normal"
+    },
+    {
+      "key": "normal-06",
+      "slug": "mainboard-01",
+      "title": "Mainboard: nhìn lại một thời #01",
+      "excerpt": "Ghi chép ngắn về bo mạch IBM PC 5150 trong dòng chảy Mainboard.",
+      "bodyPath": "body/mainboard-01.md",
+      "authorKey": "author-main",
+      "categoryKey": "mainboard",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-04-25T09:00:00.000Z",
+      "set": "normal"
+    },
+    {
+      "key": "normal-07",
+      "slug": "memory-01",
+      "title": "Ghi chép về Bộ nhớ #01",
+      "excerpt": "Ghi chép ngắn về bộ nhớ mở rộng EMS trong dòng chảy Bộ nhớ.",
+      "bodyPath": "body/memory-01.md",
+      "authorKey": "author-main",
+      "categoryKey": "memory",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-04-22T09:00:00.000Z",
+      "set": "normal"
+    },
+    {
+      "key": "normal-08",
+      "slug": "peripheral-01",
+      "title": "Hoài niệm Ngoại vi #01",
+      "excerpt": "Đôi dòng về máy in kim — một lát cắt của Ngoại vi.",
+      "bodyPath": "body/peripheral-01.md",
+      "authorKey": "author-guest",
+      "categoryKey": "peripheral",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-04-10T09:00:00.000Z",
+      "set": "normal"
+    },
+    {
+      "key": "normal-09",
+      "slug": "cpu-02",
+      "title": "Chuyện chưa kể về CPU #02",
+      "excerpt": "Ghi chép ngắn về Intel 80386 trong dòng chảy CPU.",
+      "bodyPath": "body/cpu-02.md",
+      "authorKey": "author-main",
+      "categoryKey": "cpu",
+      "coverKey": null,
+      "status": "published",
+      "publishedAt": "2026-03-29T09:00:00.000Z",
+      "set": "normal"
+    },
+    {
+      "key": "normal-10",
+      "slug": "software-02",
+      "title": "Khám phá Phần mềm thời kỳ đầu #02",
+      "excerpt": "Ghi chép ngắn về Norton Commander trong dòng chảy Phần mềm.",
+      "bodyPath": "body/software-02.md",
+      "authorKey": "author-main",
+      "categoryKey": "software",
+      "coverKey": null,
+      "status": "draft",
+      "publishedAt": null,
+      "set": "normal"
+    }
+  ]
+}
