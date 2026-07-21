@@ -55,29 +55,39 @@ services:
       retries: 6
       start_period: 40s
 
-  # ─── Presentation / Site (ADR-0002) — Astro trong container Node 22 ───
-  # Gated sau profile 'app': app apps/web được scaffold ở Phase 3, khi đó:
-  #   docker compose --profile app up
+  # ─── Presentation / Site (ADR-0002) — Astro dev trong container Node 22 ───
+  # apps/web đã scaffold (Phase 3). node_modules cài trong container (linux) qua
+  # volume riêng (không dùng chung với host win32). DIRECTUS_INTERNAL_URL trỏ
+  # service 'directus' trong network nội bộ (fetch server-side).
   web:
     image: node:22.12.0-alpine
-    profiles: ["app"]
+    restart: unless-stopped
     working_dir: /app
     depends_on:
       directus:
         condition: service_healthy
     environment:
+      DIRECTUS_INTERNAL_URL: ${DIRECTUS_INTERNAL_URL}
       PUBLIC_DIRECTUS_URL: ${PUBLIC_DIRECTUS_URL}
     volumes:
       - ./apps/web:/app
+      - web_node_modules:/app/node_modules
     ports:
       - "${WEB_PORT}:4321"
     networks:
       - retro-net
-    command: sh -c "corepack enable && pnpm install && pnpm dev --host 0.0.0.0"
+    command: sh -c "npm i -g pnpm@10.33.2 && pnpm install && pnpm dev --host 0.0.0.0 --port 4321"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:4321/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 90s
 
 volumes:
   pgdata:
   directus_uploads:
+  web_node_modules:
 
 networks:
   retro-net:
