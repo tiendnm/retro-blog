@@ -1,6 +1,8 @@
 # 07 — UI / UX & Design System
 
-> **Trạng thái:** 🟡 Đang làm (Sprint 3 Phase 0 — Design Foundation) · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-22 · **Người duyệt:** _(chờ review)_
+> **Trạng thái:** 🟢 Reader Experience hoàn thành (Sprint 3) · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-22 · **Người duyệt:** Tech Lead
+>
+> ℹ️ Phong cách thị giác retro **chưa khóa** — tokens là *nền* (§2), hoàn thiện dần sau review thực tế.
 >
 > 🎯 **Mục đích:** Định nghĩa *ngôn ngữ thiết kế* của Retro Blog — phong cách retro, design tokens, thành phần UI, và nguyên tắc trải nghiệm. Đảm bảo giao diện nhất quán và tái sử dụng được.
 > 🔗 **Liên quan:** [01-requirements](./01-requirements.md) · [15-seo-accessibility](./15-seo-accessibility.md) · [09-coding-standards](./09-coding-standards.md)
@@ -64,21 +66,27 @@
 
 ## 4. Bố cục & Responsive
 
-- TODO _(breakpoints, grid, mobile-first, khu vực nội dung)_.
+- **Container:** `body` giới hạn `--container-max` (720px), căn giữa, padding ngang `--container-pad-x`. Detail thu về `--reading-width` (~65ch) cho dễ đọc.
+- **Fluid, ít breakpoint:** bố cục dùng flex + đơn vị tương đối; PostCard giữ thumbnail nhỏ-trái ở mọi kích thước (không stack lớn — thumbnail chỉ hỗ trợ). Code/table trong `.prose` `overflow-x:auto`.
+- **Kiểm chứng:** @390px **không** cuộn ngang ở cả 3 trang (đo CDP — Sprint 3 Phase 4).
 
 ## 5. Trạng thái tương tác
 
-- TODO _(hover/focus/active/disabled; đặc biệt **focus visible** cho a11y)_.
+- **Focus:** `:focus-visible` outline accent (offset 2px) — a11y bàn phím.
+- Link nội dung gạch chân (mặc định); brand/nav không gạch chân. Hover: dùng màu accent sẵn có (chưa thêm hiệu ứng — giữ tối giản).
 
 ## 6. Dark / Light mode
 
-- TODO _(có hỗ trợ không? cách chuyển & lưu lựa chọn)_.
+- **Ngoài phạm vi (Future)** — [01a §5](./01a-mvp-scope.md).
 
 ## 7. Accessibility trong thiết kế
 
 > Tương phản màu, kích thước chạm, thứ tự tiêu điểm... Chi tiết: [15-seo-accessibility](./15-seo-accessibility.md).
 
-- TODO.
+- **Tương phản AA/AAA** (token màu Phase 0): text ~12.6:1, muted ~6.2:1, accent ~8.3:1 trên nền giấy.
+- **Landmark** ngữ nghĩa + **skip-link** → `#main`; đúng 1 `h1`/trang, thứ tự heading hợp lý; `lang="vi"`.
+- **Ảnh:** card thumbnail = trang trí (`alt=""`); cover detail & ảnh trong prose = alt thật.
+- **`prefers-reduced-motion`** tôn trọng. (Kiểm chứng bằng audit — Sprint 3 Phase 4.)
 
 ## 8. Chuyển động & Hiệu ứng (Motion)
 

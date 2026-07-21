@@ -23,6 +23,7 @@ const bodyHtml = post.body ? await marked.parse(post.body) : '';
 ---
 
 <Base title={`${post.title} — Retro Blog`} description={post.excerpt ?? undefined}>
+  <p class="back-link"><a href="/">← Trang chủ</a></p>
   <article class="post">
     <header class="post__header">
       <h1>{post.title}</h1>

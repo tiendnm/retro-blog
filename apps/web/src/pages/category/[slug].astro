@@ -18,10 +18,15 @@ const { items } = await listPostsByCategory(slug!, { pageSize: 50 });
 ---
 
 <Base title={`${category.name} — Retro Blog`}>
-  <p class="meta"><a href="/">← Trang chủ</a></p>
+  <p class="back-link"><a href="/">← Trang chủ</a></p>
   <h1>Chuyên mục: {category.name}</h1>
-  {items.length === 0 && <p>Chưa có bài viết trong chuyên mục này.</p>}
-  <ul class="post-list">
-    {items.map((post) => <PostCard post={post} />)}
-  </ul>
+  {
+    items.length === 0 ? (
+      <p class="empty-state">Chưa có bài viết trong chuyên mục này.</p>
+    ) : (
+      <ul class="post-list">
+        {items.map((post) => <PostCard post={post} />)}
+      </ul>
+    )
+  }
 </Base>

@@ -85,7 +85,11 @@ img {
   height: auto;
 }
 
-h1 { font-size: var(--text-3xl); line-height: var(--leading-tight); }
+h1 {
+  font-size: var(--text-3xl);
+  line-height: var(--leading-tight);
+  margin: 0 0 var(--space-6); /* khoảng cách tiêu đề trang nhất quán mọi trang */
+}
 h2 { font-size: var(--text-2xl); line-height: var(--leading-tight); }
 h3 { font-size: var(--text-xl); line-height: var(--leading-tight); }
 
@@ -204,6 +208,12 @@ main {
   padding: var(--space-8) 0;
   border-top: var(--border-width) solid var(--color-border);
   border-bottom: var(--border-width) solid var(--color-border);
+}
+
+/* Back-link — nhất quán ở trang con (category, detail) */
+.back-link {
+  font-size: var(--text-sm);
+  margin: 0 0 var(--space-4);
 }
 
 /* ---- Post detail: cột đọc (reading column) + prose (Sprint 3 Phase 3) ----

@@ -2,7 +2,7 @@
 
 > Một blog headless mang phong cách retro — **Astro** (site) + **Directus** (headless CMS) + **PostgreSQL**, đóng gói bằng **Docker**.
 
-> **Trạng thái:** 🟢 Sprint 2 — vertical slice MVP nội dung (Editor tạo bài → Publish → Reader xem list/detail/category). Draft không lộ.
+> **Trạng thái:** 🟢 Sprint 3 — Reader Experience (giao diện đọc thống nhất: layout shell, post card, prose, responsive + a11y baseline). Chưa mở rộng chức năng.
 > **Cập nhật lần cuối:** 2026-07-22
 
 ---
@@ -106,7 +106,8 @@ Bắt đầu từ [docs/README.md](./docs/README.md).
 | Sprint 0 | Nền tảng tài liệu & kiến trúc | 🟢 Đóng |
 | Sprint 1 | Nền tảng local chạy được (infra + plumbing) | 🟢 Hoàn thành |
 | Sprint 2 | Vertical slice MVP nội dung (Roadmap M2) | 🟢 Hoàn thành |
-| Sprint 3 | _(chưa bắt đầu)_ | ⏳ |
+| Sprint 3 | Reader Experience (Presentation Layer) | 🟢 Hoàn thành |
+| Sprint 4 | _(chưa bắt đầu)_ | ⏳ |
 
 ## License
 
