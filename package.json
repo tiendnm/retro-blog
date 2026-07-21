@@ -15,6 +15,7 @@
     "status": "docker compose ps",
     "down": "docker compose down",
     "schema:apply": "docker compose exec -T directus npx directus schema apply --yes //directus/snapshots/schema.yaml",
-    "permissions:apply": "bash services/directus/apply-permissions.sh"
+    "permissions:apply": "bash services/directus/apply-permissions.sh",
+    "seed:dev": "node services/directus/seed/seed-dev.mjs"
   }
 }

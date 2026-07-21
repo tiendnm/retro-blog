@@ -2,8 +2,8 @@
 
 > Một blog headless mang phong cách retro — **Astro** (site) + **Directus** (headless CMS) + **PostgreSQL**, đóng gói bằng **Docker**.
 
-> **Trạng thái:** 🟢 Sprint 1 — nền tảng local chạy được (infra + plumbing). Chưa có feature MVP.
-> **Cập nhật lần cuối:** 2026-07-21
+> **Trạng thái:** 🟢 Sprint 2 — vertical slice MVP nội dung (Editor tạo bài → Publish → Reader xem list/detail/category). Draft không lộ.
+> **Cập nhật lần cuối:** 2026-07-22
 
 ---
 
@@ -57,20 +57,21 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
    ```
    > Lần đầu mất vài phút (pull image + container web cài Astro). Chờ tới khi trạng thái là `healthy`.
 
-4. **Tạo content model + phân quyền (lần đầu / fresh clone)**
+4. **Tạo content model + phân quyền + seed dev (lần đầu / fresh clone)**
    ```bash
    pnpm schema:apply         # áp dụng schema snapshot (collections/fields/relations)
    pnpm permissions:apply    # cấu hình Roles/Policies/Permissions (Public/Editor)
+   pnpm seed:dev             # (tuỳ chọn) dữ liệu mẫu dev: 1 author, 2 category, 3 bài + 1 draft
    ```
-   > Chỉ cần khi Directus còn trống (volume mới). Cả hai **idempotent** — chạy lại an toàn.
-   > Artifacts: `services/directus/snapshots/schema.yaml` · `services/directus/apply-permissions.sh`.
-   > `permissions:apply` cần `ADMIN_EMAIL`/`ADMIN_PASSWORD` trong `.env` (dùng Admin API).
+   > Chỉ cần khi Directus còn trống (volume mới). Cả ba **idempotent** — chạy lại an toàn.
+   > Artifacts: `services/directus/snapshots/schema.yaml` · `services/directus/apply-permissions.sh` · `services/directus/seed/seed-dev.mjs`.
+   > `permissions:apply` / `seed:dev` cần `ADMIN_EMAIL`/`ADMIN_PASSWORD` trong `.env` (dùng Admin API; `seed:dev` cần Node 18+ trên host).
 
 5. **Truy cập**
 
    | Dịch vụ | URL | Ghi chú |
    |---|---|---|
-   | Astro (site) | http://localhost:4321 | trang plumbing-check (Sprint 1) |
+   | Astro (site) | http://localhost:4321 | trang blog: danh sách / chi tiết / category (Sprint 2) |
    | Directus admin | http://localhost:8055/admin | đăng nhập bằng `ADMIN_EMAIL` / `ADMIN_PASSWORD` trong `.env` |
 
 ### Vận hành thường ngày
@@ -104,7 +105,8 @@ Bắt đầu từ [docs/README.md](./docs/README.md).
 |---|---|---|
 | Sprint 0 | Nền tảng tài liệu & kiến trúc | 🟢 Đóng |
 | Sprint 1 | Nền tảng local chạy được (infra + plumbing) | 🟢 Hoàn thành |
-| Sprint 2 | _(đề xuất — chưa bắt đầu)_ | ⏳ |
+| Sprint 2 | Vertical slice MVP nội dung (Roadmap M2) | 🟢 Hoàn thành |
+| Sprint 3 | _(chưa bắt đầu)_ | ⏳ |
 
 ## License
 

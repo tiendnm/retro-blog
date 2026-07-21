@@ -1,6 +1,6 @@
 # 🏗️ Sprint 2 — Implementation Plan
 
-> **Trạng thái:** 🟢 Đã duyệt (approved) — đang thực hiện Phase 0 · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** Tech Lead
+> **Trạng thái:** 🟢 **HOÀN THÀNH** (xem [Completion Report](./sprint-2-completion-report.md)) · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-22 · **Người duyệt:** Tech Lead
 >
 > 🎯 **Mục tiêu Sprint 2:** hiện thực **vertical slice** đầu tiên — *Editor tạo bài trong Directus → Publish → Reader xem bài trên Astro*.
 > 🔗 **Nguồn sự thật (không định nghĩa lại):** phạm vi → [01a-mvp-scope](../01a-mvp-scope.md) · nội dung → [03c-content-model](../03c-content-model.md) · hợp đồng → [03d-api-contract](../03d-api-contract.md) · domain/state → [03b-domain-model](../03b-domain-model.md) · dữ liệu → [03e-data-model](../03e-data-model.md) · mốc → [02-roadmap M2](../02-roadmap.md).
