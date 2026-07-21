@@ -25,7 +25,7 @@
 | Đóng gói & Runtime | Docker Engine + Compose v2 | 29.x | **Accepted** | [0005](./adr/0005-use-docker-packaging.md) | P4, P5 |
 | Edge / Reverse Proxy | _TBD_ | — | ⏳ | _TBD_ | — |
 | Build / Deploy Orchestrator (CI/CD) | _TBD_ | — | ⏳ | _TBD_ | — |
-| Chiến lược render (SSG/SSR/ISR) | _TBD_ | — | ⏳ | _TBD (0006)_ | P3 |
+| Chiến lược render | **SSG (static)** | — | **Accepted** | [0006](./adr/0006-render-strategy.md) | P3, P4, P5 |
 
 > ✅ **Accepted** = đã ratify (Sprint 0 close-out). Phiên bản chốt ở **Sprint 1** (Decision Log [10 §5](./10-decisions.md)); patch cụ thể pin qua lockfile / image digest khi cài.
 

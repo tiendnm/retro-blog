@@ -32,4 +32,4 @@
 | [0003](./0003-use-directus-headless-cms.md) | Dùng Directus (Headless CMS) | **Accepted** |
 | [0004](./0004-use-postgresql-content-store.md) | Dùng PostgreSQL (Content Store) | **Accepted** |
 | [0005](./0005-use-docker-packaging.md) | Dùng Docker (đóng gói & runtime) | **Accepted** |
-| _0006_ | _(dự kiến) Chiến lược render (SSG/SSR/ISR)_ | ⏳ |
+| [0006](./0006-render-strategy.md) | Chiến lược render: SSG static-first | **Accepted** |

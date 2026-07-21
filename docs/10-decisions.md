@@ -30,7 +30,7 @@ Tạo ADR khi quyết định: khó đảo ngược, ảnh hưởng nhiều ph�
 | [0003](./adr/0003-use-directus-headless-cms.md) | Dùng Directus | Headless Content Service | P1,P2,P4 | **Accepted** |
 | [0004](./adr/0004-use-postgresql-content-store.md) | Dùng PostgreSQL | Content Store | P4,P6 | **Accepted** |
 | [0005](./adr/0005-use-docker-packaging.md) | Dùng Docker | Đóng gói/Runtime | P4,P5 | **Accepted** |
-| 0006 | _(dự kiến) Chiến lược render (SSG/SSR/ISR)_ | Data flow | P3 | ⏳ |
+| [0006](./adr/0006-render-strategy.md) | **SSG static-first** | Render strategy | P3,P4,P5 | **Accepted** |
 
 > ℹ️ ADR 0002–0005 được ratify ở Sprint 0 close-out (2026-07-21). ADR-0001 (process) vẫn Proposed — có thể ratify ở đầu Sprint 1.
 
@@ -54,3 +54,6 @@ Tạo ADR khi quyết định: khó đảo ngược, ảnh hưởng nhiều ph�
 | 2026-07-21 | **[S1-P2] Compose:** postgres không expose host (chỉ nội bộ); Directus `:8055`; web gated sau profile `app` (chưa scaffold Astro) | Self-host an toàn; web bật ở Phase 3 | Sprint 1 |
 | 2026-07-21 | **[S1-P3] Scaffold Astro** `apps/web` (minimal, Astro 5.x, `server.host=true`); web bỏ profile → vào default stack; `node_modules` ở volume `web_node_modules` (linux, tách host win32) | Full stack chạy bằng `docker compose up`. Chưa pin lockfile — container cài fresh; Dockerfile+lockfile để hardening sau | Sprint 1 |
 | 2026-07-21 | **[S1-P3] Plumbing test:** `index.astro` fetch server-side `DIRECTUS_INTERNAL_URL=http://directus:8055` → render `/server/health` | Verify Browser→Astro→Directus→PostgreSQL, KHÔNG tạo content model | Sprint 1 |
+| 2026-07-21 | **[S2-P0] ADR-0006:** render = **SSG static-first** (giữ ADR-0002); Sprint 2 KHÔNG webhook rebuild, CI/CD rebuild = future | Hiệu năng, self-host/free-cloud, phù hợp blog | Tech Lead |
+| 2026-07-21 | **[S2-P0] Hoàn thiện API Contract [03d]** (PostDetail, phân trang/lọc/sắp xếp, error model) — dẫn xuất 03b/03c/03e, **KHÔNG tạo contract mới** | Cần cho API binding; giữ SSOT | Tech Lead |
+| 2026-07-21 | **[S2-P0] Quyết định nhỏ:** client = thin fetch map DTO 03d (P3); content model as-code = Directus schema snapshot; Media = `directus_files` + alt/caption (không collection riêng) | Decoupling, reproducibility, đơn giản | Sprint 2 |
