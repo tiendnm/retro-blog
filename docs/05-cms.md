@@ -1,50 +1,71 @@
 # 05 — CMS Mapping (Directus) — Implementation
 
-> **Trạng thái:** 🔴 Chưa bắt đầu · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chưa gán)_
+> **Trạng thái:** 🟡 Draft · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chờ review)_
 >
-> 🎯 **Mục đích:** Mô tả *cách hiện thực* Content Model trên CMS được chọn — collections, interface field, phân quyền, flows/webhooks, preview. Tầng RÌA, gắn công nghệ.
+> 🎯 **Mục đích:** Mô tả *cách hiện thực* Content Model trên CMS được chọn — collections, interface field, phân quyền, workflow. Tầng RÌA, gắn công nghệ.
 > 🔗 **Liên quan:** [03c-content-model](./03c-content-model.md) ← SSOT · [03b-domain-model](./03b-domain-model.md) · [12-security](./12-security.md) · [06-api](./06-api.md)
 
 ---
 
-> ⚙️ **Tầng RÌA (IMPLEMENTATION — gắn CMS).** Content Model *trung lập CMS* là **nguồn sự thật** ở [03c-content-model](./03c-content-model.md); máy trạng thái & luật nghiệp vụ ở [03b-domain-model](./03b-domain-model.md). Tài liệu này **không định nghĩa lại** loại nội dung/field — chỉ mô tả ánh xạ sang CMS. Tuân [Nguyên tắc 0 & P2](./03a-architecture-principles.md).
->
-> ℹ️ Directus là *lựa chọn implementation* — cần ADR ([10-decisions](./10-decisions.md)) và liệt kê ở `Tech Stack`. Thay CMS chỉ được chạm tài liệu này, không đụng [03b]/[03c].
+> ⚙️ **Tầng RÌA (IMPLEMENTATION — gắn CMS).** Content Model *trung lập CMS* là **nguồn sự thật** ở [03c](./03c-content-model.md); máy trạng thái ở [03b](./03b-domain-model.md). Tài liệu này **không định nghĩa lại** loại nội dung/field — chỉ mô tả ánh xạ sang Directus.
 
-## 1. Ánh xạ Content Type → Collection
+## 0. Schema-as-code (artifact chính thức)
 
-> Với mỗi Content Type ở [03c §2](./03c-content-model.md), ghi tên collection + interface/kiểu field của CMS. KHÔNG chép lại danh sách field logic.
+- Content model được version-control dưới dạng **Directus schema snapshot**: [`services/directus/snapshots/schema.yaml`](../services/directus/snapshots/schema.yaml).
+- **Tái tạo schema** trên một Directus (volume trống): `pnpm schema:apply` (hoặc `docker compose exec directus npx directus schema apply --yes //directus/snapshots/schema.yaml`).
+- Snapshot **không** phụ thuộc export thủ công UI; là nguồn tái lập cho mọi môi trường. Cập nhật schema → export lại snapshot & commit.
 
-| Content Type (03c) | Collection (CMS) | Ghi chú interface/kiểu field |
-|---|---|---|
-| Post | posts | title→input, body→WYSIWYG/markdown... TODO |
-| Author / Category / Tag / Media | ... | TODO |
+## 1. Ánh xạ Content Type → Collection (Sprint 2)
 
-## 2. Phân quyền (hiện thực Roles & Permissions)
+> Ánh xạ từ [03c §2](./03c-content-model.md). **Tag: ngoài Sprint 2.**
 
-> Hiện thực luật quyền nghiệp vụ ([03b §4](./03b-domain-model.md)) trên cơ chế role của CMS. Least privilege — chi tiết bảo mật [12-security](./12-security.md).
+### `posts` ← Post ([03c §2.1](./03c-content-model.md))
+| Field (03c) | Directus type | Interface | Ghi chú |
+|---|---|---|---|
+| title | string | input | required |
+| slug | string | input | required, **unique** |
+| excerpt | text | input-multiline | |
+| body | text | input-rich-text-md | |
+| status | string | select-dropdown | choices **draft/published**, default `draft` |
+| published_at | timestamp | datetime | |
+| author | uuid (M2O) | select-dropdown-m2o → `authors` | required; on_delete NO ACTION |
+| category | uuid (M2O) | select-dropdown-m2o → `categories` | on_delete SET NULL |
+| cover | uuid (M2O) | file-image → `directus_files` | on_delete SET NULL |
 
-| Vai trò | Quyền (hiện thực trên CMS) |
-|---|---|
-| Public (API) | Chỉ đọc Post đã Published |
-| Author / Editor / Admin | TODO |
+### `authors` ← Author ([03c §2.2](./03c-content-model.md))
+| name (string, req) · slug (string, req, unique) · bio (text) · avatar (M2O → `directus_files`) |
 
-## 3. Hiện thực workflow biên tập
+### `categories` ← Category ([03c §2.3](./03c-content-model.md))
+| name (string, req) · slug (string, req, unique) · description (text) · parent (M2O → `categories`, phân cấp, on_delete SET NULL) |
 
-- Ánh xạ máy trạng thái [03b §4](./03b-domain-model.md) sang trường/luồng của CMS; ai được chuyển trạng thái nào. TODO.
+### Media ← Media ([03c §2.5](./03c-content-model.md))
+- **Dùng Directus Files (`directus_files`, built-in)** — *không tạo Media collection riêng*.
+- Thêm field tuỳ biến: **`alt`** (string — a11y, bắt buộc theo quy ước) · **`caption`** (string).
+- Post.cover / Author.avatar tham chiếu `directus_files`.
+
+> Mọi collection dùng khoá chính `id` kiểu **uuid** (auto-generate).
+
+## 2. Phân quyền (Roles & Permissions) — **Phase 2**
+
+> Sẽ hiện thực ở Sprint 2 Phase 2. Dự kiến: **Admin** (quản trị CMS), **Editor** (tạo/sửa/xuất bản posts/authors/categories/files; không quản lý user/role), **Public** (read-only, **chỉ `status=published`**). Không frontend auth, không public CMS users. Chi tiết: [12-security](./12-security.md).
+
+## 3. Workflow biên tập — **Phase 2**
+
+- Field `status` đã tạo (enum `draft`/`published`, mặc định `draft`) — Phase 1.
+- Luật chuyển `draft → published` (+ `published_at`) và ai được phép: hiện thực ở Phase 2 theo [03b §4](./03b-domain-model.md). In-review/scheduled ngoài Sprint 2.
 
 ## 4. Preview bản nháp
 
-- Cơ chế preview draft (token/route) của CMS. TODO.
+- Ngoài Sprint 2 (Nice). TODO khi cần.
 
 ## 5. Media & Assets
 
-- Lưu trữ tệp, biến thể ảnh, bắt buộc alt text (a11y [15](./15-seo-accessibility.md)). TODO.
+- Lưu trữ qua Directus Files (volume `directus_uploads`). Alt bắt buộc (a11y [15](./15-seo-accessibility.md)). Tối ưu ảnh nâng cao: ngoài Sprint 2.
 
 ## 6. Flows / Webhooks / Automation
 
-- Webhook khi Published → kích hoạt rebuild (xem [06-api §Webhooks](./06-api.md), [08-deployment](./08-deployment.md)). TODO.
+- **Rebuild-on-publish** (webhook → build) là *future work* theo [ADR-0006](./adr/0006-render-strategy.md) — không thuộc Sprint 2.
 
 ## 7. Cấu hình & Môi trường (không chứa secret)
 
-- Biến môi trường cần có, khác biệt theo môi trường. Secrets: [12-security](./12-security.md). TODO.
+- Biến môi trường ở [`.env.example`](../.env.example) (DB, KEY/SECRET, ADMIN_*). Secrets: [12-security](./12-security.md).

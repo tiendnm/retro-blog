@@ -44,6 +44,9 @@ services:
       PUBLIC_URL: ${PUBLIC_URL}
     volumes:
       - directus_uploads:/directus/uploads
+      # Schema snapshot (artifact chính thức, version-control) → apply tái tạo content model:
+      #   docker compose exec directus npx directus schema apply --yes //directus/snapshots/schema.yaml
+      - ./services/directus/snapshots:/directus/snapshots:ro
     ports:
       - "${DIRECTUS_PORT}:8055"
     networks:

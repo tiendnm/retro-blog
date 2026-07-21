@@ -57,7 +57,13 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
    ```
    > Lần đầu mất vài phút (pull image + container web cài Astro). Chờ tới khi trạng thái là `healthy`.
 
-4. **Truy cập**
+4. **Tạo content model (lần đầu / fresh clone)**
+   ```bash
+   pnpm schema:apply     # áp dụng schema snapshot vào Directus (Sprint 2+)
+   ```
+   > Chỉ cần khi Directus còn trống (volume mới). Snapshot: `services/directus/snapshots/schema.yaml`.
+
+5. **Truy cập**
 
    | Dịch vụ | URL | Ghi chú |
    |---|---|---|
