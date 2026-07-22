@@ -1,0 +1,24 @@
+# Caddy — reverse proxy + auto-TLS (Sprint 6, ADR-0007).
+# Biến {$SITE_DOMAIN}/{$CMS_DOMAIN}/{$ACME_EMAIL} nạp từ .env.production qua
+# docker-compose.prod.yml. Site tĩnh phục vụ trực tiếp; Directus qua reverse_proxy.
+{
+	# Email ACME (Let's Encrypt) — thông báo hết hạn chứng chỉ.
+	email {$ACME_EMAIL}
+}
+
+# ── Site tĩnh (SSG — ADR-0006) ─────────────────────────────────────────────
+{$SITE_DOMAIN} {
+	root * /srv/site
+	encode gzip zstd
+
+	# URL sạch KHÔNG trailing-slash (khớp canonical Sprint 5): phục vụ
+	# /posts/<slug> bằng /posts/<slug>/index.html mà KHÔNG 301 thêm dấu "/".
+	# Thứ tự: .html → thư mục/index.html → chính path (file như sitemap.xml/robots.txt).
+	try_files {path}.html {path}/index.html {path}
+	file_server
+}
+
+# ── Directus: admin UI + REST API + /assets ────────────────────────────────
+{$CMS_DOMAIN} {
+	reverse_proxy directus:8055
+}

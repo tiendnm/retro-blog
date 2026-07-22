@@ -8,6 +8,7 @@ node_modules/
 .env.*.local
 # override global ~/.gitignore_global (có '.env.*') để GIỮ track file template:
 !.env.example
+!.env.production.example
 
 # ─── Astro ───
 apps/web/dist/
