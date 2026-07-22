@@ -17,8 +17,8 @@
 |---|---|---|---|
 | Khởi động / dừng hệ thống | | TODO | |
 | Triển khai phiên bản mới | | Xem [08-deployment](./08-deployment.md) | |
-| Rollback | Deploy lỗi | TODO | |
-| Rebuild site (sau khi publish) | Nội dung đổi | TODO | |
+| Rollback (site) | Deploy/rebuild lỗi | **Atomic swap** về build trước: đổi symlink `current` trong volume `site_dist` sang `builds/<TS-cũ>` (giữ `KEEP_BUILDS` bản). Xem [08 §6](./08-deployment.md) | Thấp (không rebuild) |
+| Rebuild site (sau publish) | Nội dung đổi | **Tự động** qua Directus Flow → webhook → `services/rebuild/rebuild.sh` (build + atomic swap; ADR-0008). **Thủ công/fallback:** chạy `sh services/rebuild/rebuild.sh` trên host | Thấp (atomic; fail → giữ bản cũ) |
 | Khởi động lại Directus / DB | Treo/lỗi | TODO | |
 | Xoá cache | Dữ liệu cũ | TODO | |
 

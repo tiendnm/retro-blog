@@ -19,6 +19,8 @@
     "seed:dev": "node services/directus/seed/seed-dev.mjs",
     "fixtures:generate": "node services/directus/fixtures/framework/generator.mjs",
     "fixtures:load": "node services/directus/fixtures/loader/load.mjs",
-    "fixtures:reset": "node services/directus/fixtures/loader/reset.mjs"
+    "fixtures:reset": "node services/directus/fixtures/loader/reset.mjs",
+    "rebuild:flow": "node services/directus/apply-rebuild-flow.mjs",
+    "rebuild:run": "sh services/rebuild/rebuild.sh"
   }
 }

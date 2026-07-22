@@ -8,7 +8,8 @@
 
 # ── Site tĩnh (SSG — ADR-0006) ─────────────────────────────────────────────
 {$SITE_DOMAIN} {
-	root * /srv/site
+	# `current` = symlink tới bản build đang phục vụ (atomic swap — ADR-0008).
+	root * /srv/site/current
 	encode gzip zstd
 
 	# URL sạch KHÔNG trailing-slash (khớp canonical Sprint 5): phục vụ

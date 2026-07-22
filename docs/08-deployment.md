@@ -52,12 +52,20 @@
 
 ## 4. Phát hành nội dung — Rebuild-on-publish *(Accepted — [ADR-0008](./adr/0008-rebuild-on-publish.md))*
 
-Giải "SSG stale" ([ADR-0006](./adr/0006-render-strategy.md)): Editor publish trong Directus → site static tự cập nhật.
+Giải "SSG stale" ([ADR-0006](./adr/0006-render-strategy.md)): Editor publish trong Directus → site static tự cập nhật. **Đã hiện thực (Phase 3 ✅).**
 
-- **Cơ chế (ưu tiên tối giản):** **Directus Flow** (trigger `items.create/update/delete` trên `posts` + `categories`/`authors`) → **webhook** (token bảo vệ) → **shell script / internal utility** on-server: `astro build` (fetch `directus:8055` nội bộ) → **atomic swap** thư mục static proxy serve.
-- **KHÔNG tạo microservice riêng** trừ khi có **lý do rõ ràng** (queue/điều phối phức tạp) — mặc định script/utility.
-- **Debounce** tránh build dồn khi publish liên tiếp; **giữ N build gần nhất** (cho rollback §6). Build **fail → giữ bản đang phục vụ** (atomic → không phục vụ dở).
-- **Fallback:** rebuild thủ công (runbook [13](./13-operations.md)).
+**Chuỗi:** **Directus Flow** (event `items.create/update/delete` trên `posts`/`categories`/`authors`) → **Webhook** POST (header `x-rebuild-token`) → **receiver** → **shell script** build + **atomic swap**.
+
+| Thành phần | File | Vai trò |
+|---|---|---|
+| Flow (reproducible) | [`services/directus/apply-rebuild-flow.mjs`](../services/directus/apply-rebuild-flow.mjs) | Tạo Flow + operation Webhook (idempotent, như apply-permissions) |
+| Receiver tối giản | [`services/rebuild/webhook.mjs`](../services/rebuild/webhook.mjs) | Kiểm token → gọi `rebuild.sh`; debounce (gộp khi đang build). **KHÔNG microservice** — ~50 dòng glue |
+| Orchestrator (host) | [`services/rebuild/rebuild.sh`](../services/rebuild/rebuild.sh) | `docker compose run web` (build-runner); serialize bằng `flock` |
+| Build + swap (in-container) | [`services/rebuild/build-swap.sh`](../services/rebuild/build-swap.sh) | `astro build` → staging `builds/<TS>` → **atomic** `ln -sfn current` → prune giữ `KEEP_BUILDS` |
+
+- **Layout phục vụ:** volume `site_dist` chứa `builds/<TS>/` + symlink `current`; **Caddy root = `/srv/site/current`**. Swap = đổi symlink (1 thao tác) → không phục vụ bản dở; build **fail → `current` giữ bản cũ** (an toàn).
+- **KHÔNG microservice riêng** trừ khi có lý do rõ ràng (queue phức tạp). **Fallback:** chạy tay `services/rebuild/rebuild.sh` (runbook [13](./13-operations.md)).
+- **Verify (Phase 3):** publish 1 bài → sau rebuild **xuất hiện** (trước rebuild vẫn stale); unpublish → **biến mất**; `builds/` giữ N (rollback); Directus Flow **fire webhook** kèm token (đã kiểm).
 
 ## 5. Secrets & cấu hình
 

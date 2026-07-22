@@ -20,22 +20,25 @@ services:
       CORS_ENABLED: "true"
       CORS_ORIGIN: ${PUBLIC_SITE_URL}
 
-  # Web = build-runner (ADR-0008): astro build → /out (volume site_dist) rồi THOÁT.
-  # Rebuild-on-publish (Phase 3) chạy lại job này + atomic swap.
+  # Web = build-runner (ADR-0008): astro build → staging builds/<TS> → ATOMIC
+  # SWAP symlink `current` (build-swap.sh) rồi THOÁT. First-boot chạy job này;
+  # rebuild-on-publish (services/rebuild/rebuild.sh) chạy lại job này.
   web:
     build:
       context: ./apps/web
       dockerfile: Dockerfile
     image: retro-web:prod
     restart: "no"
-    command: ["sh", "-c", "pnpm build && rm -rf /out/* && cp -a dist/. /out/ && echo 'build -> site_dist OK'"]
+    command: ["sh", "/rebuild/build-swap.sh"]
     environment:
       DIRECTUS_INTERNAL_URL: ${DIRECTUS_INTERNAL_URL}
       PUBLIC_DIRECTUS_URL: ${PUBLIC_DIRECTUS_URL}
       PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}
-    # Thay bind-mount dev bằng volume output (nguồn baked trong image).
+      KEEP_BUILDS: ${KEEP_BUILDS:-5}
+    # Thay bind-mount dev bằng volume output (nguồn baked trong image) + script swap.
     volumes: !override
       - site_dist:/out
+      - ./services/rebuild:/rebuild:ro
     # Không publish cổng dev, không healthcheck (job chạy-1-lần).
     ports: !reset []
     healthcheck: !reset {}
