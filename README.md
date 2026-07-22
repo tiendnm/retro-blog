@@ -116,7 +116,7 @@ Bắt đầu từ [docs/README.md](./docs/README.md).
 | Sprint 2 | Vertical slice MVP nội dung (Roadmap M2) | 🟢 Hoàn thành |
 | Sprint 3 | Reader Experience (Presentation Layer) | 🟢 Hoàn thành |
 | Sprint 4 | Fixture Framework & Dogfooding | 🟢 Hoàn thành |
-| Sprint 5 | Reader Completeness (Pagination + SEO baseline) | 🟡 Đang tiến hành (P1 Pagination ✓ · P2 SEO ✓) |
+| Sprint 5 | Reader Completeness (Pagination + SEO baseline) | 🟡 Hoàn tất P1–P3 — [chờ review đóng sprint](./docs/sprints/sprint-5-completion-report.md) |
 
 ## License
 
