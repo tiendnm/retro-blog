@@ -95,13 +95,16 @@ Giải "SSG stale" ([ADR-0006](./adr/0006-render-strategy.md)): Editor publish t
 
 > **Đã chốt: Caddy** — auto-TLS + cấu hình tối giản, khớp "giữ đơn giản" self-host ([ADR-0005](./adr/0005-use-docker-packaging.md)). Chi tiết quyết định: [ADR-0007](./adr/0007-reverse-proxy-and-tls.md).
 
-## 8. Checklist phát hành (Release Checklist) — *hoàn thiện ở Phase 4*
+## 8. Checklist phát hành (Release Checklist)
 
-- [ ] Build web từ **lockfile** (`--frozen-lockfile`), reproducible
-- [ ] **HTTPS/TLS** hợp lệ; Postgres không expose; Directus chỉ qua proxy
-- [ ] **Rebuild-on-publish** hoạt động (publish → hiện sau rebuild); draft ẩn
-- [ ] **Backup** (db + uploads + config + env) chạy + **restore drill** đạt
-- [ ] **Rollback = atomic swap** về static build trước — đã thử
-- [ ] Không secret trong repo/log; secrets prod mạnh; 2FA admin
-- [ ] SEO/a11y đúng ở prod (canonical/OG/sitemap domain thật) ([15](./15-seo-accessibility.md))
-- [ ] DoD release đạt ([14 §2.2](./14-quality-gates.md))
+Trạng thái Sprint 6: **✅ = cơ chế đã kiểm chứng** · **@deploy = xác nhận trên server thật khi Product cấp domain/hosting**.
+
+- [x] Build web từ **lockfile** (`--frozen-lockfile`), reproducible — ✅ 2 build byte-identical (S6-P1)
+- [x] **HTTPS/TLS** + Postgres không expose + Directus chỉ qua proxy — ✅ config/`caddy validate`/routing smoke (internal TLS); **@deploy**: chứng chỉ thật (ACME) khi DNS trỏ domain
+- [x] **Rebuild-on-publish** (publish → hiện sau rebuild); draft ẩn — ✅ verify end-to-end (S6-P3)
+- [x] **Backup** (db+uploads+config+env) + **restore drill** đạt — ✅ posts 117=117 (S6-P4)
+- [x] **Rollback = atomic swap** về static build trước — ✅ `builds/` giữ N, swap symlink (S6-P3)
+- [x] Không secret trong repo/log — ✅ `.env*` gitignored; **@deploy**: secrets prod mạnh + **2FA admin**
+- [x] SEO đúng ở prod (canonical/OG/sitemap domain thật) — ✅ build `PUBLIC_SITE_URL` (S6-P2); a11y giữ (S3–S5)
+- [ ] **@deploy:** DNS `retro.`/`cms.` trỏ host; mở 80/443; `.env.production` (domain+secrets); `docker compose -f … -f docker-compose.prod.yml up -d`; `pnpm rebuild:flow`
+- [x] DoD release ([14 §2.2](./14-quality-gates.md)) — cơ chế đạt; chốt cuối khi deploy

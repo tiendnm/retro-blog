@@ -39,7 +39,14 @@
 
 ## 6. Bảo mật hạ tầng
 
-- TODO _(Docker: image tin cậy, không chạy root, cập nhật vá lỗi; network segmentation; TLS bắt buộc)_.
+**Đã có (Sprint 6):**
+- **TLS bắt buộc:** Caddy auto-HTTPS (Let's Encrypt/ACME), HTTP→HTTPS redirect ([ADR-0007](./adr/0007-reverse-proxy-and-tls.md)).
+- **Network segmentation:** Postgres **không expose** (chỉ nội bộ `retro-net`); Directus **bind `127.0.0.1`** trên host (public **chỉ** qua Caddy). Edge duy nhất = Caddy (80/443).
+- **Image pin cứng** (không `latest`): `postgres:16.8-alpine` · `directus:11.3.5` · `caddy:2.8-alpine` · web build từ `node:22.12.0-alpine`.
+- **Build tái lập:** `--frozen-lockfile` (chống drift → giảm rủi ro chuỗi cung ứng, [S6-P1](./10-decisions.md)).
+- **Secrets ngoài repo:** `.env.production` gitignored; chỉ commit `.env.production.example` (placeholder).
+
+**Sprint 7 (Hardening — sau Public MVP):** container không chạy root · **security headers** (§8) · quét lỗ hổng dependency định kỳ · cập nhật vá lỗi.
 
 ## 7. Bảo mật chuỗi cung ứng (Supply chain)
 
@@ -61,9 +68,11 @@
 
 ## 11. Checklist bảo mật trước phát hành
 
-- [ ] Không secret trong repo/log
-- [ ] HTTPS/TLS bắt buộc
-- [ ] Quyền Directus theo least privilege
-- [ ] Security headers cấu hình
-- [ ] Dependencies không có lỗ hổng nghiêm trọng
-- [ ] TODO.
+- [x] Không secret trong repo/log — `.env*` gitignored; chỉ `.example` placeholder _(S6)_
+- [x] HTTPS/TLS bắt buộc — Caddy auto-TLS + HTTP→HTTPS _(S6, ADR-0007)_
+- [x] Quyền Directus theo least privilege — Public read + gate `published`/`$NOW` + field allowlist _(S2)_
+- [x] Postgres không expose; Directus chỉ qua proxy _(S6)_
+- [ ] **Security headers cấu hình** — **Sprint 7** (Hardening)
+- [ ] **Sanitize HTML markdown (XSS)** — **Sprint 7** (Public MVP: nội dung Editor tin cậy §8)
+- [ ] **Dependencies quét lỗ hổng** — **Sprint 7**
+- [ ] 2FA admin — bật khi cấu hình server thật (khuyến nghị §3)

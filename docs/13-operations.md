@@ -9,7 +9,37 @@
 
 ## 1. Tổng quan môi trường & topo
 
-- TODO _(các service đang chạy, sơ đồ, cổng, phụ thuộc)_.
+**Production (self-host, Sprint 6 — [08-deployment §2](./08-deployment.md), [ADR-0005](./adr/0005-use-docker-packaging.md)/[0007](./adr/0007-reverse-proxy-and-tls.md)/[0008](./adr/0008-rebuild-on-publish.md)):** 1 Docker host, `docker-compose.prod.yml`.
+
+```
+                       Internet (80/443)
+                              │
+                     ┌────────▼─────────┐  Caddy (edge) — auto-TLS ACME
+                     │  caddy:2.8       │  (ADR-0007)
+                     └───┬──────────┬───┘
+        retro.<domain>   │          │   cms.<domain>
+        (site tĩnh)      │          │   (Directus admin+API+/assets)
+              ┌──────────▼───┐   ┌──▼──────────┐
+              │ site_dist    │   │ directus     │ :8055 (bind 127.0.0.1, không public)
+              │  builds/<TS> │   │ 11.3.5       │
+              │  current ───►│   └──┬───────────┘
+              └──────▲───────┘      │ retro-net (nội bộ)
+     web build-runner│         ┌────▼─────┐
+     (astro build →  │         │ postgres │ 16.8 (KHÔNG expose)
+      atomic swap)   │         └──────────┘
+                     │ rebuild-on-publish (ADR-0008):
+              Directus Flow → webhook (token) → rebuild.sh → build-swap.sh
+```
+
+| Service | Ảnh | Cổng | Ghi chú |
+|---|---|---|---|
+| caddy | `caddy:2.8-alpine` | 80/443 (public) | Edge: TLS + serve static `current` + proxy Directus |
+| web (build-runner) | build từ `apps/web/Dockerfile` | — | Chạy-1-lần: `astro build` → `site_dist/builds/<TS>` → swap `current` |
+| directus | `directus/directus:11.3.5` | 127.0.0.1:8055 | Chỉ localhost host; public qua Caddy `cms.` |
+| postgres | `postgres:16.8-alpine` | — | Không expose; volume `pgdata` |
+
+> **Volumes:** `pgdata`, `directus_uploads`, `site_dist` (builds + `current`), `caddy_data`/`caddy_config`.
+> **Dev** ([docker-compose.yml](../docker-compose.yml)): `astro dev` on-demand (:4321), Directus :8055 — không có Caddy/build-runner.
 
 ## 2. Runbook — thao tác thường gặp
 
@@ -33,17 +63,19 @@
 
 ## 4. Sao lưu & Khôi phục (Backup & Recovery)
 
+Công cụ (Sprint 6): [`services/ops/backup.sh`](../services/ops/backup.sh) (`pnpm backup`) · [`restore.sh`](../services/ops/restore.sh) (`pnpm restore <dir>`).
+
 | Hạng mục | Chính sách |
 |---|---|
-| Sao lưu gì | DB, media/assets, cấu hình |
-| Tần suất | TODO |
-| Lưu giữ (retention) | TODO |
-| Nơi lưu | TODO (tách khỏi prod) |
-| **RPO** (mất tối đa bao nhiêu dữ liệu) | TODO |
-| **RTO** (phục hồi trong bao lâu) | TODO |
-| Diễn tập khôi phục (restore drill) | Định kỳ — TODO |
+| Sao lưu gì | **database** (`pg_dump -Fc`) · **uploads** (`directus_uploads`) · **config** (schema snapshot, compose, Caddyfile) · **env** (secret — lưu tách/mã hoá). **KHÔNG** `dist/` (tái sinh bằng `astro build`) |
+| Tần suất | Khuyến nghị **hằng ngày** (cron) + trước mỗi lần deploy/nâng cấp |
+| Lưu giữ (retention) | Giữ ≥ 7 bản gần nhất (điều chỉnh theo dung lượng) |
+| Nơi lưu | **Tách khỏi host prod** (object storage/máy khác); thư mục backup NHẠY CẢM (có DB+secret) → mã hoá |
+| **RPO** | ≤ khoảng cách giữa 2 lần backup (hằng ngày → ≤ 24h) |
+| **RTO** | ≈ thời gian `restore.sh` (DB+uploads) + `rebuild.sh` (dựng lại static) |
+| Diễn tập khôi phục (restore drill) | ✅ **Đã diễn tập (Sprint 6 Phase 4):** restore `db.dump` vào Postgres sạch → **posts count khớp nguồn (117=117)**, uploads khớp (4=4 file). Lặp lại định kỳ |
 
-> ⚠️ Backup chưa được kiểm chứng khôi phục = **không có backup**. Phải diễn tập restore.
+> ⚠️ Backup chưa được kiểm chứng khôi phục = **không có backup**. Restore drill đã đạt (trên); duy trì diễn tập định kỳ.
 
 ## 5. Xử lý sự cố (Incident Response)
 

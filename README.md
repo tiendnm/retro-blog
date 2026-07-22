@@ -2,8 +2,8 @@
 
 > Một blog headless mang phong cách retro — **Astro** (site) + **Directus** (headless CMS) + **PostgreSQL**, đóng gói bằng **Docker**.
 
-> **Trạng thái:** 🟡 Sprint 5 — Reader Completeness (Pagination ✓ + SEO baseline ✓). Content Model/API/DTO/thin client không đổi.
-> **Cập nhật lần cuối:** 2026-07-22
+> **Trạng thái:** 🟡 Sprint 6 — Deployment & **Public MVP** (Caddy TLS + build tái lập + rebuild-on-publish + backup/restore). Content Model/API/DTO/thin client không đổi.
+> **Cập nhật lần cuối:** 2026-07-23
 
 ---
 
@@ -95,6 +95,19 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
 
 > **Dữ liệu bền:** named volumes `pgdata`, `directus_uploads` tồn tại qua `stop`/`down` (chỉ mất khi `docker compose down -v`).
 
+### Triển khai production (Sprint 6 — [08-deployment](./docs/08-deployment.md))
+
+Self-host HTTPS qua **Caddy** (auto-TLS) + **rebuild-on-publish** + **backup**. Tóm tắt:
+
+```bash
+cp .env.production.example .env.production   # điền <domain> thật + secrets mạnh (KHÔNG commit)
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production up -d
+pnpm rebuild:flow    # tạo Directus Flow rebuild-on-publish (cần REBUILD_* + admin creds)
+pnpm backup          # sao lưu db+uploads+config (restore: pnpm restore <dir>)
+```
+
+> Cần DNS `retro.<domain>` + `cms.<domain>` trỏ host, mở 80/443. Chi tiết topology/checklist: [08-deployment](./docs/08-deployment.md) · vận hành/backup: [13-operations](./docs/13-operations.md).
+
 ---
 
 ## Tài liệu
@@ -116,7 +129,8 @@ Bắt đầu từ [docs/README.md](./docs/README.md).
 | Sprint 2 | Vertical slice MVP nội dung (Roadmap M2) | 🟢 Hoàn thành |
 | Sprint 3 | Reader Experience (Presentation Layer) | 🟢 Hoàn thành |
 | Sprint 4 | Fixture Framework & Dogfooding | 🟢 Hoàn thành |
-| Sprint 5 | Reader Completeness (Pagination + SEO baseline) | 🟡 Hoàn tất P1–P3 — [chờ review đóng sprint](./docs/sprints/sprint-5-completion-report.md) |
+| Sprint 5 | Reader Completeness (Pagination + SEO baseline) | 🟢 Hoàn thành |
+| Sprint 6 | Deployment & Public MVP (TLS + rebuild-on-publish + backup) | 🟡 Đang tiến hành ([08-deployment](./docs/08-deployment.md)) |
 
 ## License
 

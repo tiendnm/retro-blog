@@ -30,10 +30,12 @@ Một hạng mục (story/task) chỉ được kéo vào sprint khi:
 - [ ] Không cảnh báo bảo mật mới ([12](./12-security.md))
 
 ### 2.2. DoD cho một bản phát hành (release)
-- [ ] Toàn bộ cổng CI xanh ([08 §3](./08-deployment.md))
-- [ ] Backup trước khi phát hành ([13](./13-operations.md))
-- [ ] Checklist launch (SEO, a11y, security) đạt
-- [ ] Kế hoạch rollback sẵn sàng
+> **Checklist Launch cụ thể (Sprint 6):** [08-deployment §8](./08-deployment.md).
+
+- [ ] Toàn bộ cổng CI xanh ([08 §3](./08-deployment.md)) — **CI tự động = Sprint 7**; Public MVP dựa build reproducible + verify thủ công
+- [x] Backup trước khi phát hành ([13 §4](./13-operations.md)) — cơ chế + restore drill đạt _(S6)_
+- [x] Checklist launch (SEO, a11y, security) đạt — [08 §8](./08-deployment.md) _(S6; a11y S3–S5)_
+- [x] Kế hoạch rollback sẵn sàng — atomic swap về build trước _(S6, ADR-0008)_
 
 ## 3. Checklist Code Review
 
