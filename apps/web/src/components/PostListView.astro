@@ -1,0 +1,32 @@
+---
+// PostListView — khung dùng chung cho trang list (homepage & category), mọi trang
+// phân trang. Chỉ nhận DTO + tham số trình bày; KHÔNG gọi Directus.
+import PostCard from './PostCard.astro';
+import Pagination from './Pagination.astro';
+import type { PostSummary } from '../lib/types';
+
+interface Props {
+  heading: string;
+  items: PostSummary[];
+  emptyText: string;
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+  pagePrefix: string;
+  backLink?: boolean;
+}
+const { heading, items, emptyText, currentPage, totalPages, baseUrl, pagePrefix, backLink } = Astro.props;
+---
+
+{backLink && <p class="back-link"><a href="/">← Trang chủ</a></p>}
+<h1>{heading}</h1>
+{
+  items.length === 0 ? (
+    <p class="empty-state">{emptyText}</p>
+  ) : (
+    <ul class="post-list">
+      {items.map((post) => <PostCard post={post} />)}
+    </ul>
+  )
+}
+<Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={baseUrl} pagePrefix={pagePrefix} />

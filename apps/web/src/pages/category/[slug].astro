@@ -1,8 +1,8 @@
 ---
-// Trang CHUYÊN MỤC — liệt kê bài đã xuất bản trong 1 category. Route tĩnh (SSG).
+// Trang CHUYÊN MỤC — TRANG 1 (page 2+ ở /category/[slug]/page/[page]). Route tĩnh.
 // Chỉ dùng thin client → DTO; KHÔNG gọi Directus trực tiếp.
 import Base from '../../layouts/Base.astro';
-import PostCard from '../../components/PostCard.astro';
+import PostListView from '../../components/PostListView.astro';
 import { getAllCategorySlugs, getCategoryBySlug, listPostsByCategory } from '../../lib/directus';
 
 export async function getStaticPaths() {
@@ -14,19 +14,19 @@ const { slug } = Astro.params;
 const category = await getCategoryBySlug(slug!);
 if (!category) throw new Error(`Không tìm thấy chuyên mục: ${slug}`);
 
-const { items } = await listPostsByCategory(slug!, { pageSize: 50 });
+const { items, pageInfo } = await listPostsByCategory(slug!, { page: 1 });
+const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
 ---
 
 <Base title={`${category.name} — Retro Blog`}>
-  <p class="back-link"><a href="/">← Trang chủ</a></p>
-  <h1>Chuyên mục: {category.name}</h1>
-  {
-    items.length === 0 ? (
-      <p class="empty-state">Chưa có bài viết trong chuyên mục này.</p>
-    ) : (
-      <ul class="post-list">
-        {items.map((post) => <PostCard post={post} />)}
-      </ul>
-    )
-  }
+  <PostListView
+    heading={`Chuyên mục: ${category.name}`}
+    items={items}
+    emptyText="Chưa có bài viết trong chuyên mục này."
+    currentPage={1}
+    totalPages={totalPages}
+    baseUrl={`/category/${slug}`}
+    pagePrefix={`/category/${slug}/page`}
+    backLink
+  />
 </Base>

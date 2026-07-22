@@ -1,0 +1,31 @@
+---
+// Trang DANH SÁCH — TRANG 2+ (SSG). getStaticPaths dùng listPublishedPosts sẵn có.
+import Base from '../../layouts/Base.astro';
+import PostListView from '../../components/PostListView.astro';
+import { listPublishedPosts } from '../../lib/directus';
+
+export async function getStaticPaths() {
+  const { pageInfo } = await listPublishedPosts({ page: 1 });
+  const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
+  const paths = [];
+  for (let p = 2; p <= totalPages; p++) {
+    const { items } = await listPublishedPosts({ page: p });
+    paths.push({ params: { page: String(p) }, props: { items, currentPage: p, totalPages } });
+  }
+  return paths;
+}
+
+const { items, currentPage, totalPages } = Astro.props;
+---
+
+<Base title={`Bài viết mới nhất — Trang ${currentPage} — Retro Blog`}>
+  <PostListView
+    heading="Bài viết mới nhất"
+    items={items}
+    emptyText="Chưa có bài viết nào được xuất bản."
+    currentPage={currentPage}
+    totalPages={totalPages}
+    baseUrl="/"
+    pagePrefix="/page"
+  />
+</Base>

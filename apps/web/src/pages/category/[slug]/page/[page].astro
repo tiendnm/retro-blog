@@ -1,0 +1,41 @@
+---
+// Trang CHUYÊN MỤC — TRANG 2+ (SSG). getStaticPaths dùng listPostsByCategory sẵn có.
+import Base from '../../../../layouts/Base.astro';
+import PostListView from '../../../../components/PostListView.astro';
+import { getAllCategorySlugs, getCategoryBySlug, listPostsByCategory } from '../../../../lib/directus';
+
+export async function getStaticPaths() {
+  const slugs = await getAllCategorySlugs();
+  const paths = [];
+  for (const slug of slugs) {
+    const { pageInfo } = await listPostsByCategory(slug, { page: 1 });
+    const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
+    if (totalPages < 2) continue;
+    const category = await getCategoryBySlug(slug);
+    for (let p = 2; p <= totalPages; p++) {
+      const { items } = await listPostsByCategory(slug, { page: p });
+      paths.push({
+        params: { slug, page: String(p) },
+        props: { items, currentPage: p, totalPages, categoryName: category?.name ?? slug },
+      });
+    }
+  }
+  return paths;
+}
+
+const { slug } = Astro.params;
+const { items, currentPage, totalPages, categoryName } = Astro.props;
+---
+
+<Base title={`${categoryName} — Trang ${currentPage} — Retro Blog`}>
+  <PostListView
+    heading={`Chuyên mục: ${categoryName}`}
+    items={items}
+    emptyText="Chưa có bài viết trong chuyên mục này."
+    currentPage={currentPage}
+    totalPages={totalPages}
+    baseUrl={`/category/${slug}`}
+    pagePrefix={`/category/${slug}/page`}
+    backLink
+  />
+</Base>

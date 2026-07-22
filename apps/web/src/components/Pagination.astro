@@ -1,0 +1,39 @@
+---
+// Pagination — Trước/Sau + chỉ báo "Trang X/Y". A11y (Sprint 5 Phase 1):
+// - LINK chỉ khi có trang đích; ở BIÊN (đầu/cuối) là span disabled, KHÔNG điều hướng.
+// - <nav aria-label> + rel=prev/next. Chỉ render khi có >1 trang.
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;    // URL trang 1 (vd "/" hoặc "/category/cpu")
+  pagePrefix: string; // tiền tố trang 2+ (append "/N"), vd "/page" hoặc "/category/cpu/page"
+}
+const { currentPage, totalPages, baseUrl, pagePrefix } = Astro.props;
+const pageUrl = (n: number) => (n <= 1 ? baseUrl : `${pagePrefix}/${n}`);
+const hasPrev = currentPage > 1;
+const hasNext = currentPage < totalPages;
+---
+
+{
+  totalPages > 1 && (
+    <nav class="pagination" aria-label="Phân trang">
+      {hasPrev ? (
+        <a class="pagination__link" rel="prev" href={pageUrl(currentPage - 1)}>
+          ← Trước
+        </a>
+      ) : (
+        <span class="pagination__link pagination__link--disabled" aria-disabled="true">← Trước</span>
+      )}
+
+      <span class="pagination__status">Trang {currentPage} / {totalPages}</span>
+
+      {hasNext ? (
+        <a class="pagination__link" rel="next" href={pageUrl(currentPage + 1)}>
+          Sau →
+        </a>
+      ) : (
+        <span class="pagination__link pagination__link--disabled" aria-disabled="true">Sau →</span>
+      )}
+    </nav>
+  )
+}

@@ -1,22 +1,22 @@
 ---
-// Trang DANH SÁCH bài viết (thay trang plumbing Sprint 1).
-// Chỉ dùng thin client → nhận DTO PostSummary; KHÔNG gọi Directus trực tiếp.
+// Trang DANH SÁCH bài viết — TRANG 1 (page 2+ ở /page/[page]).
+// Chỉ dùng thin client → DTO; KHÔNG gọi Directus trực tiếp.
 import Base from '../layouts/Base.astro';
-import PostCard from '../components/PostCard.astro';
+import PostListView from '../components/PostListView.astro';
 import { listPublishedPosts } from '../lib/directus';
 
-const { items } = await listPublishedPosts({ pageSize: 50 });
+const { items, pageInfo } = await listPublishedPosts({ page: 1 });
+const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
 ---
 
 <Base title="Retro Blog — Bài viết mới nhất" description="Blog headless phong cách retro.">
-  <h1>Bài viết mới nhất</h1>
-  {
-    items.length === 0 ? (
-      <p class="empty-state">Chưa có bài viết nào được xuất bản.</p>
-    ) : (
-      <ul class="post-list">
-        {items.map((post) => <PostCard post={post} />)}
-      </ul>
-    )
-  }
+  <PostListView
+    heading="Bài viết mới nhất"
+    items={items}
+    emptyText="Chưa có bài viết nào được xuất bản."
+    currentPage={1}
+    totalPages={totalPages}
+    baseUrl="/"
+    pagePrefix="/page"
+  />
 </Base>

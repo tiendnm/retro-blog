@@ -216,6 +216,26 @@ main {
   margin: 0 0 var(--space-4);
 }
 
+/* Pagination (Sprint 5) — Trước/Sau + Trang X/Y; biên disabled không điều hướng */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-top: var(--space-8);
+  padding-top: var(--space-3);
+  border-top: 2px dashed var(--color-border);
+  font-size: var(--text-sm);
+}
+.pagination__status {
+  color: var(--color-muted);
+}
+.pagination__link--disabled {
+  color: var(--color-muted);
+  opacity: 0.5;
+}
+
 /* ---- Post detail: cột đọc (reading column) + prose (Sprint 3 Phase 3) ----
    Toàn bộ HTML markdown được style TẬP TRUNG qua .prose (không rải rác theo page). */
 .post {
