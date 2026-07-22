@@ -31,8 +31,10 @@ Tạo ADR khi quyết định: khó đảo ngược, ảnh hưởng nhiều ph�
 | [0004](./adr/0004-use-postgresql-content-store.md) | Dùng PostgreSQL | Content Store | P4,P6 | **Accepted** |
 | [0005](./adr/0005-use-docker-packaging.md) | Dùng Docker | Đóng gói/Runtime | P4,P5 | **Accepted** |
 | [0006](./adr/0006-render-strategy.md) | **SSG static-first** | Render strategy | P3,P4,P5 | **Accepted** |
+| [0007](./adr/0007-reverse-proxy-and-tls.md) | **Caddy** (reverse proxy + auto-TLS) | Edge / Ingress / TLS | P4,P5 | **Accepted** |
+| [0008](./adr/0008-rebuild-on-publish.md) | **Rebuild-on-publish** (Flow→webhook→script→atomic swap) | Content release pipeline | P3,P4,P5 | **Accepted** |
 
-> ℹ️ ADR 0002–0005 được ratify ở Sprint 0 close-out (2026-07-21). ADR-0001 (process) vẫn Proposed — có thể ratify ở đầu Sprint 1.
+> ℹ️ ADR 0002–0005 được ratify ở Sprint 0 close-out (2026-07-21). ADR-0001 (process) vẫn Proposed — có thể ratify ở đầu Sprint 1. ADR-0006 ratify Sprint 2 Phase 0. **ADR-0007/0008 ratify Sprint 6 Phase 0 (2026-07-23, Product chốt).**
 
 ## 5. Nhật ký quyết định nhẹ (Lightweight Decision Log)
 
@@ -94,3 +96,5 @@ Tạo ADR khi quyết định: khó đảo ngược, ảnh hưởng nhiều ph�
 | 2026-07-23 | **[S6-P0] Reverse proxy = CANDIDATE:** Caddy · Traefik · Nginx — ma trận đánh đổi [08 §7](./08-deployment.md) (nghiêng Caddy); **ADR-0007 ghi SAU khi Product chốt** ở review Phase 0 | Giữ candidate theo yêu cầu Product; không chốt sớm | Product |
 | 2026-07-23 | **[S6-P0] Rebuild-on-publish = Recommended:** Directus Flow → **webhook → shell script/internal utility → atomic swap** (on-server, tối giản); **không** microservice trừ khi có lý do rõ ràng; **không** phụ thuộc GitHub Actions ở MVP; **ADR-0008 ghi SAU khi chốt** | Tối giản theo yêu cầu Product; đủ cho MVP | Product |
 | 2026-07-23 | **[S6-P0] Backup scope:** database + uploads + config + env — **KHÔNG** backup `dist/` (tái sinh từ build). **Rollback = atomic swap** về static build trước (vào Launch Checklist). **CI test/hardening/monitoring → Sprint 7** | Backup đúng dữ liệu không tái tạo được; rollback nhanh; giữ scope MVP | Product |
+| 2026-07-23 | **[S6-P0 CHỐT] Product chốt** → **ADR-0007 Caddy** (auto-TLS Let's Encrypt/ACME; static phục vụ trực tiếp bởi Caddy; Directus qua `cms.<domain>`) + **ADR-0008** (Directus Flow→Webhook→Shell script→Atomic swap; không microservice). **Domain topology: `retro.<domain>` + `cms.<domain>`** (domain thật cung cấp ở Phase 2) | Kết thúc candidate; ratify 2 ADR | Product |
+| 2026-07-23 | **[S6-P1] Web build tái lập:** `apps/web/Dockerfile` (build-runner: `pnpm install --frozen-lockfile`; **`astro build` chạy lúc runtime** — không bake nội dung) + `.dockerignore`. **Verify: 2 lần build cho `dist` byte-identical** (aggregate sha256 khớp, 123 trang/126 file) | Chống drift deps; nội dung động tách khỏi image (khớp ADR-0008); reproducible theo tiêu chí S6 | Sprint 6 |

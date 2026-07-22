@@ -1,0 +1,9 @@
+# Loại khỏi build context (giữ context nhỏ + build tái lập, tránh lẫn artifact host)
+node_modules
+dist
+.astro
+*.log
+npm-debug.log*
+.DS_Store
+Dockerfile
+.dockerignore

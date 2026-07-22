@@ -74,7 +74,7 @@ Chuyển sản phẩm từ "chạy local" → **public production**:
 Chốt và ghi Decision Log + ADR mới. **Một số quyết định giữ ở trạng thái _candidate_ tới khi Product xác nhận** (không chốt ngay đầu Phase 0):
 - **Hosting target**: self-host Docker host (đúng ADR-0005). *(Cần Product cung cấp: máy chủ/VPS + **domain** + DNS.)* Đề xuất: 1 VPS nhỏ, all-in-one compose.
 - **Reverse proxy + TLS — _Candidate_ (chưa chốt):** **Caddy** · **Traefik** · **Nginx** (+Certbot/ACME). Đánh giá đánh đổi (đơn giản cấu hình, auto-TLS, vận hành) ở Phase 0 → **ADR-0007 ghi SAU khi chốt**.
-- **Domain topology — _Recommended_ (chưa chốt tới khi Product xác nhận domain):** khuyến nghị **subdomain tách** — `blog.<domain>` (site tĩnh) + `cms.<domain>` (Directus). Tách CORS/PUBLIC_URL rõ ràng.
+- **Domain topology — ✅ CHỐT (Product, Phase 0):** **subdomain tách** — **`retro.<domain>`** (site tĩnh) + **`cms.<domain>`** (Directus). Tách CORS/PUBLIC_URL rõ ràng. *(`<domain>` thật cung cấp ở Phase 2.)*
 - **Web serving prod**: **static build → reverse proxy serve** (không Node runtime cho site).
 - **Rebuild-on-publish — ưu tiên tối giản:** **webhook → shell script/internal utility → atomic swap** (on-server), **không** phụ thuộc GitHub Actions ở MVP và **không** tạo microservice trừ khi có lý do rõ ràng → **ADR-0008 ghi SAU khi chốt**.
 - **Prod compose**: file override riêng; secrets prod ngoài repo; **2FA admin** khuyến nghị.
