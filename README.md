@@ -2,7 +2,7 @@
 
 > Một blog headless mang phong cách retro — **Astro** (site) + **Directus** (headless CMS) + **PostgreSQL**, đóng gói bằng **Docker**.
 
-> **Trạng thái:** 🟢 Sprint 4 — Fixture Framework & Dogfooding (dataset ~100 bài + edge/stress để kiểm thử ở quy mô thật). Reader/API/Content Model không đổi.
+> **Trạng thái:** 🟡 Sprint 5 — Reader Completeness (Pagination ✓ + SEO baseline ✓). Content Model/API/DTO/thin client không đổi.
 > **Cập nhật lần cuối:** 2026-07-22
 
 ---
@@ -116,7 +116,7 @@ Bắt đầu từ [docs/README.md](./docs/README.md).
 | Sprint 2 | Vertical slice MVP nội dung (Roadmap M2) | 🟢 Hoàn thành |
 | Sprint 3 | Reader Experience (Presentation Layer) | 🟢 Hoàn thành |
 | Sprint 4 | Fixture Framework & Dogfooding | 🟢 Hoàn thành |
-| Sprint 5 | _(chưa bắt đầu)_ | ⏳ |
+| Sprint 5 | Reader Completeness (Pagination + SEO baseline) | 🟡 Đang tiến hành (P1 Pagination ✓ · P2 SEO ✓) |
 
 ## License
 

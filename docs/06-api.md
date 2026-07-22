@@ -39,6 +39,7 @@
 - **Không có filter `status`/`published_at` trong truy vấn** — Public role đã enforce (defense-in-depth: client quên cũng không lộ draft).
 - **Media:** M2O `cover`/`avatar` → `{ url: PUBLIC_DIRECTUS_URL/assets/<id>, alt }`. `alt` từ field tuỳ biến trên `directus_files`.
 - **`<summary>` / `<detail>`** = allowlist field khớp `PostSummary` / `PostDetail` (xem hằng `SUMMARY_FIELDS`/`DETAIL_FIELDS` trong client).
+- **SEO (S5-P2)** — `sitemap.xml`/`robots.txt` là endpoint Astro **tái dùng** `getAllPublishedPostSlugs()`/`getAllCategorySlugs()` sẵn có; **KHÔNG** thêm thao tác/field/hợp đồng mới. Sitemap chỉ liệt kê canonical content URL (loại pagination — Decision `[S5-P0]`).
 
 ## 3. Phân trang / lọc / sắp xếp (hiện thực)
 

@@ -22,7 +22,12 @@ if (!post) throw new Error(`Không tìm thấy bài đã xuất bản: ${slug}`)
 const bodyHtml = post.body ? await marked.parse(post.body) : '';
 ---
 
-<Base title={`${post.title} — Retro Blog`} description={post.excerpt ?? undefined}>
+<Base
+  title={`${post.title} — Retro Blog`}
+  description={post.excerpt ?? undefined}
+  type="article"
+  image={post.cover?.url}
+>
   <p class="back-link"><a href="/">← Trang chủ</a></p>
   <article class="post">
     <header class="post__header">
