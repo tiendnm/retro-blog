@@ -481,10 +481,10 @@ fields:
       group: null
       hidden: false
       interface: input
-      note: Alt text (a11y, 03c 2.5)
+      note: 'Văn bản thay thế (a11y, 03c §2.5): mô tả nội dung ảnh cho screen reader. Bắt buộc khi tải ảnh lên (ảnh trang trí để alt rỗng là quyết định ở tầng hiển thị).'
       options: null
       readonly: false
-      required: false
+      required: true
       sort: 1
       special: null
       translations: null
@@ -638,8 +638,10 @@ fields:
       group: null
       hidden: false
       interface: input
-      note: null
-      options: null
+      note: 'Định danh URL: chữ thường, không dấu, dùng gạch nối thay khoảng trắng. Ổn định sau khi xuất bản (BR-2) — tránh đổi để không gãy link.'
+      options:
+        slug: true
+        trim: true
       readonly: false
       required: true
       sort: 3
@@ -677,7 +679,7 @@ fields:
       group: null
       hidden: false
       interface: input-multiline
-      note: null
+      note: 'Tóm tắt ngắn: hiển thị ở danh sách bài và dùng làm thẻ mô tả SEO (meta description). Để trống nếu không cần.'
       options: null
       readonly: false
       required: false
@@ -755,7 +757,7 @@ fields:
       group: null
       hidden: false
       interface: select-dropdown
-      note: null
+      note: 'Draft = nháp (ẩn khỏi site). Published = công khai khi published_at ≤ hiện tại.'
       options:
         choices:
           - text: Draft
@@ -799,7 +801,7 @@ fields:
       group: null
       hidden: false
       interface: datetime
-      note: null
+      note: 'Để trống khi chuyển sang Published → hệ thống tự đặt = thời điểm hiện tại. Nhập tay để hẹn lịch/lùi ngày; giá trị đã có sẽ KHÔNG bị ghi đè.'
       options: null
       readonly: false
       required: false

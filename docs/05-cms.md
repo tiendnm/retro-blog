@@ -25,11 +25,11 @@
 | Field (03c) | Directus type | Interface | Ghi chú |
 |---|---|---|---|
 | title | string | input | required |
-| slug | string | input | required, **unique** |
-| excerpt | text | input-multiline | |
+| slug | string | input | required, **unique**; auto-slugify (`options.slug`) + help note (S6.5) |
+| excerpt | text | input-multiline | help note: dùng cho list + SEO description (S6.5) |
 | body | text | input-rich-text-md | |
-| status | string | select-dropdown | choices **draft/published**, default `draft` |
-| published_at | timestamp | datetime | |
+| status | string | select-dropdown | choices **draft/published**, default `draft`; help note (S6.5) |
+| published_at | timestamp | datetime | help note: để trống → auto-set khi publish (Flow C1, S6.5) |
 | author | uuid (M2O) | select-dropdown-m2o → `authors` | required; on_delete NO ACTION |
 | category | uuid (M2O) | select-dropdown-m2o → `categories` | on_delete SET NULL |
 | cover | uuid (M2O) | file-image → `directus_files` | on_delete SET NULL |
@@ -42,7 +42,7 @@
 
 ### Media ← Media ([03c §2.5](./03c-content-model.md))
 - **Dùng Directus Files (`directus_files`, built-in)** — *không tạo Media collection riêng*.
-- Thêm field tuỳ biến: **`alt`** (string — a11y, bắt buộc theo quy ước) · **`caption`** (string).
+- Thêm field tuỳ biến: **`alt`** (string — a11y; **`required` ở form editor** từ S6.5, R6) · **`caption`** (string).
 - Post.cover / Author.avatar tham chiếu `directus_files`.
 
 > Mọi collection dùng khoá chính `id` kiểu **uuid** (auto-generate).
