@@ -18,7 +18,10 @@ const { items, pageInfo } = await listPostsByCategory(slug!, { page: 1 });
 const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
 ---
 
-<Base title={`${category.name} — Retro Blog`}>
+<Base
+  title={`${category.name} — Retro Blog`}
+  description={`Các bài viết thuộc chuyên mục ${category.name} trên Retro Blog.`}
+>
   <PostListView
     heading={`Chuyên mục: ${category.name}`}
     items={items}
@@ -27,6 +30,5 @@ const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
     totalPages={totalPages}
     baseUrl={`/category/${slug}`}
     pagePrefix={`/category/${slug}/page`}
-    backLink
   />
 </Base>

@@ -20,6 +20,29 @@ if (!post) throw new Error(`Không tìm thấy bài đã xuất bản: ${slug}`)
 // body là markdown (03c: input-rich-text-md). Nội dung do Editor tin cậy nhập
 // (MVP, không nhận input công khai). Sanitize HTML: hardening tương lai (12-security §8).
 const bodyHtml = post.body ? await marked.parse(post.body) : '';
+
+// URL/ảnh tuyệt đối cho structured data + article meta (Sprint 6.5).
+const site = Astro.site;
+const pageUrl = site ? new URL(`/posts/${post.slug}`, site).href : `/posts/${post.slug}`;
+const imageAbs = post.cover?.url
+  ? (site ? new URL(post.cover.url, site).href : post.cover.url)
+  : (site ? new URL('/og-default.png', site).href : '/og-default.png');
+
+// JSON-LD BlogPosting — chỉ dùng field DTO sẵn có, không đổi kiến trúc (R3).
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  ...(post.excerpt ? { description: post.excerpt } : {}),
+  ...(post.publishedAt ? { datePublished: post.publishedAt } : {}),
+  author: { '@type': 'Person', name: post.author.name },
+  ...(post.category ? { articleSection: post.category.name } : {}),
+  image: imageAbs,
+  mainEntityOfPage: pageUrl,
+  publisher: { '@type': 'Organization', name: 'Retro Blog' },
+};
+// Escape '<' để chuỗi JSON không thể phá vỡ ngữ cảnh <script> (nội dung tin cậy, vẫn hardening).
+const jsonLdScript = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
 ---
 
 <Base
@@ -28,7 +51,12 @@ const bodyHtml = post.body ? await marked.parse(post.body) : '';
   type="article"
   image={post.cover?.url}
 >
-  <p class="back-link"><a href="/">← Trang chủ</a></p>
+  <Fragment slot="head">
+    {post.publishedAt && <meta property="article:published_time" content={post.publishedAt} />}
+    <meta property="article:author" content={post.author.name} />
+    {post.category && <meta property="article:section" content={post.category.name} />}
+    <script type="application/ld+json" set:html={jsonLdScript} />
+  </Fragment>
   <article class="post">
     <header class="post__header">
       <h1>{post.title}</h1>

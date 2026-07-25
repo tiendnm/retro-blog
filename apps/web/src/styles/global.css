@@ -191,6 +191,22 @@ main {
   flex: 1 1 auto;
   min-width: 0; /* cho phép text co, tránh tràn ngang */
 }
+/* Chuyên mục trên card (Sprint 6.5, N2) — kicker nhỏ trên tiêu đề, giúp nhận chủ đề */
+.post-card__cat {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.post-card__cat a {
+  color: var(--color-muted);
+  text-decoration: none;
+}
+.post-card__cat a:hover,
+.post-card__cat a:focus-visible {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
 .post-card__body h2 {
   margin: 0 0 var(--space-2);
   font-size: var(--text-xl);
@@ -216,7 +232,7 @@ main {
   margin: 0 0 var(--space-4);
 }
 
-/* Pagination (Sprint 5) — Trước/Sau + Trang X/Y; biên disabled không điều hướng */
+/* Pagination (Sprint 6.5, R8) — Trước/Sau + dãy số trang; biên disabled không điều hướng */
 .pagination {
   display: flex;
   align-items: center;
@@ -228,12 +244,40 @@ main {
   border-top: 2px dashed var(--color-border);
   font-size: var(--text-sm);
 }
-.pagination__status {
-  color: var(--color-muted);
-}
 .pagination__link--disabled {
   color: var(--color-muted);
   opacity: 0.5;
+}
+/* Dãy số trang: đứng giữa, cho phép xuống dòng ở quy mô lớn */
+.pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.pagination__page {
+  min-width: 2em;
+  padding: var(--space-1) var(--space-2);
+  text-align: center;
+  text-decoration: none;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent);
+}
+.pagination__page:hover,
+.pagination__page:focus-visible {
+  border-color: var(--color-accent);
+}
+.pagination__page--current {
+  color: var(--color-bg);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  font-weight: var(--weight-bold);
+}
+.pagination__ellipsis {
+  color: var(--color-muted);
+  padding: 0 var(--space-1);
 }
 
 /* ---- Post detail: cột đọc (reading column) + prose (Sprint 3 Phase 3) ----
@@ -261,6 +305,10 @@ main {
 
 .prose {
   line-height: var(--leading-relaxed);
+  /* UI-1 (Sprint 6.5, R4): từ/URL siêu dài không tràn ngang, bẻ dòng trong hộp đọc */
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
 }
 /* Vertical rhythm — khoảng cách dọc nhất quán giữa các khối */
 .prose > * {
@@ -374,6 +422,26 @@ main {
   border-top: 2px dashed var(--color-border);
   margin-top: var(--space-8);
   margin-bottom: var(--space-8);
+}
+
+/* Trang 404 (Sprint 6.5, R5) — nhận diện retro, canh giữa gọn */
+.notfound {
+  text-align: center;
+  padding: var(--space-12) 0;
+}
+.notfound__code {
+  font-size: 5rem;
+  line-height: 1;
+  font-weight: var(--weight-bold);
+  letter-spacing: 4px;
+  color: var(--color-accent);
+  margin: 0 0 var(--space-4);
+}
+.notfound__msg {
+  color: var(--color-muted);
+  max-width: 40ch;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .site-footer {

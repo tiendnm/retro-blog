@@ -23,6 +23,9 @@ interface Props {
 const { title, description, image, type = 'website' } = Astro.props;
 
 const SITE_NAME = 'Retro Blog';
+// Ảnh chia sẻ mặc định (Sprint 6.5): bài không cover → thẻ share vẫn có ảnh
+// thương hiệu 1200×630 thay vì trống. Asset tĩnh trong public/.
+const DEFAULT_OG_IMAGE = '/og-default.png';
 
 // Chuẩn hoá path (bỏ trailing slash trừ gốc) để canonical KHỚP TUYỆT ĐỐI với
 // loc trong sitemap.xml (cùng dạng không-trailing). `Astro.site` luôn có vì
@@ -30,7 +33,10 @@ const SITE_NAME = 'Retro Blog';
 const rawPath = Astro.url.pathname;
 const path = rawPath !== '/' ? rawPath.replace(/\/$/, '') : '/';
 const canonical = Astro.site ? new URL(path, Astro.site).href : path;
-const ogImage = image ? (Astro.site ? new URL(image, Astro.site).href : image) : undefined;
+// Luôn có ảnh: dùng cover bài nếu truyền vào, ngược lại ảnh mặc định (đều 1200×630
+// → twitter card 'summary_large_image').
+const imagePath = image ?? DEFAULT_OG_IMAGE;
+const ogImage = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
 ---
 
 <!doctype html>
@@ -49,13 +55,16 @@ const ogImage = image ? (Astro.site ? new URL(image, Astro.site).href : image) :
     <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}
     <meta property="og:url" content={canonical} />
-    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:image" content={ogImage} />
 
-    {/* Twitter card */}
-    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    {/* Twitter card — luôn có ảnh (cover hoặc mặc định) ⇒ large image */}
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     {description && <meta name="twitter:description" content={description} />}
-    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    <meta name="twitter:image" content={ogImage} />
+
+    {/* Metadata bổ sung theo trang (article:*, JSON-LD…) — trang chi tiết inject qua đây */}
+    <slot name="head" />
   </head>
   <body>
     <a class="skip-link" href="#main">Bỏ qua tới nội dung</a>

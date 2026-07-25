@@ -35,6 +35,8 @@ export interface PostSummary {
   cover: MediaRef | null;
   publishedAt: string | null;
   author: AuthorSummary;
+  /** Chuyên mục (Sprint 6.5) — bổ sung additive để card hiện chủ đề; `null` nếu bài không có. */
+  category: CategoryRef | null;
 }
 
 /** PostDetail — 03d §3.2 (trang chi tiết). */

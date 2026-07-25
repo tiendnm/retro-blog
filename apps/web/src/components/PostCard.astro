@@ -24,6 +24,13 @@ const href = `/posts/${post.slug}`;
     )
   }
   <div class="post-card__body">
+    {
+      post.category && (
+        <p class="post-card__cat">
+          <a href={`/category/${post.category.slug}`}>{post.category.name}</a>
+        </p>
+      )
+    }
     <h2><a href={href}>{post.title}</a></h2>
     {post.excerpt && <p>{post.excerpt}</p>}
     <p class="meta">

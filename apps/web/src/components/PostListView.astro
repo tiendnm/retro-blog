@@ -13,12 +13,10 @@ interface Props {
   totalPages: number;
   baseUrl: string;
   pagePrefix: string;
-  backLink?: boolean;
 }
-const { heading, items, emptyText, currentPage, totalPages, baseUrl, pagePrefix, backLink } = Astro.props;
+const { heading, items, emptyText, currentPage, totalPages, baseUrl, pagePrefix } = Astro.props;
 ---
 
-{backLink && <p class="back-link"><a href="/">← Trang chủ</a></p>}
 <h1>{heading}</h1>
 {
   items.length === 0 ? (

@@ -30,7 +30,8 @@ const MAX_PAGE_SIZE = 50;
 
 // Field allowlist gửi lên Directus — TẬP CON của Public permission (05-cms §2).
 const SUMMARY_FIELDS =
-  'id,title,slug,excerpt,published_at,author.name,author.slug,cover.id,cover.alt';
+  'id,title,slug,excerpt,published_at,author.name,author.slug,' +
+  'category.name,category.slug,cover.id,cover.alt';
 const DETAIL_FIELDS =
   'id,title,slug,excerpt,body,published_at,' +
   'author.name,author.slug,author.avatar.id,author.avatar.alt,' +
@@ -120,6 +121,7 @@ function toSummary(p: RawPost): PostSummary {
     cover: toMedia(p.cover),
     publishedAt: p.published_at ?? null,
     author: toAuthorSummary(p.author),
+    category: toCategory(p.category),
   };
 }
 function toDetail(p: RawPost): PostDetail {

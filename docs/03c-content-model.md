@@ -29,7 +29,7 @@
 | published_at | datetime | ❌ | Thời điểm xuất bản | bắt buộc khi status=Published |
 | author | reference → Author | ✅ | Tác giả | |
 | category | reference → Category | ❌ | Chuyên mục (độc quyền) | |
-| tags | reference[] → Tag | ❌ | Thẻ (nhiều-nhiều) | |
+| ~~tags~~ | reference[] → Tag | ❌ | Thẻ (nhiều-nhiều) | ⏭️ **Deferred** — xem §2.4 |
 | cover | reference → Media | ❌ | Ảnh bìa | cần alt text (a11y [15](./15-seo-accessibility.md)) |
 
 ### 2.2. Author (Tác giả)
@@ -50,7 +50,9 @@
 | description | text | ❌ | Mô tả | |
 | parent | reference → Category | ❌ | Chuyên mục cha | cho phân cấp (theo [03b §2](./03b-domain-model.md)); không tạo vòng |
 
-### 2.4. Tag (Thẻ)
+### 2.4. Tag (Thẻ) — ⏭️ Deferred (Future)
+
+> ⚠️ **Chưa hiện thực (đồng bộ SSOT ⇄ impl — Sprint 6.5, C4).** Collection `tags` và field `Post.tags` **không** tồn tại trong `schema.yaml` (đúng "Tag ngoài Sprint 2" ở [05-cms §1](./05-cms.md)). Mô hình dưới đây giữ lại làm **thiết kế cho tương lai**; hệ thống Tag (collection + M2M + trang) là **feature** → Sprint 7+/Future, không thuộc MVP hiện tại.
 
 | Field | Kiểu (trung lập) | Bắt buộc | Mô tả | Ràng buộc |
 |---|---|---|---|---|
@@ -73,7 +75,7 @@
 |---|---|---|---|
 | Post | nhiều → 1 (bắt buộc) | Author | mỗi bài một tác giả |
 | Post | nhiều → 0..1 | Category | độc quyền |
-| Post | nhiều ↔ nhiều | Tag | |
+| Post | nhiều ↔ nhiều | Tag | ⏭️ Deferred (§2.4) — chưa hiện thực |
 | Post | nhiều → 0..1 | Media (cover) | |
 | Author / Category / Media | 1 → nhiều / được tham chiếu | Post | |
 | Category | 0..1 → 1 | Category (parent) | phân cấp |

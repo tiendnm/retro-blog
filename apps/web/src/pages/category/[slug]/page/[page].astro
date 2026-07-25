@@ -27,7 +27,10 @@ const { slug } = Astro.params;
 const { items, currentPage, totalPages, categoryName } = Astro.props;
 ---
 
-<Base title={`${categoryName} — Trang ${currentPage} — Retro Blog`}>
+<Base
+  title={`${categoryName} — Trang ${currentPage} — Retro Blog`}
+  description={`Các bài viết thuộc chuyên mục ${categoryName} trên Retro Blog — Trang ${currentPage}.`}
+>
   <PostListView
     heading={`Chuyên mục: ${categoryName}`}
     items={items}
@@ -36,6 +39,5 @@ const { items, currentPage, totalPages, categoryName } = Astro.props;
     totalPages={totalPages}
     baseUrl={`/category/${slug}`}
     pagePrefix={`/category/${slug}/page`}
-    backLink
   />
 </Base>

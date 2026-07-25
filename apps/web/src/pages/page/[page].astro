@@ -18,7 +18,10 @@ export async function getStaticPaths() {
 const { items, currentPage, totalPages } = Astro.props;
 ---
 
-<Base title={`Bài viết mới nhất — Trang ${currentPage} — Retro Blog`}>
+<Base
+  title={`Bài viết mới nhất — Trang ${currentPage} — Retro Blog`}
+  description={`Bài viết mới nhất trên Retro Blog — Trang ${currentPage}.`}
+>
   <PostListView
     heading="Bài viết mới nhất"
     items={items}
