@@ -1,6 +1,6 @@
 # 13 — Operations (Runbook, Observability, Backup, Incident)
 
-> **Trạng thái:** 🔴 Chưa bắt đầu · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chưa gán)_
+> **Trạng thái:** 🟡 Đang bổ sung · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-26 · **Người duyệt:** _(chưa gán)_
 >
 > 🎯 **Mục đích:** Hướng dẫn *vận hành hệ thống khi đã chạy* — thao tác thường ngày, giám sát, sao lưu/khôi phục và xử lý sự cố. Đảm bảo hệ thống chạy ổn định và phục hồi được.
 > 🔗 **Liên quan:** [08-deployment](./08-deployment.md) · [12-security](./12-security.md) · [04-database](./04-database.md)
@@ -49,6 +49,7 @@
 | Triển khai phiên bản mới | | Xem [08-deployment](./08-deployment.md) | |
 | Rollback (site) | Deploy/rebuild lỗi | **Atomic swap** về build trước: đổi symlink `current` trong volume `site_dist` sang `builds/<TS-cũ>` (giữ `KEEP_BUILDS` bản). Xem [08 §6](./08-deployment.md) | Thấp (không rebuild) |
 | Rebuild site (sau publish) | Nội dung đổi | **Tự động** qua Directus Flow → webhook → `services/rebuild/rebuild.sh` (build + atomic swap; ADR-0008). **Thủ công/fallback:** chạy `sh services/rebuild/rebuild.sh` trên host | Thấp (atomic; fail → giữ bản cũ) |
+| Xuất bản bài (publish) | Editor đặt `status=published` | Directus **Flow "Auto set published_at"** (`services/directus/apply-publish-flow.mjs`, Sprint 6.5) tự đặt `published_at = thời điểm hiện tại` **CHỈ khi field còn trống** — vá "bẫy 2 bước" (publish nhưng quên `published_at` → bài ẩn). **Editor vẫn chỉnh `published_at` thủ công** được (vd xuất bản lùi/định ngày); Flow **KHÔNG ghi đè** giá trị đã có. Chạy `emitEvents=false` ⇒ không loop/rebuild thừa. Áp dụng khi deploy: `node services/directus/apply-publish-flow.mjs` | Thấp |
 | Khởi động lại Directus / DB | Treo/lỗi | TODO | |
 | Xoá cache | Dữ liệu cũ | TODO | |
 
