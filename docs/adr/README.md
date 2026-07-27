@@ -33,3 +33,6 @@
 | [0004](./0004-use-postgresql-content-store.md) | Dùng PostgreSQL (Content Store) | **Accepted** |
 | [0005](./0005-use-docker-packaging.md) | Dùng Docker (đóng gói & runtime) | **Accepted** |
 | [0006](./0006-render-strategy.md) | Chiến lược render: SSG static-first | **Accepted** |
+| [0007](./0007-reverse-proxy-and-tls.md) | Reverse proxy & TLS: Caddy | **Accepted** |
+| [0008](./0008-rebuild-on-publish.md) | Rebuild-on-publish (Flow→webhook→swap) | **Accepted** |
+| [0009](./0009-quality-tooling-biome-vitest.md) | Cổng chất lượng: Biome + Vitest | **Accepted** |

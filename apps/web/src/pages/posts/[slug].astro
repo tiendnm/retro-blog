@@ -55,7 +55,7 @@ const jsonLdScript = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
     {post.publishedAt && <meta property="article:published_time" content={post.publishedAt} />}
     <meta property="article:author" content={post.author.name} />
     {post.category && <meta property="article:section" content={post.category.name} />}
-    <script type="application/ld+json" set:html={jsonLdScript} />
+    <script type="application/ld+json" is:inline set:html={jsonLdScript} />
   </Fragment>
   <article class="post">
     <header class="post__header">

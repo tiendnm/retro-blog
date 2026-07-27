@@ -1,6 +1,9 @@
 # ─── Dependencies ───
 node_modules/
 .pnpm-store/
+# Lockfile BẮT BUỘC track (Dockerfile + CI dùng --frozen-lockfile để build tái lập)
+# → override ~/.gitignore_global (có 'pnpm-lock.yaml'):
+!apps/web/pnpm-lock.yaml
 
 # ─── Env & secrets (KHÔNG commit giá trị thật; chỉ .env.example được track) ───
 .env
