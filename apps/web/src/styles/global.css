@@ -7,11 +7,11 @@
 
 :root {
   /* ---- Color — kiểm tương phản trên --color-bg (AA ≥ 4.5:1) ------------- */
-  --color-bg: #f4f1e8;            /* nền giấy */
-  --color-surface: #efe8d6;       /* nền phụ (khối/card) */
-  --color-text: #2b2b2b;          /* chữ chính  — ~12.6:1 (AAA) */
-  --color-muted: #595959;         /* chữ phụ    — ~6.2:1  (AA)  */
-  --color-accent: #7b2d26;        /* nhấn/link  — ~8.3:1  (AAA) */
+  --color-bg: #f4f1e8; /* nền giấy */
+  --color-surface: #efe8d6; /* nền phụ (khối/card) */
+  --color-text: #2b2b2b; /* chữ chính  — ~12.6:1 (AAA) */
+  --color-muted: #595959; /* chữ phụ    — ~6.2:1  (AA)  */
+  --color-accent: #7b2d26; /* nhấn/link  — ~8.3:1  (AAA) */
   --color-accent-strong: #5c211c;
   --color-border: #d9d2c0;
 
@@ -19,7 +19,7 @@
   --font-mono: "Courier New", Courier, monospace;
   --font-serif: Georgia, "Times New Roman", serif;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-body: var(--font-mono);      /* provisional: giữ chất retro hiện tại */
+  --font-body: var(--font-mono); /* provisional: giữ chất retro hiện tại */
   --font-heading: var(--font-mono);
 
   /* type scale — base 1rem, tỉ lệ ~1.2 */
@@ -49,9 +49,9 @@
   --space-16: 4rem;
 
   /* ---- Container / width ------------------------------------------------ */
-  --container-max: 720px;         /* bề rộng trang */
+  --container-max: 720px; /* bề rộng trang */
   --container-pad-x: 1.25rem;
-  --reading-width: 68ch;          /* độ rộng dòng thân bài (áp dụng ở Phase 3) */
+  --reading-width: 68ch; /* độ rộng dòng thân bài (áp dụng ở Phase 3) */
 
   /* ---- Border ----------------------------------------------------------- */
   --border-width: 1px;
@@ -90,8 +90,14 @@ h1 {
   line-height: var(--leading-tight);
   margin: 0 0 var(--space-6); /* khoảng cách tiêu đề trang nhất quán mọi trang */
 }
-h2 { font-size: var(--text-2xl); line-height: var(--leading-tight); }
-h3 { font-size: var(--text-xl); line-height: var(--leading-tight); }
+h2 {
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
+}
+h3 {
+  font-size: var(--text-xl);
+  line-height: var(--leading-tight);
+}
 
 /* a11y foundation: tiêu điểm bàn phím luôn thấy rõ */
 :focus-visible {
@@ -331,14 +337,26 @@ main {
   line-height: var(--leading-tight);
   margin-top: var(--space-8);
 }
-.prose h2 { font-size: var(--text-2xl); }
-.prose h3 { font-size: var(--text-xl); }
-.prose h4 { font-size: var(--text-lg); }
+.prose h2 {
+  font-size: var(--text-2xl);
+}
+.prose h3 {
+  font-size: var(--text-xl);
+}
+.prose h4 {
+  font-size: var(--text-lg);
+}
 .prose h5,
-.prose h6 { font-size: var(--text-base); }
+.prose h6 {
+  font-size: var(--text-base);
+}
 
-.prose a { color: var(--color-accent); }
-.prose strong { font-weight: var(--weight-bold); }
+.prose a {
+  color: var(--color-accent);
+}
+.prose strong {
+  font-weight: var(--weight-bold);
+}
 
 /* Lists */
 .prose ul,
