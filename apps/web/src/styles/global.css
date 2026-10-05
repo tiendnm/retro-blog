@@ -345,9 +345,11 @@ main {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-6);
-  align-items: start;
+  align-items: stretch; /* các thẻ cùng hàng cao bằng nhau */
 }
 .paper-card {
+  display: flex;
+  flex-direction: column;
   background: var(--color-card);
   border: var(--border-width) solid var(--color-border);
   box-shadow: 4px 4px 0 var(--color-border);
@@ -368,6 +370,7 @@ main {
   object-fit: cover;
 }
 .paper-card__body {
+  flex: 1 1 auto; /* thân thẻ giãn đầy để meta luôn nằm đáy */
   padding: var(--space-4);
   display: flex;
   flex-direction: column;
@@ -380,6 +383,10 @@ main {
 }
 .paper-card__body p {
   margin: 0;
+}
+.paper-card__body .meta {
+  margin-top: auto; /* đẩy dòng tác giả/ngày xuống đáy thẻ */
+  padding-top: var(--space-1);
 }
 .paper-card__ex {
   font-size: var(--text-sm);
