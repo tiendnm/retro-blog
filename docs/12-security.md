@@ -54,7 +54,7 @@
 
 ## 8. Bảo mật tầng ứng dụng
 
-- **Render Markdown từ CMS (`body`):** Sprint 2 dùng `marked` + `set:html` để hiển thị bài. Nội dung do **Editor tin cậy** nhập (không có input công khai — không comment/không user-generated content ở MVP), nên rủi ro XSS thấp. **Hardening tương lai (bắt buộc trước khi cho tác giả không tin cậy):** sanitize HTML đầu ra (vd allowlist thẻ/thuộc tính) — [10-decisions §5 `[S2-P3]`](./10-decisions.md).
+- **Render nội dung từ CMS (`body`):** `body` lưu **HTML** (WYSIWYG, [ADR-0011](./adr/0011-body-stored-as-html-wysiwyg.md); trước đó markdown + `marked`) và hiển thị qua `set:html`. Nội dung do **Editor tin cậy** nhập (không có input công khai — không comment/không user-generated content ở MVP), nên rủi ro XSS thấp. **Hardening tương lai (bắt buộc trước khi cho tác giả không tin cậy):** sanitize HTML đầu ra (vd allowlist thẻ/thuộc tính) — [10-decisions §5 `[S2-P3]`](./10-decisions.md).
 - **Không tự lộ field nội bộ:** Public API dùng **field allowlist** (không `*`) — field thêm về sau không tự ra Public ([05-cms §2](./05-cms.md), [06-api §1](./06-api.md)).
 - TODO _(CSRF, security headers, rate limiting)_.
 
@@ -73,6 +73,6 @@
 - [x] Quyền Directus theo least privilege — Public read + gate `published`/`$NOW` + field allowlist _(S2)_
 - [x] Postgres không expose; Directus chỉ qua proxy _(S6)_
 - [ ] **Security headers cấu hình** — **Sprint 7** (Hardening)
-- [ ] **Sanitize HTML markdown (XSS)** — **Sprint 7** (Public MVP: nội dung Editor tin cậy §8)
+- [ ] **Sanitize HTML body (XSS)** — **Sprint 7** (Public MVP: nội dung Editor tin cậy §8)
 - [ ] **Dependencies quét lỗ hổng** — **Sprint 7**
 - [ ] 2FA admin — bật khi cấu hình server thật (khuyến nghị §3)

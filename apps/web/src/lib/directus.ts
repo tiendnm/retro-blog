@@ -19,6 +19,7 @@ import type {
   PostListResult,
   PostSummary,
 } from './types';
+import { rewriteAssetUrls } from './rewrite-assets';
 
 // URL container→Directus (server-side). Không token ⇒ Public role.
 const INTERNAL_URL = process.env.DIRECTUS_INTERNAL_URL ?? 'http://directus:8055';
@@ -130,7 +131,7 @@ function toDetail(p: RawPost): PostDetail {
     title: p.title,
     slug: p.slug,
     excerpt: p.excerpt ?? null,
-    body: p.body ?? null,
+    body: p.body ? rewriteAssetUrls(p.body, PUBLIC_URL) : null,
     publishedAt: p.published_at ?? null,
     author: toAuthorDetail(p.author),
     category: toCategory(p.category),

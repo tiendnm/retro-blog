@@ -34,6 +34,7 @@ Tạo ADR khi quyết định: khó đảo ngược, ảnh hưởng nhiều ph�
 | [0007](./adr/0007-reverse-proxy-and-tls.md) | **Caddy** (reverse proxy + auto-TLS) | Edge / Ingress / TLS | P4,P5 | **Accepted** |
 | [0008](./adr/0008-rebuild-on-publish.md) | **Rebuild-on-publish** (Flow→webhook→script→atomic swap) | Content release pipeline | P3,P4,P5 | **Accepted** |
 | [0010](./adr/0010-external-postgres-instance.md) | **PostgreSQL instance có sẵn trên host** (ngoài compose) | Content Store (hạ tầng) | P6 | **Accepted** |
+| [0011](./adr/0011-body-stored-as-html-wysiwyg.md) | **`posts.body` lưu HTML (WYSIWYG)** — thay `[S2-P3]` | Content format (RÌA) | P6 | **Accepted** |
 
 > ℹ️ ADR 0002–0005 được ratify ở Sprint 0 close-out (2026-07-21). ADR-0001 (process) vẫn Proposed — có thể ratify ở đầu Sprint 1. ADR-0006 ratify Sprint 2 Phase 0. **ADR-0007/0008 ratify Sprint 6 Phase 0 (2026-07-23, Product chốt).**
 
@@ -68,7 +69,7 @@ Tạo ADR khi quyết định: khó đảo ngược, ảnh hưởng nhiều ph�
 | 2026-07-21 | **[S2-P3] Thin fetch client** `apps/web/src/lib/directus.ts` là tầng DUY NHẤT gọi Directus; page/component chỉ nhận DTO ([03d](./03d-api-contract.md)), không chạm JSON Directus | Decoupling (P3): đổi CMS chỉ sửa client; UI ổn định | Tech Lead |
 | 2026-07-21 | **[S2-P3] Client fetch vai Public (KHÔNG token)** → permission enforce published + field allowlist; không nhúng secret | Bảo mật ở tầng permission, không ở client; least privilege | Sprint 2 |
 | 2026-07-21 | **[S2-P3] Siết Public field allowlist** (bỏ `fields:['*']`) — field nội bộ tương lai không tự lộ ra Public API | Yêu cầu bảo mật Phase 3; defense-in-depth | Tech Lead |
-| 2026-07-21 | **[S2-P3] Render Markdown body bằng `marked` + `set:html`**; sanitize HTML để hardening sau | Editor là nguồn tin cậy (MVP, không nhận input công khai); `marked` gọn, đủ cho blog | Sprint 2 |
+| 2026-07-21 | **[S2-P3] Render Markdown body bằng `marked` + `set:html`** _(⚠ thay bởi [ADR-0011](./adr/0011-body-stored-as-html-wysiwyg.md): body lưu HTML)_; sanitize HTML để hardening sau | Editor là nguồn tin cậy (MVP, không nhận input công khai); `marked` gọn, đủ cho blog | Sprint 2 |
 | 2026-07-21 | **[S2-P3] Render = SSG static** (`output` mặc định) + `getStaticPaths`, KHÔNG adapter | Đúng ADR-0006; blog tĩnh, không cần server runtime | Sprint 2 |
 | 2026-07-22 | **[S3] Sprint 3 = Reader Experience — CHỈ Presentation**, không mở rộng chức năng; đóng băng 03d/03c/03e + thin client `directus.ts`/`types.ts` | Nâng trải nghiệm đọc trước Launch; chống scope creep | Tech Lead |
 | 2026-07-22 | **[S3-P0] Design Foundation:** CSS tokens (typography scale · spacing · container · color AA) ở `apps/web/src/styles/global.css`; **KHÔNG khóa phong cách thị giác cuối** | Dựng nền nhất quán; retro style hoàn thiện dần sau review giao diện thực tế | Tech Lead |

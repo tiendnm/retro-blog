@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { connect, assertDevOnly } from './directus.mjs';
 import { resetManifest } from './reset.mjs';
+import { mdToHtml } from '../../lib/md-to-html.mjs';
 import { parseArgs, resolveSets, readManifest, readBody, DEFAULT_BASE } from './common.mjs';
 
 async function loadManifest(client, manifest, dir) {
@@ -32,7 +33,7 @@ async function loadManifest(client, manifest, dir) {
   for (const p of manifest.posts) {
     await api('POST', '/items/posts', {
       title: p.title, slug: p.slug, excerpt: p.excerpt ?? null,
-      body: readBody(dir, p.bodyPath),
+      body: mdToHtml(readBody(dir, p.bodyPath)), // fixture soạn markdown → CMS lưu HTML (ADR-0011)
       status: p.status, published_at: p.publishedAt ?? null,
       author: authorId[p.authorKey],
       category: p.categoryKey ? categoryId[p.categoryKey] : null,

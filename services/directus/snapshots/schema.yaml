@@ -717,9 +717,29 @@ fields:
       field: body
       group: null
       hidden: false
-      interface: input-rich-text-md
+      interface: input-rich-text-html
       note: null
-      options: null
+      options:
+        toolbar:
+          - h2
+          - h3
+          - h4
+          - bold
+          - italic
+          - strikethrough
+          - bullist
+          - numlist
+          - blockquote
+          - customLink
+          - unlink
+          - customImage
+          - table
+          - hr
+          - code
+          - removeformat
+          - undo
+          - redo
+          - fullscreen
       readonly: false
       required: false
       sort: 5

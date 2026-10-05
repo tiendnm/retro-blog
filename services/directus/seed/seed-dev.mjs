@@ -4,11 +4,13 @@
 //
 // Chạy sau khi Directus healthy + schema + permissions đã áp:  pnpm seed:dev
 // Dùng Node (đọc source UTF-8 chuẩn — tránh shell Windows làm hỏng tiếng Việt).
+// body soạn bằng markdown rồi chuyển HTML khi ghi (CMS lưu HTML — ADR-0011).
 // Nội dung: 1 author · 2 categories · 3 published posts · 1 draft.
 // ============================================================================
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
+import { mdToHtml } from '../lib/md-to-html.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ENV_PATH = resolve(HERE, '../../../.env');
@@ -104,7 +106,7 @@ for (const c of CATEGORIES) {
 const now = Date.now();
 for (const p of POSTS) {
   await api('POST', '/items/posts', {
-    title: p.title, slug: p.slug, excerpt: p.excerpt, body: p.body,
+    title: p.title, slug: p.slug, excerpt: p.excerpt, body: mdToHtml(p.body),
     status: 'published',
     published_at: new Date(now - p.daysAgo * DAY).toISOString(),
     author: author.data.id,
@@ -112,7 +114,7 @@ for (const p of POSTS) {
   });
 }
 await api('POST', '/items/posts', {
-  title: DRAFT.title, slug: DRAFT.slug, excerpt: DRAFT.excerpt, body: DRAFT.body,
+  title: DRAFT.title, slug: DRAFT.slug, excerpt: DRAFT.excerpt, body: mdToHtml(DRAFT.body),
   status: 'draft',
   author: author.data.id,
   category: catId[DRAFT.cat],

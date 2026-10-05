@@ -27,7 +27,7 @@
 | title | string | input | required |
 | slug | string | input | required, **unique**; auto-slugify (`options.slug`) + help note (S6.5) |
 | excerpt | text | input-multiline | help note: dùng cho list + SEO description (S6.5) |
-| body | text | input-rich-text-md | |
+| body | text | input-rich-text-html (WYSIWYG) | lưu **HTML**; toolbar giới hạn, không h1 ([ADR-0011](./adr/0011-body-stored-as-html-wysiwyg.md)) |
 | status | string | select-dropdown | choices **draft/published**, default `draft`; help note (S6.5) |
 | published_at | timestamp | datetime | help note: để trống → auto-set khi publish (Flow C1, S6.5) |
 | author | uuid (M2O) | select-dropdown-m2o → `authors` | required; on_delete NO ACTION |
