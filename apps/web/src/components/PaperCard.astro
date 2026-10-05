@@ -1,0 +1,43 @@
+---
+// PaperCard — thẻ giấy trong lưới 3 cột (Sprint 8, phương án D): ảnh trên, chữ dưới,
+// đổ bóng cứng kiểu in offset. Không cover → thẻ chỉ có chữ (không placeholder; quyết định Sprint 3).
+import type { PostSummary } from '../lib/types';
+import { formatDate } from '../lib/format';
+import CoverImage from './CoverImage.astro';
+
+interface Props {
+  post: PostSummary;
+}
+const { post } = Astro.props;
+const href = `/posts/${post.slug}`;
+---
+
+<li class="paper-card">
+  {
+    post.cover && (
+      <a class="paper-card__img" href={href} tabindex="-1" aria-hidden="true">
+        {/* Trang trí trong ngữ cảnh card (tiêu đề là link chính) → alt rỗng */}
+        <CoverImage
+          src={post.cover.url}
+          alt=""
+          widths={[400, 640, 900]}
+          sizes="(min-width: 860px) 340px, (min-width: 560px) 50vw, 100vw"
+        />
+      </a>
+    )
+  }
+  <div class="paper-card__body">
+    {
+      post.category && (
+        <p class="kicker">
+          <a href={`/category/${post.category.slug}`}>{post.category.name}</a>
+        </p>
+      )
+    }
+    <h2><a href={href}>{post.title}</a></h2>
+    {post.excerpt && <p class="paper-card__ex">{post.excerpt}</p>}
+    <p class="meta">
+      Bởi {post.author.name}{post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
+    </p>
+  </div>
+</li>

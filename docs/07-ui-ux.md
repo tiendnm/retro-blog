@@ -61,6 +61,7 @@
 | CoverImage (ảnh) | Render ảnh nếu có `src`; không thì rỗng (không placeholder/ảnh mặc định) — `CoverImage.astro` | 🟢 Phase 2 |
 | Empty state (list) | Khối `.empty-state` khi list rỗng | 🟢 Phase 2 |
 | Post layout (detail) | `.post` = reading column (giới hạn `--reading-width`) + header + cover (`CoverImage`) + `.prose` | 🟢 Phase 3 |
+| Bố cục trang list (D) | `PostListView`: **hero** (cửa sổ OS cổ) → **lưới thẻ giấy** 3 cột → **danh sách gọn** "Cũ hơn"; thanh chuyên mục (chip); container list ~1080px, chi tiết giữ cột đọc; ảnh `srcset` qua Directus transform — [proposal](./sprints/homepage-layout-proposal.md) | 🟢 |
 | Prose (HTML body) | `.prose` — style TẬP TRUNG cho toàn bộ HTML của body (heading/list/blockquote/code/table/hr/img); vertical rhythm nhất quán | 🟢 Phase 3 |
 | Tag / Category badge · Pagination | ngoài Sprint 3 | — |
 

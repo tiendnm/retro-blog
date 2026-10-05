@@ -2,21 +2,37 @@
 // CoverImage — hiển thị ảnh NẾU có `src`; nếu không có thì render RỖNG.
 // KHÔNG placeholder, KHÔNG ảnh mặc định (quyết định Product Review Phase 2).
 // Dùng cho: thumbnail card (alt="" — trang trí) & ảnh bìa detail (Phase 3, alt thật).
+//
+// Hiệu năng (Sprint 8): với asset Directus (`/assets/<uuid>`) và có `widths`, sinh `srcset`
+// qua tham số transform của Directus (`?width=&quality=&format=webp`) để không tải ảnh gốc
+// cho khung nhỏ. URL gốc (DTO) không đổi; không phải asset Directus → dùng nguyên `src`.
 interface Props {
   src: string | null | undefined;
   alt?: string;
   class?: string;
+  widths?: number[];
+  sizes?: string;
+  /** Ảnh trên màn hình đầu (LCP): tải ngay, ưu tiên cao. */
+  eager?: boolean;
 }
-const { src, alt = '', class: className } = Astro.props;
+const { src, alt = '', class: className, widths, sizes, eager = false } = Astro.props;
+
+const isAsset = !!src && /\/assets\/[0-9a-f-]{36}$/i.test(src);
+const variant = (w: number) => `${src}?width=${w}&quality=80&format=webp`;
+const srcset = isAsset && widths?.length ? widths.map((w) => `${variant(w)} ${w}w`).join(', ') : undefined;
+const fallback = srcset && widths ? variant(widths[Math.floor(widths.length / 2)]) : src;
 ---
 
 {
   src && (
     <img
-      src={src}
+      src={fallback}
+      srcset={srcset}
+      sizes={srcset ? sizes : undefined}
       alt={alt}
       class={className}
-      loading="lazy"
+      loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? 'high' : undefined}
       decoding="async"
     />
   )

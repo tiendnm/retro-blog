@@ -1,0 +1,22 @@
+---
+// CategoryNav — thanh chuyên mục (Sprint 8, phương án D): chip kiểu "thẻ lệnh".
+// Chỉ nhận DTO CategoryRef; trang hiện tại đánh dấu aria-current.
+import type { CategoryRef } from '../lib/types';
+
+interface Props {
+  categories: CategoryRef[];
+  activeSlug?: string;
+}
+const { categories, activeSlug } = Astro.props;
+---
+
+<nav class="cat-nav" aria-label="Chuyên mục">
+  <a class="chip" href="/" aria-current={activeSlug ? undefined : 'page'}>Tất cả</a>
+  {
+    categories.map((c) => (
+      <a class="chip" href={`/category/${c.slug}`} aria-current={c.slug === activeSlug ? 'page' : undefined}>
+        {c.name}
+      </a>
+    ))
+  }
+</nav>

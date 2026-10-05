@@ -1,9 +1,16 @@
 ---
 // PostListView — khung dùng chung cho trang list (homepage & category), mọi trang
 // phân trang. Chỉ nhận DTO + tham số trình bày; KHÔNG gọi Directus.
+//
+// Bố cục (Sprint 8 — phương án D, nhịp lớn → vừa → nhỏ):
+//  - variant 'home' (trang 1): hero (bài 1) · lưới thẻ giấy (bài 2–4) · "Cũ hơn" = danh sách gọn (còn lại)
+//  - variant 'list' (trang 2+): danh sách gọn cho tất cả bài
 import PostCard from './PostCard.astro';
+import PostHero from './PostHero.astro';
+import PaperCard from './PaperCard.astro';
+import CategoryNav from './CategoryNav.astro';
 import Pagination from './Pagination.astro';
-import type { PostSummary } from '../lib/types';
+import type { CategoryRef, PostSummary } from '../lib/types';
 
 interface Props {
   heading: string;
@@ -13,18 +20,53 @@ interface Props {
   totalPages: number;
   baseUrl: string;
   pagePrefix: string;
+  variant?: 'home' | 'list';
+  categories?: CategoryRef[];
+  activeCategory?: string;
 }
-const { heading, items, emptyText, currentPage, totalPages, baseUrl, pagePrefix } = Astro.props;
+const {
+  heading,
+  items,
+  emptyText,
+  currentPage,
+  totalPages,
+  baseUrl,
+  pagePrefix,
+  variant = 'list',
+  categories = [],
+  activeCategory,
+} = Astro.props;
+
+const featured = variant === 'home' && items.length > 0;
+const hero = featured ? items[0] : null;
+const cards = featured ? items.slice(1, 4) : [];
+const rows = featured ? items.slice(4) : items;
 ---
 
 <h1>{heading}</h1>
+{categories.length > 0 && <CategoryNav categories={categories} activeSlug={activeCategory} />}
 {
   items.length === 0 ? (
     <p class="empty-state">{emptyText}</p>
   ) : (
-    <ul class="post-list">
-      {items.map((post) => <PostCard post={post} />)}
-    </ul>
+    <>
+      {hero && <PostHero post={hero} />}
+      {
+        cards.length > 0 && (
+          <ul class="paper-grid">
+            {cards.map((post) => <PaperCard post={post} />)}
+          </ul>
+        )
+      }
+      {rows.length > 0 && featured && <h2 class="dir-heading">Cũ hơn</h2>}
+      {
+        rows.length > 0 && (
+          <ul class="post-list">
+            {rows.map((post) => <PostCard post={post} />)}
+          </ul>
+        )
+      }
+    </>
   )
 }
 <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={baseUrl} pagePrefix={pagePrefix} />

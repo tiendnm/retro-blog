@@ -2,7 +2,7 @@
 // Trang CHUYÊN MỤC — TRANG 2+ (SSG). getStaticPaths dùng listPostsByCategory sẵn có.
 import Base from '../../../../layouts/Base.astro';
 import PostListView from '../../../../components/PostListView.astro';
-import { getAllCategorySlugs, getCategoryBySlug, getSiteSettings, listPostsByCategory } from '../../../../lib/directus';
+import { getAllCategorySlugs, getCategoryBySlug, getSiteSettings, listCategories, listPostsByCategory } from '../../../../lib/directus';
 
 export async function getStaticPaths() {
   const slugs = await getAllCategorySlugs();
@@ -24,6 +24,7 @@ export async function getStaticPaths() {
 }
 
 const { siteName } = await getSiteSettings();
+const categories = await listCategories();
 const { slug } = Astro.params;
 const { items, currentPage, totalPages, categoryName } = Astro.props;
 ---
@@ -31,6 +32,7 @@ const { items, currentPage, totalPages, categoryName } = Astro.props;
 <Base
   title={`${categoryName} — Trang ${currentPage} — ${siteName}`}
   description={`Các bài viết thuộc chuyên mục ${categoryName} trên ${siteName} — Trang ${currentPage}.`}
+  wide
 >
   <PostListView
     heading={`Chuyên mục: ${categoryName}`}
@@ -40,5 +42,7 @@ const { items, currentPage, totalPages, categoryName } = Astro.props;
     totalPages={totalPages}
     baseUrl={`/category/${slug}`}
     pagePrefix={`/category/${slug}/page`}
+    categories={categories}
+    activeCategory={slug}
   />
 </Base>

@@ -1,0 +1,51 @@
+---
+// PostHero — bài NỔI BẬT đầu trang (Sprint 8, phương án D): khung "cửa sổ" kiểu OS cổ,
+// ảnh lớn + chữ. Không cover → chỉ còn khối chữ (không placeholder). Chỉ nhận DTO PostSummary.
+import type { PostSummary } from '../lib/types';
+import { formatDate } from '../lib/format';
+import CoverImage from './CoverImage.astro';
+
+interface Props {
+  post: PostSummary;
+}
+const { post } = Astro.props;
+const href = `/posts/${post.slug}`;
+---
+
+<article class:list={['hero', { 'hero--text': !post.cover }]}>
+  {/* Thanh tiêu đề trang trí (aria-hidden): gợi cửa sổ / đường dẫn tập tin của OS cổ */}
+  <div class="hero__bar" aria-hidden="true">
+    <span>■ MỚI NHẤT</span>
+    <span>C:\BAIVIET\{post.slug.toUpperCase()}.TXT</span>
+  </div>
+  <div class="hero__inner">
+    {
+      post.cover && (
+        <a class="hero__img" href={href} tabindex="-1" aria-hidden="true">
+          <CoverImage
+            src={post.cover.url}
+            alt=""
+            widths={[640, 960, 1200]}
+            sizes="(min-width: 860px) 640px, 100vw"
+            eager
+          />
+        </a>
+      )
+    }
+    <div class="hero__txt">
+      {
+        post.category && (
+          <p class="kicker">
+            <a href={`/category/${post.category.slug}`}>{post.category.name}</a>
+          </p>
+        )
+      }
+      <h2><a href={href}>{post.title}</a></h2>
+      {post.excerpt && <p>{post.excerpt}</p>}
+      <p class="meta">
+        Bởi {post.author.name}{post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
+      </p>
+      <p><a class="hero__more" href={href}>Đọc tiếp →</a></p>
+    </div>
+  </div>
+</article>

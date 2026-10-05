@@ -75,7 +75,14 @@ const jsonLdScript = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
     </header>
     {
       post.cover && (
-        <CoverImage class="post__cover" src={post.cover.url} alt={post.cover.alt} />
+        <CoverImage
+          class="post__cover"
+          src={post.cover.url}
+          alt={post.cover.alt}
+          widths={[640, 960, 1200]}
+          sizes="(min-width: 760px) 680px, 100vw"
+          eager
+        />
       )
     }
     <div class="prose" set:html={bodyHtml}></div>

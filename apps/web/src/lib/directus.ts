@@ -134,7 +134,8 @@ interface RawSiteSettings {
   default_og_image?: RawFile | null;
 }
 const DEFAULT_SITE_NAME = 'Retro Blog';
-const DEFAULT_DESCRIPTION = 'Blog headless phong cách retro.';
+const DEFAULT_DESCRIPTION =
+  'Blog về máy tính cổ: phần cứng, phần mềm, lập trình và kiến thức nền tảng.';
 
 /** Map + áp fallback: CMS chưa cấu hình / field trống → giá trị mặc định (không đổi hành vi cũ). */
 function toSiteSettings(
@@ -143,7 +144,7 @@ function toSiteSettings(
 ): SiteSettings {
   const siteName = raw?.site_name?.trim() || DEFAULT_SITE_NAME;
   const footer =
-    raw?.footer_text?.trim() || `© {year} ${siteName} — blog headless phong cách retro.`;
+    raw?.footer_text?.trim() || `© {year} ${siteName} — nhật ký của những chiếc máy tính cổ.`;
   return {
     siteName,
     description: raw?.description?.trim() || DEFAULT_DESCRIPTION,
@@ -260,6 +261,17 @@ export async function getCategoryBySlug(slug: string): Promise<CategoryRef | nul
     if (e instanceof DirectusError && e.code === 'not_found') return null;
     throw e;
   }
+}
+
+/** Danh sách chuyên mục (thanh chuyên mục). Build (PROD) cache 1 lần/tiến trình. */
+let categoriesCache: Promise<CategoryRef[]> | undefined;
+export function listCategories(): Promise<CategoryRef[]> {
+  if (import.meta.env.PROD && categoriesCache) return categoriesCache;
+  const p = directusGet<RawCategory[]>(
+    '/items/categories?fields=name,slug&sort=name&limit=-1',
+  ).then((r) => r.data.map(toCategory).filter((c): c is CategoryRef => c !== null));
+  if (import.meta.env.PROD) categoriesCache = p;
+  return p;
 }
 
 // ---- Hỗ trợ getStaticPaths (SSG — ADR-0006) ----
