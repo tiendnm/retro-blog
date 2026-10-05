@@ -3,18 +3,19 @@
 # Phạm vi: database + uploads + config (+ env riêng). KHÔNG backup dist/ (tái
 # sinh bằng astro build). Chạy TRÊN HOST. Dùng stdin/stdout redirect (không cần
 # mount volume → chạy được cả Linux/Windows).
-#   Env: COMPOSE_FILES (mặc định dev), POSTGRES_USER/DB, BACKUP_DIR, ENV_FILE.
+#   Env: COMPOSE_FILES (mặc định dev), PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDB, BACKUP_DIR, ENV_FILE.
+#   Postgres chạy NGOÀI compose (ADR-0010) → dùng pg_dump của HOST (cần client >= 16).
 set -eu
 
 STAMP=$(date +%Y%m%d-%H%M%S)
 DEST="${BACKUP_DIR:-./backups}/$STAMP"
 mkdir -p "$DEST"
 COMPOSE="docker compose ${COMPOSE_FILES:-}"
-PGUSER="${POSTGRES_USER:-directus}"
-PGDB="${POSTGRES_DB:-directus}"
+export PGHOST="${PGHOST:-localhost}" PGPORT="${PGPORT:-5433}" PGUSER="${PGUSER:-postgres}"
+PGDB="${PGDB:-retro-blog}"
 
 echo "[backup] database → db.dump (pg_dump -Fc)"
-$COMPOSE exec -T postgres pg_dump -U "$PGUSER" -Fc "$PGDB" >"$DEST/db.dump"
+pg_dump -Fc "$PGDB" >"$DEST/db.dump"
 
 echo "[backup] uploads → uploads.tgz (directus_uploads)"
 $COMPOSE exec -T directus tar czf - -C /directus/uploads . >"$DEST/uploads.tgz"

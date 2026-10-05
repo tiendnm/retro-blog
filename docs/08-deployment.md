@@ -36,12 +36,12 @@
              │  dist/  │  └──┬────────┘
              └─────────┘     │ network nội bộ
                         ┌─────▼──────┐
-                        │ postgres   │  (KHÔNG expose ra host)
+                        │ postgres   │  (ngoài compose, ADR-0010)
                         └────────────┘
 ```
 
 - **Web serving:** site là **static build** (`dist/` từ `astro build`) — reverse proxy **serve file tĩnh trực tiếp**, **không** chạy Node runtime cho site (nhanh, ít bề mặt tấn công). Đúng SSG ([ADR-0006](./adr/0006-render-strategy.md)).
-- **Directus:** ra ngoài **chỉ qua proxy** ở `cms.<domain>` (admin UI + REST API + `/assets`). **Postgres không expose** (giữ như dev).
+- **Directus:** ra ngoài **chỉ qua proxy** ở `cms.<domain>` (admin UI + REST API + `/assets`). **Postgres chạy ngoài compose** (instance có sẵn trên host, DB `retro-blog` — [ADR-0010](./adr/0010-external-postgres-instance.md)); không expose ra internet.
 - **Domain topology (Accepted):** **subdomain tách** — `retro.<domain>` (site) + `cms.<domain>` (Directus). Lợi: `PUBLIC_SITE_URL`/`PUBLIC_DIRECTUS_URL` rõ ràng, CORS gọn, khớp canonical/OG/sitemap của [Sprint 5](./sprints/sprint-5-completion-report.md). *(`<domain>` thật do Product cung cấp ở Phase 2.)*
 
 ## 3. Pipeline / Phát hành

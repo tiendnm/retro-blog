@@ -25,7 +25,7 @@
               │  current ───►│   └──┬───────────┘
               └──────▲───────┘      │ retro-net (nội bộ)
      web build-runner│         ┌────▼─────┐
-     (astro build →  │         │ postgres │ 16.8 (KHÔNG expose)
+     (astro build →  │         │ postgres │ 16 (ngoài compose)
       atomic swap)   │         └──────────┘
                      │ rebuild-on-publish (ADR-0008):
               Directus Flow → webhook (token) → rebuild.sh → build-swap.sh
@@ -36,9 +36,9 @@
 | caddy | `caddy:2.8-alpine` | 80/443 (public) | Edge: TLS + serve static `current` + proxy Directus |
 | web (build-runner) | build từ `apps/web/Dockerfile` | — | Chạy-1-lần: `astro build` → `site_dist/builds/<TS>` → swap `current` |
 | directus | `directus/directus:11.3.5` | 127.0.0.1:8055 | Chỉ localhost host; public qua Caddy `cms.` |
-| postgres | `postgres:16.8-alpine` | — | Không expose; volume `pgdata` |
+| postgres | instance host (PG 16, :5433) | — | Ngoài compose, DB `retro-blog` ([ADR-0010](./adr/0010-external-postgres-instance.md)); không còn volume `pgdata` |
 
-> **Volumes:** `pgdata`, `directus_uploads`, `site_dist` (builds + `current`), `caddy_data`/`caddy_config`.
+> **Volumes:** `directus_uploads`, `site_dist` (builds + `current`), `caddy_data`/`caddy_config`.
 > **Dev** ([docker-compose.yml](../docker-compose.yml)): `astro dev` on-demand (:4321), Directus :8055 — không có Caddy/build-runner.
 
 ## 2. Runbook — thao tác thường gặp

@@ -6,7 +6,7 @@
 # Topology: Caddy (edge, TLS) → site tĩnh (/srv/site) + Directus (cms).
 # - web = build-runner MỘT LẦN: astro build → volume site_dist (Caddy phục vụ). ADR-0008.
 # - directus: KHÔNG public trực tiếp (chỉ bind localhost server, debug); public qua Caddy.
-# - postgres: giữ như base (không expose ra host).
+# - postgres: ngoài compose (instance có sẵn trên host, ADR-0010) — Directus nối qua DB_HOST.
 name: retro-blog
 
 services:

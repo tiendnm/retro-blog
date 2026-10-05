@@ -21,7 +21,7 @@
 |---|---|---|---|---|---|
 | Presentation / Site (Site Generator) | Astro | 5.x | **Accepted** | [0002](./adr/0002-use-astro-site-generator.md) | P1, P3, P5 |
 | Headless Content Service (CMS) | Directus | `11.3.5` (image, pin) | **Accepted** | [0003](./adr/0003-use-directus-headless-cms.md) | P1, P2, P4 |
-| Content Store (Persistence) | PostgreSQL | `16.8-alpine` (image, pin) | **Accepted** | [0004](./adr/0004-use-postgresql-content-store.md) | P4, P6 |
+| Content Store (Persistence) | PostgreSQL | 16 (instance host :5433, DB `retro-blog`) | **Accepted** | [0004](./adr/0004-use-postgresql-content-store.md), [0010](./adr/0010-external-postgres-instance.md) | P4, P6 |
 | Đóng gói & Runtime | Docker Engine + Compose v2 | 29.x | **Accepted** | [0005](./adr/0005-use-docker-packaging.md) | P4, P5 |
 | Edge / Reverse Proxy | _TBD_ | — | ⏳ | _TBD_ | — |
 | Build / Deploy Orchestrator (CI/CD) | _TBD_ | — | ⏳ | _TBD_ | — |

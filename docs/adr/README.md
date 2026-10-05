@@ -36,3 +36,4 @@
 | [0007](./0007-reverse-proxy-and-tls.md) | Reverse proxy & TLS: Caddy | **Accepted** |
 | [0008](./0008-rebuild-on-publish.md) | Rebuild-on-publish (Flow→webhook→swap) | **Accepted** |
 | [0009](./0009-quality-tooling-biome-vitest.md) | Cổng chất lượng: Biome + Vitest | **Accepted** |
+| [0010](./0010-external-postgres-instance.md) | PostgreSQL instance có sẵn trên host | **Accepted** |

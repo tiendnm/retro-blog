@@ -5,31 +5,16 @@ name: retro-blog
 
 services:
   # ─── Content Store (ADR-0004) ───
-  postgres:
-    image: postgres:16.8-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    networks:
-      - retro-net
-    # KHÔNG expose ra host: chỉ Directus truy cập qua network nội bộ (self-host an toàn).
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # PostgreSQL KHÔNG chạy trong compose: dùng instance có sẵn trên host (cổng 5433),
+  # database riêng 'retro-blog'. Directus truy cập qua host.docker.internal (xem ADR-0010).
 
   # ─── Headless Content Service (ADR-0003) ───
   directus:
     image: directus/directus:11.3.5
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
+    # host.docker.internal: tự có trên Docker Desktop; dòng dưới bổ sung cho Linux.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       KEY: ${KEY}
       SECRET: ${SECRET}
@@ -88,7 +73,6 @@ services:
       start_period: 90s
 
 volumes:
-  pgdata:
   directus_uploads:
   web_node_modules:
 

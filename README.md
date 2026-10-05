@@ -19,7 +19,7 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
 |---|---|---|---|
 | Presentation / Site | Astro | 5.x | [ADR-0002](./docs/adr/0002-use-astro-site-generator.md) |
 | Headless CMS | Directus | `11.3.5` | [ADR-0003](./docs/adr/0003-use-directus-headless-cms.md) |
-| Content Store | PostgreSQL | `16.8-alpine` | [ADR-0004](./docs/adr/0004-use-postgresql-content-store.md) |
+| Content Store | PostgreSQL | 16 (instance host :5433) | [ADR-0004](./docs/adr/0004-use-postgresql-content-store.md), [ADR-0010](./docs/adr/0010-external-postgres-instance.md) |
 | Đóng gói & runtime | Docker + Compose v2 | 29.x | [ADR-0005](./docs/adr/0005-use-docker-packaging.md) |
 
 > Sổ đăng ký công nghệ: [docs/10a-tech-stack.md](./docs/10a-tech-stack.md).
