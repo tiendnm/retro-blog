@@ -4,7 +4,7 @@
 import Base from '../../layouts/Base.astro';
 import CoverImage from '../../components/CoverImage.astro';
 import { formatDate } from '../../lib/format';
-import { getAllPublishedPostSlugs, getPostBySlug } from '../../lib/directus';
+import { getAllPublishedPostSlugs, getPostBySlug, getSiteSettings } from '../../lib/directus';
 
 export async function getStaticPaths() {
   const slugs = await getAllPublishedPostSlugs();
@@ -12,6 +12,7 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
+const { siteName, defaultOgImage } = await getSiteSettings();
 const post = await getPostBySlug(slug!);
 // getStaticPaths chỉ sinh slug hợp lệ ⇒ nhánh này chỉ là chốt an toàn khi build.
 if (!post) throw new Error(`Không tìm thấy bài đã xuất bản: ${slug}`);
@@ -25,7 +26,7 @@ const site = Astro.site;
 const pageUrl = site ? new URL(`/posts/${post.slug}`, site).href : `/posts/${post.slug}`;
 const imageAbs = post.cover?.url
   ? (site ? new URL(post.cover.url, site).href : post.cover.url)
-  : (site ? new URL('/og-default.png', site).href : '/og-default.png');
+  : (site ? new URL(defaultOgImage?.url ?? '/og-default.png', site).href : (defaultOgImage?.url ?? '/og-default.png'));
 
 // JSON-LD BlogPosting — chỉ dùng field DTO sẵn có, không đổi kiến trúc (R3).
 const jsonLd = {
@@ -38,14 +39,14 @@ const jsonLd = {
   ...(post.category ? { articleSection: post.category.name } : {}),
   image: imageAbs,
   mainEntityOfPage: pageUrl,
-  publisher: { '@type': 'Organization', name: 'Retro Blog' },
+  publisher: { '@type': 'Organization', name: siteName },
 };
 // Escape '<' để chuỗi JSON không thể phá vỡ ngữ cảnh <script> (nội dung tin cậy, vẫn hardening).
 const jsonLdScript = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
 ---
 
 <Base
-  title={`${post.title} — Retro Blog`}
+  title={`${post.title} — ${siteName}`}
   description={post.excerpt ?? undefined}
   type="article"
   image={post.cover?.url}

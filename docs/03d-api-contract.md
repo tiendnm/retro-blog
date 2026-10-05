@@ -61,6 +61,19 @@
 }
 ```
 
+### 3.3. SiteSettings (cấu hình site — singleton)
+
+Nguồn: [03c §2.6](./03c-content-model.md). **Luôn trả đủ giá trị** (consumer áp fallback mặc định khi CMS chưa cấu hình).
+
+```jsonc
+{
+  "siteName": "…",                          // luôn có
+  "description": "…",                        // luôn có (mô tả mặc định)
+  "footerText": "…",                         // đã thay {year}
+  "defaultOgImage": { "url": "…", "alt": "…" } // null → ảnh tĩnh mặc định
+}
+```
+
 ## 4. Ngữ nghĩa phân trang / lọc / sắp xếp (logic)
 
 - **Phân trang (offset-based):** tham số `page` (bắt đầu 1) + `pageSize`; **mặc định 10**, **tối đa 50**. Metadata trả về: `total`, `page`, `pageSize`, `hasMore`.

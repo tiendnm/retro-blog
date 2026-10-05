@@ -1,9 +1,11 @@
 ---
 // Footer site — ĐƠN GIẢN, nhẹ: chỉ thông tin cơ bản. Không section lớn
 // (Sprint 3 Phase 1). Năm lấy lúc build (SSG).
-const year = new Date().getFullYear();
+import { getSiteSettings } from '../lib/directus';
+
+const { footerText } = await getSiteSettings();
 ---
 
 <footer class="site-footer">
-  <p>© {year} Retro Blog — blog headless phong cách retro.</p>
+  <p>{footerText}</p>
 </footer>

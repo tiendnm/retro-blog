@@ -2,7 +2,7 @@
 // Trang DANH SÁCH — TRANG 2+ (SSG). getStaticPaths dùng listPublishedPosts sẵn có.
 import Base from '../../layouts/Base.astro';
 import PostListView from '../../components/PostListView.astro';
-import { listPublishedPosts } from '../../lib/directus';
+import { getSiteSettings, listPublishedPosts } from '../../lib/directus';
 
 export async function getStaticPaths() {
   const { pageInfo } = await listPublishedPosts({ page: 1 });
@@ -15,12 +15,13 @@ export async function getStaticPaths() {
   return paths;
 }
 
+const { siteName } = await getSiteSettings();
 const { items, currentPage, totalPages } = Astro.props;
 ---
 
 <Base
-  title={`Bài viết mới nhất — Trang ${currentPage} — Retro Blog`}
-  description={`Bài viết mới nhất trên Retro Blog — Trang ${currentPage}.`}
+  title={`Bài viết mới nhất — Trang ${currentPage} — ${siteName}`}
+  description={`Bài viết mới nhất trên ${siteName} — Trang ${currentPage}.`}
 >
   <PostListView
     heading="Bài viết mới nhất"

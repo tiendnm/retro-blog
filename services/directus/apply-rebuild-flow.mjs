@@ -1,6 +1,6 @@
 // ── Tạo Directus Flow rebuild-on-publish (Sprint 6 Phase 3 — ADR-0008) ─────
 // Reproducible + idempotent (như apply-permissions). Tạo Flow:
-//   trigger event "action" (items.create/update/delete trên posts/categories/authors)
+//   trigger event "action" (items.create/update/delete trên posts/categories/authors/site_settings)
 //   → operation Webhook POST tới REBUILD_WEBHOOK_URL kèm token bảo vệ.
 // Chạy TRÊN HOST:  node services/directus/apply-rebuild-flow.mjs
 // Env: DIRECTUS_URL (admin API, mặc định http://localhost:8055),
@@ -11,7 +11,7 @@ const PASSWORD = process.env.ADMIN_PASSWORD;
 const WEBHOOK_URL = process.env.REBUILD_WEBHOOK_URL || 'http://host.docker.internal:9000/rebuild';
 const TOKEN = process.env.REBUILD_TOKEN;
 const FLOW_NAME = 'Rebuild on publish';
-const COLLECTIONS = ['posts', 'categories', 'authors'];
+const COLLECTIONS = ['posts', 'categories', 'authors', 'site_settings'];
 
 if (!EMAIL || !PASSWORD) {
   console.error('❌ cần ADMIN_EMAIL/ADMIN_PASSWORD');

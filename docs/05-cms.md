@@ -15,7 +15,7 @@
 - **Tái tạo schema** trên một Directus (volume trống): `pnpm schema:apply` (hoặc `docker compose exec directus npx directus schema apply --yes //directus/snapshots/schema.yaml`).
 - Snapshot **không** phụ thuộc export thủ công UI; là nguồn tái lập cho mọi môi trường. Cập nhật schema → export lại snapshot & commit.
 
-> 🧪 **Dữ liệu dev:** seed tối thiểu `services/directus/seed/seed-dev.mjs` (`pnpm seed:dev`) · **Fixture dogfooding** (dataset ~100 bài + edge/stress, deterministic, DEV-only) ở `services/directus/fixtures/` — xem [DESIGN.md](../services/directus/fixtures/DESIGN.md) (Sprint 4). Loader là adapter Directus duy nhất; generator/content độc lập backend.
+> 🧪 **Dữ liệu dev:** seed tối thiểu `services/directus/seed/seed-dev.mjs` (`pnpm seed:dev`) · · **Fixture dogfooding** (dataset ~100 bài + edge/stress, deterministic, DEV-only) ở `services/directus/fixtures/` — xem [DESIGN.md](../services/directus/fixtures/DESIGN.md) (Sprint 4). Loader là adapter Directus duy nhất; generator/content độc lập backend.
 
 ## 1. Ánh xạ Content Type → Collection (Sprint 2)
 
@@ -40,12 +40,15 @@
 ### `categories` ← Category ([03c §2.3](./03c-content-model.md))
 | name (string, req) · slug (string, req, unique) · description (text) · parent (M2O → `categories`, phân cấp, on_delete SET NULL) |
 
+### `site_settings` ← SiteSettings ([03c §2.6](./03c-content-model.md)) — **singleton** ([ADR-0012](./adr/0012-site-settings-singleton.md))
+| site_name (string, req, default "Retro Blog") · description (text) · footer_text (string, `{year}`) · default_og_image (M2O → `directus_files`, SET NULL) — khoá chính `id` integer (singleton) |
+
 ### Media ← Media ([03c §2.5](./03c-content-model.md))
 - **Dùng Directus Files (`directus_files`, built-in)** — *không tạo Media collection riêng*.
 - Thêm field tuỳ biến: **`alt`** (string — a11y; **`required` ở form editor** từ S6.5, R6) · **`caption`** (string).
 - Post.cover / Author.avatar tham chiếu `directus_files`.
 
-> Mọi collection dùng khoá chính `id` kiểu **uuid** (auto-generate).
+> Mọi collection dùng khoá chính `id` kiểu **uuid** (auto-generate), **trừ `site_settings`** (singleton, `id` integer).
 
 ## 2. Phân quyền (Roles & Permissions)
 
@@ -64,6 +67,7 @@
 - **`$NOW`** = biến thời gian động của Directus → thực thi được yêu cầu "chỉ nội dung đã publish **và đã tới giờ**" (lịch phát hành cơ bản) ngay trong rule, không cần job nền.
 - **Field allowlist (không `*`):** Public chỉ đọc đúng field cần cho hợp đồng [03d](./03d-api-contract.md). Field nội bộ thêm về sau (vd `internal_notes`, `status`) **không tự động lộ** — xin field ngoài allowlist → Directus trả `FORBIDDEN`. Đây là ranh giới chống-lộ (Sprint 2 Phase 3).
 - **Editor không quản trị user/role/policy** (không `admin_access`); chỉ thao tác nội dung. **Public không có** create/update/delete ở bất kỳ collection nào; không frontend auth, không public CMS users.
+- `site_settings` (singleton): Public đọc **4 field** `site_name`/`description`/`footer_text`/`default_og_image`; Editor **read + update** (không create/delete). Sửa → Flow rebuild-on-publish kích hoạt rebuild.
 - `authors`/`categories`/`directus_files` cho Public đọc **mọi hàng** (dữ liệu tham chiếu để render bài) nhưng **giới hạn field** như trên — không lộ `bio`/`description`/`parent`…
 
 ### 2.2. Tái lập (reproducible) — **không thao tác thủ công**

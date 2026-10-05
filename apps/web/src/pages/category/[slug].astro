@@ -3,7 +3,7 @@
 // Chỉ dùng thin client → DTO; KHÔNG gọi Directus trực tiếp.
 import Base from '../../layouts/Base.astro';
 import PostListView from '../../components/PostListView.astro';
-import { getAllCategorySlugs, getCategoryBySlug, listPostsByCategory } from '../../lib/directus';
+import { getAllCategorySlugs, getCategoryBySlug, getSiteSettings, listPostsByCategory } from '../../lib/directus';
 
 export async function getStaticPaths() {
   const slugs = await getAllCategorySlugs();
@@ -11,6 +11,7 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
+const { siteName } = await getSiteSettings();
 const category = await getCategoryBySlug(slug!);
 if (!category) throw new Error(`Không tìm thấy chuyên mục: ${slug}`);
 
@@ -19,8 +20,8 @@ const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
 ---
 
 <Base
-  title={`${category.name} — Retro Blog`}
-  description={`Các bài viết thuộc chuyên mục ${category.name} trên Retro Blog.`}
+  title={`${category.name} — ${siteName}`}
+  description={`Các bài viết thuộc chuyên mục ${category.name} trên ${siteName}.`}
 >
   <PostListView
     heading={`Chuyên mục: ${category.name}`}

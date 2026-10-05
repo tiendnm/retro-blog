@@ -50,6 +50,13 @@ else
   echo "-> Public permissions đã có, bỏ qua"
 fi
 
+# ---- PUBLIC: site_settings (singleton, thêm ở Sprint 8 — ADR-0012; idempotent riêng) ----
+HAS_SS=$(api GET "/permissions?filter[policy][_eq]=$PUB&filter[collection][_eq]=site_settings&aggregate[count]=id" | val count id)
+if [ "${HAS_SS:-0}" = "0" ] || [ -z "$HAS_SS" ]; then
+  echo "-> tạo Public read site_settings"
+  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"site_settings\",\"action\":\"read\",\"fields\":[\"site_name\",\"description\",\"footer_text\",\"default_og_image\"],\"permissions\":{}}" >/dev/null
+fi
+
 # ---- EDITOR policy + role + access + permissions (idempotent) ----
 ED_ROLE=$(api GET "/roles?filter[name][_eq]=Editor&fields=id" | val id)
 if [ -z "$ED_ROLE" ]; then
@@ -65,5 +72,15 @@ if [ -z "$ED_ROLE" ]; then
   echo "   Editor policy=$ED_POL role=$ED_ROLE"
 else
   echo "-> Editor role đã có ($ED_ROLE), bỏ qua"
+fi
+
+# ---- EDITOR: site_settings (read + update; singleton → không create/delete) ----
+ED_POL=$(api GET "/access?filter[role][_eq]=$ED_ROLE&fields=policy" | val policy)
+HAS_ESS=$(api GET "/permissions?filter[policy][_eq]=$ED_POL&filter[collection][_eq]=site_settings&aggregate[count]=id" | val count id)
+if [ -n "$ED_POL" ] && { [ "${HAS_ESS:-0}" = "0" ] || [ -z "$HAS_ESS" ]; }; then
+  echo "-> tạo Editor permissions site_settings"
+  for a in read update; do
+    api POST /permissions "{\"policy\":\"$ED_POL\",\"collection\":\"site_settings\",\"action\":\"$a\",\"fields\":[\"*\"]}" >/dev/null
+  done
 fi
 echo "DONE"

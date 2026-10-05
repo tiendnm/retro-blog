@@ -3,13 +3,14 @@
 // Chỉ dùng thin client → DTO; KHÔNG gọi Directus trực tiếp.
 import Base from '../layouts/Base.astro';
 import PostListView from '../components/PostListView.astro';
-import { listPublishedPosts } from '../lib/directus';
+import { getSiteSettings, listPublishedPosts } from '../lib/directus';
 
+const { siteName, description } = await getSiteSettings();
 const { items, pageInfo } = await listPublishedPosts({ page: 1 });
 const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
 ---
 
-<Base title="Retro Blog — Bài viết mới nhất" description="Blog headless phong cách retro.">
+<Base title={`${siteName} — Bài viết mới nhất`} description={description}>
   <PostListView
     heading="Bài viết mới nhất"
     items={items}

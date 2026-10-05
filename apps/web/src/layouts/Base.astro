@@ -11,6 +11,7 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { getSiteSettings } from '../lib/directus';
 
 interface Props {
   title: string;
@@ -22,10 +23,12 @@ interface Props {
 }
 const { title, description, image, type = 'website' } = Astro.props;
 
-const SITE_NAME = 'Retro Blog';
+// Cấu hình site từ CMS (ADR-0012; có fallback mặc định).
+const settings = await getSiteSettings();
+const SITE_NAME = settings.siteName;
 // Ảnh chia sẻ mặc định (Sprint 6.5): bài không cover → thẻ share vẫn có ảnh
-// thương hiệu 1200×630 thay vì trống. Asset tĩnh trong public/.
-const DEFAULT_OG_IMAGE = '/og-default.png';
+// thương hiệu 1200×630 thay vì trống. Ưu tiên ảnh cấu hình trong CMS, fallback asset tĩnh public/.
+const DEFAULT_OG_IMAGE = settings.defaultOgImage?.url ?? '/og-default.png';
 
 // Chuẩn hoá path (bỏ trailing slash trừ gốc) để canonical KHỚP TUYỆT ĐỐI với
 // loc trong sitemap.xml (cùng dạng không-trailing). `Astro.site` luôn có vì
@@ -36,6 +39,8 @@ const canonical = Astro.site ? new URL(path, Astro.site).href : path;
 // Luôn có ảnh: dùng cover bài nếu truyền vào, ngược lại ảnh mặc định (đều 1200×630
 // → twitter card 'summary_large_image').
 const imagePath = image ?? DEFAULT_OG_IMAGE;
+// Trang không có mô tả riêng → mô tả mặc định của site (trước đây: không có thẻ).
+const metaDescription = description ?? settings.description;
 const ogImage = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
 ---
 
@@ -45,7 +50,7 @@ const ogImage = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
-    {description && <meta name="description" content={description} />}
+    {metaDescription && <meta name="description" content={metaDescription} />}
     <link rel="canonical" href={canonical} />
 
     {/* OpenGraph — link chia sẻ (Facebook/Zalo/…) hiển thị đẹp */}
@@ -53,14 +58,14 @@ const ogImage = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
     <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:locale" content="vi_VN" />
     <meta property="og:title" content={title} />
-    {description && <meta property="og:description" content={description} />}
+    {metaDescription && <meta property="og:description" content={metaDescription} />}
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
 
     {/* Twitter card — luôn có ảnh (cover hoặc mặc định) ⇒ large image */}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
-    {description && <meta name="twitter:description" content={description} />}
+    {metaDescription && <meta name="twitter:description" content={metaDescription} />}
     <meta name="twitter:image" content={ogImage} />
 
     {/* Metadata bổ sung theo trang (article:*, JSON-LD…) — trang chi tiết inject qua đây */}

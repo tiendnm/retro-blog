@@ -18,6 +18,7 @@ import type {
   PostDetail,
   PostListResult,
   PostSummary,
+  SiteSettings,
 } from './types';
 import { rewriteAssetUrls } from './rewrite-assets';
 
@@ -125,6 +126,53 @@ function toSummary(p: RawPost): PostSummary {
     category: toCategory(p.category),
   };
 }
+// ---- Site settings (singleton) — ADR-0012 ----
+interface RawSiteSettings {
+  site_name?: string | null;
+  description?: string | null;
+  footer_text?: string | null;
+  default_og_image?: RawFile | null;
+}
+const DEFAULT_SITE_NAME = 'Retro Blog';
+const DEFAULT_DESCRIPTION = 'Blog headless phong cách retro.';
+
+/** Map + áp fallback: CMS chưa cấu hình / field trống → giá trị mặc định (không đổi hành vi cũ). */
+function toSiteSettings(
+  raw: RawSiteSettings | null | undefined,
+  year = new Date().getFullYear(),
+): SiteSettings {
+  const siteName = raw?.site_name?.trim() || DEFAULT_SITE_NAME;
+  const footer =
+    raw?.footer_text?.trim() || `© {year} ${siteName} — blog headless phong cách retro.`;
+  return {
+    siteName,
+    description: raw?.description?.trim() || DEFAULT_DESCRIPTION,
+    footerText: footer.replaceAll('{year}', String(year)),
+    defaultOgImage: toMedia(raw?.default_og_image),
+  };
+}
+
+let siteSettingsCache: Promise<SiteSettings> | undefined;
+/** Cấu hình site. Build (PROD) cache 1 lần/tiến trình; dev luôn đọc mới để sửa trong CMS thấy ngay. */
+export function getSiteSettings(): Promise<SiteSettings> {
+  if (import.meta.env.PROD && siteSettingsCache) return siteSettingsCache;
+  const p = (async () => {
+    try {
+      const res = await directusGet<RawSiteSettings | RawSiteSettings[] | null>(
+        '/items/site_settings?fields=site_name,description,footer_text,default_og_image.id,default_og_image.alt',
+      );
+      const raw = Array.isArray(res.data) ? res.data[0] : res.data;
+      return toSiteSettings(raw);
+    } catch (e) {
+      // Chưa có quyền/bản ghi → mặc định; lỗi hệ thống vẫn nổi lên (giống các hàm khác).
+      if (e instanceof DirectusError && e.code === 'not_found') return toSiteSettings(null);
+      throw e;
+    }
+  })();
+  if (import.meta.env.PROD) siteSettingsCache = p;
+  return p;
+}
+
 function toDetail(p: RawPost): PostDetail {
   return {
     id: p.id,

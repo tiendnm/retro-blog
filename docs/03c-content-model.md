@@ -67,6 +67,17 @@
 | alt | text | ✅ | Văn bản thay thế | **bắt buộc** cho a11y ([15](./15-seo-accessibility.md)) |
 | caption | text | ❌ | Chú thích | |
 
+### 2.6. SiteSettings (Cấu hình site) — singleton
+
+> Chỉ **một bản ghi** cho cả site. Là cấu hình *nội dung* của site (không phải hạ tầng/bí mật) — xem [ADR-0012](./adr/0012-site-settings-singleton.md).
+
+| Field | Kiểu (trung lập) | Bắt buộc | Mô tả | Ràng buộc |
+|---|---|---|---|---|
+| site_name | text | ✅ | Tên site (header, tiêu đề trang, og:site_name) | mặc định "Retro Blog" |
+| description | text | ❌ | Mô tả mặc định (meta description) khi trang không có mô tả riêng | |
+| footer_text | text | ❌ | Chữ footer | `{year}` → năm hiện tại |
+| default_og_image | media | ❌ | Ảnh chia sẻ mặc định | khuyến nghị 1200×630; trống → ảnh tĩnh mặc định |
+
 ## 3. Quan hệ giữa các loại nội dung
 
 > Khớp với [03b §2](./03b-domain-model.md).

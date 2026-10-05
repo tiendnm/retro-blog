@@ -74,6 +74,32 @@ collections:
       versioning: false
     schema:
       name: posts
+  - collection: site_settings
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: null
+      archive_value: null
+      collapse: open
+      collection: site_settings
+      color: null
+      display_template: null
+      group: null
+      hidden: false
+      icon: settings
+      item_duplication_fields: null
+      note: >-
+        Cấu hình site (một bản ghi duy nhất). Thay đổi có hiệu lực sau khi site
+        rebuild.
+      preview_url: null
+      singleton: true
+      sort: 10
+      sort_field: null
+      translations: null
+      unarchive_value: null
+      versioning: false
+    schema:
+      name: site_settings
 fields:
   - collection: authors
     field: id
@@ -968,6 +994,202 @@ fields:
       has_auto_increment: false
       foreign_key_table: directus_files
       foreign_key_column: id
+  - collection: site_settings
+    field: id
+    type: integer
+    meta:
+      collection: site_settings
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: site_settings
+      data_type: integer
+      default_value: nextval('site_settings_id_seq'::regclass)
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: site_settings
+    field: site_name
+    type: string
+    meta:
+      collection: site_settings
+      conditions: null
+      display: null
+      display_options: null
+      field: site_name
+      group: null
+      hidden: false
+      interface: input
+      note: Tên site — hiện ở header, tiêu đề trang, og:site_name.
+      options: null
+      readonly: false
+      required: true
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: site_name
+      table: site_settings
+      data_type: character varying
+      default_value: Retro Blog
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: site_settings
+    field: description
+    type: text
+    meta:
+      collection: site_settings
+      conditions: null
+      display: null
+      display_options: null
+      field: description
+      group: null
+      hidden: false
+      interface: input-multiline
+      note: Mô tả mặc định (meta description) khi trang không có mô tả riêng.
+      options: null
+      readonly: false
+      required: false
+      sort: 3
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: description
+      table: site_settings
+      data_type: text
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: site_settings
+    field: footer_text
+    type: string
+    meta:
+      collection: site_settings
+      conditions: null
+      display: null
+      display_options: null
+      field: footer_text
+      group: null
+      hidden: false
+      interface: input
+      note: Chữ ở footer. Dùng {year} để chèn năm hiện tại.
+      options: null
+      readonly: false
+      required: false
+      sort: 4
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: footer_text
+      table: site_settings
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: site_settings
+    field: default_og_image
+    type: uuid
+    meta:
+      collection: site_settings
+      conditions: null
+      display: null
+      display_options: null
+      field: default_og_image
+      group: null
+      hidden: false
+      interface: file-image
+      note: Ảnh chia sẻ mặc định (1200×630). Để trống → dùng ảnh mặc định tĩnh.
+      options: null
+      readonly: false
+      required: false
+      sort: 5
+      special:
+        - file
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: default_og_image
+      table: site_settings
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: directus_files
+      foreign_key_column: id
 relations:
   - collection: authors
     field: avatar
@@ -1072,5 +1294,26 @@ relations:
       foreign_key_table: directus_files
       foreign_key_column: id
       constraint_name: posts_cover_foreign
+      on_update: NO ACTION
+      on_delete: SET NULL
+  - collection: site_settings
+    field: default_og_image
+    related_collection: directus_files
+    meta:
+      junction_field: null
+      many_collection: site_settings
+      many_field: default_og_image
+      one_allowed_collections: null
+      one_collection: directus_files
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: null
+      sort_field: null
+    schema:
+      table: site_settings
+      column: default_og_image
+      foreign_key_table: directus_files
+      foreign_key_column: id
+      constraint_name: site_settings_default_og_image_foreign
       on_update: NO ACTION
       on_delete: SET NULL

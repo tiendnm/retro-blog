@@ -120,5 +120,13 @@ await api('POST', '/items/posts', {
   category: catId[DRAFT.cat],
 });
 
+// ---- Site settings (singleton, ADR-0012) — đặt lại giá trị dev mặc định ----
+await api('PATCH', '/items/site_settings', {
+  site_name: 'Retro Blog',
+  description: 'Blog headless phong cách retro.',
+  footer_text: '© {year} Retro Blog — blog headless phong cách retro.',
+  default_og_image: null,
+});
+
 console.log('Seed dev hoàn tất:');
 console.log(`  authors=1  categories=${CATEGORIES.length}  published=${POSTS.length}  draft=1`);

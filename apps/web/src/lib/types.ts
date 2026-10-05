@@ -52,6 +52,17 @@ export interface PostDetail {
   cover: MediaRef | null;
 }
 
+/** SiteSettings — 03d §3.4 (cấu hình site, singleton). Luôn có giá trị (fallback khi CMS chưa cấu hình). */
+export interface SiteSettings {
+  siteName: string;
+  /** Mô tả mặc định (meta description). */
+  description: string;
+  /** Chữ footer, đã thay `{year}`. */
+  footerText: string;
+  /** Ảnh chia sẻ mặc định; `null` → dùng ảnh tĩnh mặc định. */
+  defaultOgImage: MediaRef | null;
+}
+
 /** Metadata phân trang — 03d §4. */
 export interface PageInfo {
   total: number;

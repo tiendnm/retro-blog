@@ -38,3 +38,4 @@
 | [0009](./0009-quality-tooling-biome-vitest.md) | Cổng chất lượng: Biome + Vitest | **Accepted** |
 | [0010](./0010-external-postgres-instance.md) | PostgreSQL instance có sẵn trên host | **Accepted** |
 | [0011](./0011-body-stored-as-html-wysiwyg.md) | `posts.body` lưu HTML (WYSIWYG) | **Accepted** |
+| [0012](./0012-site-settings-singleton.md) | Cấu hình site động: singleton `site_settings` | **Accepted** |

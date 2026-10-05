@@ -2,9 +2,12 @@
 // Trang 404 (Sprint 6.5, R5) — giữ nhận diện retro thay vì 404 mặc định của
 // server. Tĩnh, không gọi Directus. Astro sinh /404.html; Caddy trỏ về trang này.
 import Base from '../layouts/Base.astro';
+import { getSiteSettings } from '../lib/directus';
+
+const { siteName } = await getSiteSettings();
 ---
 
-<Base title="404 — Không tìm thấy — Retro Blog" description="Trang bạn tìm không tồn tại.">
+<Base title={`404 — Không tìm thấy — ${siteName}`} description="Trang bạn tìm không tồn tại.">
   <section class="notfound">
     <p class="notfound__code" aria-hidden="true">404</p>
     <h1>Không tìm thấy trang</h1>
