@@ -4,8 +4,10 @@
 //
 // Chạy sau khi Directus healthy + schema + permissions đã áp:  pnpm seed:dev
 // Dùng Node (đọc source UTF-8 chuẩn — tránh shell Windows làm hỏng tiếng Việt).
-// body soạn bằng markdown rồi chuyển HTML khi ghi (CMS lưu HTML — ADR-0011).
 // Nội dung: 1 author · 2 categories · 3 published posts · 1 draft.
+// Chủ đề blog: MÁY TÍNH CỔ (phần cứng, phần mềm, kiến thức) — xem memory content-direction.
+// body soạn bằng markdown rồi chuyển HTML khi ghi (CMS lưu HTML — ADR-0011).
+// Muốn dữ liệu phong phú + ảnh: chạy thêm `pnpm seed:showcase`.
 // ============================================================================
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -61,32 +63,32 @@ async function delBySlug(collection, slug) {
 // ---- Định nghĩa seed (slug là danh tính để idempotent) ----
 const AUTHOR = { name: 'Biên tập viên Demo', slug: 'bien-tap-vien-demo', bio: 'Tài khoản demo cho môi trường phát triển.' };
 const CATEGORIES = [
-  { name: 'Công nghệ', slug: 'cong-nghe', description: 'Bài viết công nghệ (demo).' },
-  { name: 'Đời sống', slug: 'doi-song', description: 'Bài viết đời sống (demo).' },
+  { name: 'Phần cứng', slug: 'phan-cung', description: 'Máy tính, linh kiện và thiết bị cổ (demo).' },
+  { name: 'Phần mềm', slug: 'phan-mem', description: 'Hệ điều hành, công cụ và phần mềm một thời (demo).' },
 ];
 const DAY = 86400000;
 const POSTS = [
   {
-    title: 'Bắt đầu với Retro Blog', slug: 'bat-dau-voi-retro-blog', cat: 'cong-nghe',
-    excerpt: 'Giới thiệu nhanh về blog demo phong cách retro.',
-    body: '## Chào mừng\n\nĐây là bài **demo** đầu tiên với [liên kết ví dụ](https://example.com).\n\n- Nội dung do Directus quản trị\n- Astro hiển thị tĩnh',
-    daysAgo: 3,
+    title: 'Chào mừng đến với Retro Blog', slug: 'bat-dau-voi-retro-blog', cat: 'phan-mem',
+    excerpt: 'Nơi ghi lại phần cứng, phần mềm và kiến thức của thời máy tính còn có tiếng quạt và đĩa mềm.',
+    body: '## Chào mừng\n\nĐây là blog về **máy tính cổ**: những chiếc máy 8-bit, đĩa mềm, màn hình CRT và các chương trình chạy trong vài chục kilobyte.\n\nBạn sẽ tìm thấy ở đây:\n\n- **Phần cứng** — cách các cỗ máy cũ được làm ra\n- **Phần mềm** — hệ điều hành và công cụ một thời\n- **Kiến thức** — những nền tảng vẫn còn đúng đến hôm nay',
+    daysAgo: 70,
   },
   {
-    title: 'Thẩm mỹ hoài cổ trong thiết kế', slug: 'tham-my-hoai-co', cat: 'doi-song',
-    excerpt: 'Vài ghi chú demo về phong cách hoài cổ.',
-    body: '## Hoài cổ\n\nMàu giấy ngả vàng, phông chữ đánh máy — *chất retro* cơ bản.\n\n1. Đơn giản\n2. Ấm áp',
-    daysAgo: 2,
+    title: 'Vì sao chúng ta vẫn mê máy tính cổ?', slug: 'tham-my-hoai-co', cat: 'phan-cung',
+    excerpt: 'Bàn phím lạch cạch, đèn báo nhấp nháy và những giới hạn kỳ lạ vẫn còn sức hút.',
+    body: '## Sức hút của giới hạn\n\nMáy tính cổ **đơn giản đủ để hiểu hết**: ít chip, ít lớp trừu tượng, và bạn có thể chạm vào từng linh kiện.\n\n1. Giới hạn buộc người ta sáng tạo\n2. Mọi thứ đều có thể sửa được\n3. Mỗi cỗ máy có một "tính cách" riêng',
+    daysAgo: 66,
   },
   {
-    title: 'Vòng đời một bài viết', slug: 'vong-doi-mot-bai-viet', cat: 'cong-nghe',
-    excerpt: 'Từ bản nháp tới xuất bản — mô tả demo.',
-    body: '## Vòng đời\n\n`draft` → `published`. Chỉ bài đã publish & tới giờ mới hiển thị công khai.',
-    daysAgo: 1,
+    title: 'Vòng đời một bài viết: từ bản nháp đến xuất bản', slug: 'vong-doi-mot-bai-viet', cat: 'phan-mem',
+    excerpt: 'Bài viết đi từ nháp tới xuất bản như thế nào trong hệ thống CMS của blog.',
+    body: '## Vòng đời\n\n`draft` → `published`. Chỉ bài đã publish & tới giờ mới hiển thị công khai.\n\n```\n10 PRINT "XUAT BAN"\n20 GOTO 10\n```',
+    daysAgo: 62,
   },
 ];
 const DRAFT = {
-  title: 'Ghi chú nội bộ chưa xuất bản', slug: 'ghi-chu-noi-bo', cat: 'cong-nghe',
+  title: 'Ghi chú nội bộ chưa xuất bản', slug: 'ghi-chu-noi-bo', cat: 'phan-cung',
   excerpt: 'Bản nháp — không được lộ ra công khai.',
   body: 'Nội dung nháp, chỉ nhìn thấy trong CMS.',
 };
@@ -123,8 +125,8 @@ await api('POST', '/items/posts', {
 // ---- Site settings (singleton, ADR-0012) — đặt lại giá trị dev mặc định ----
 await api('PATCH', '/items/site_settings', {
   site_name: 'Retro Blog',
-  description: 'Blog headless phong cách retro.',
-  footer_text: '© {year} Retro Blog — blog headless phong cách retro.',
+  description: 'Blog về máy tính cổ: phần cứng, phần mềm, lập trình và những kiến thức nền tảng — viết cho người thích hiểu máy tính từ gốc.',
+  footer_text: '© {year} Retro Blog — nhật ký của những chiếc máy tính cổ.',
   default_og_image: null,
 });
 

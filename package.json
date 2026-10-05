@@ -17,6 +17,7 @@
     "schema:apply": "docker compose exec -T directus npx directus schema apply --yes //directus/snapshots/schema.yaml",
     "permissions:apply": "bash services/directus/apply-permissions.sh",
     "seed:dev": "node services/directus/seed/seed-dev.mjs",
+    "seed:showcase": "node services/directus/seed/seed-showcase.mjs",
     "fixtures:generate": "node services/directus/fixtures/framework/generator.mjs",
     "fixtures:load": "node services/directus/fixtures/loader/load.mjs",
     "fixtures:reset": "node services/directus/fixtures/loader/reset.mjs",

@@ -62,6 +62,7 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
    pnpm schema:apply         # áp dụng schema snapshot (collections/fields/relations)
    pnpm permissions:apply    # cấu hình Roles/Policies/Permissions (Public/Editor)
    pnpm seed:dev             # (tuỳ chọn) dữ liệu mẫu dev: 1 author, 2 category, 3 bài + 1 draft
+   pnpm seed:showcase        # (tuỳ chọn, sau seed:dev) +17 bài có ảnh, 4 chuyên mục, 2 tác giả, avatar — xem blog "đủ ảnh"
    ```
    > Chỉ cần khi Directus còn trống (volume mới). Cả ba **idempotent** — chạy lại an toàn.
    > Artifacts: `services/directus/snapshots/schema.yaml` · `services/directus/apply-permissions.sh` · `services/directus/seed/seed-dev.mjs`.
