@@ -106,5 +106,5 @@ Trạng thái Sprint 6: **✅ = cơ chế đã kiểm chứng** · **@deploy = x
 - [x] **Rollback = atomic swap** về static build trước — ✅ `builds/` giữ N, swap symlink (S6-P3)
 - [x] Không secret trong repo/log — ✅ `.env*` gitignored; **@deploy**: secrets prod mạnh + **2FA admin**
 - [x] SEO đúng ở prod (canonical/OG/sitemap domain thật) — ✅ build `PUBLIC_SITE_URL` (S6-P2); a11y giữ (S3–S5)
-- [ ] **@deploy:** DNS `retro.`/`cms.` trỏ host; mở 80/443; `.env.production` (domain+secrets); `docker compose -f … -f docker-compose.prod.yml up -d`; `pnpm rebuild:flow`
+- [ ] **@deploy:** DNS `retro.`/`cms.` trỏ host; mở 80/443; `.env.production` (domain+secrets); `docker compose -f … -f docker-compose.prod.yml up -d`; `pnpm rebuild:flow`; `pnpm theme:apply` (theme/branding Directus admin)
 - [x] DoD release ([14 §2.2](./14-quality-gates.md)) — cơ chế đạt; chốt cuối khi deploy

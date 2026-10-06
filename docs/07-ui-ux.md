@@ -34,8 +34,8 @@
 ### 2.2. Typography
 | Token | Giá trị | Ghi chú |
 |---|---|---|
-| `--font-body` / `--font-heading` | `= --font-mono` | **system stack** (không web font ngoài) |
-| `--font-mono` / `--font-serif` / `--font-sans` | Courier / Georgia / system-ui | sẵn để đổi |
+| `--font-body` / `--font-heading` | `= --font-mono` | **IBM Plex Mono** self-host (@fontsource, 400/700; fallback Courier New) — không gọi CDN ngoài |
+| `--font-mono` / `--font-serif` / `--font-sans` | IBM Plex Mono (self-host, @fontsource) / Georgia / system-ui | sẵn để đổi |
 | `--text-xs … --text-3xl` | `0.833 · 0.9 · 1 · 1.125 · 1.35 · 1.6 · 1.95` rem | thang ~1.2 |
 | `--leading-tight / body / relaxed` | `1.25 / 1.65 / 1.8` | |
 | `--weight-normal / bold` | `400 / 700` | |

@@ -104,6 +104,7 @@ Self-host HTTPS qua **Caddy** (auto-TLS) + **rebuild-on-publish** + **backup**. 
 cp .env.production.example .env.production   # điền <domain> thật + secrets mạnh (KHÔNG commit)
 docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production up -d
 pnpm rebuild:flow    # tạo Directus Flow rebuild-on-publish (cần REBUILD_* + admin creds)
+pnpm theme:apply     # đồng bộ màu + font Directus Admin với web (Settings → Appearance)
 pnpm backup          # sao lưu db+uploads+config (restore: pnpm restore <dir>)
 ```
 

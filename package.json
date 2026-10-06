@@ -22,6 +22,7 @@
     "fixtures:load": "node services/directus/fixtures/loader/load.mjs",
     "fixtures:reset": "node services/directus/fixtures/loader/reset.mjs",
     "rebuild:flow": "node services/directus/apply-rebuild-flow.mjs",
+    "theme:apply": "node services/directus/apply-theme.mjs",
     "rebuild:run": "sh services/rebuild/rebuild.sh",
     "backup": "sh services/ops/backup.sh",
     "restore": "sh services/ops/restore.sh"
