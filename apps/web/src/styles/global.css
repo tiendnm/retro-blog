@@ -17,7 +17,7 @@
   --color-card: #faf7ee; /* nền thẻ giấy (sáng hơn --color-surface) */
 
   /* ---- Typography ------------------------------------------------------- */
-  --font-mono: "Courier New", Courier, monospace;
+  --font-mono: "IBM Plex Mono", "Courier New", Courier, monospace;
   --font-serif: Georgia, "Times New Roman", serif;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-body: var(--font-mono); /* provisional: giữ chất retro hiện tại */
