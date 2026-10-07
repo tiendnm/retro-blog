@@ -5,6 +5,8 @@
 
 > ✅ **Quyết định đã CHỐT (Sprint 6 Phase 0, Product):** reverse proxy = **Caddy** + auto-TLS ([ADR-0007](./adr/0007-reverse-proxy-and-tls.md)); rebuild = **Flow→webhook→script→atomic swap** ([ADR-0008](./adr/0008-rebuild-on-publish.md)); topology = **`retro.<domain>` + `cms.<domain>`**. **`<domain>` thật** do Product cung cấp ở **Phase 2**.
 
+> 🏠 **Server tại nhà:** chạy sau **Cloudflare Tunnel** (không mở cổng) — [ADR-0015](./adr/0015-cloudflare-tunnel-ingress.md) · Postgres trong compose — [ADR-0014](./adr/0014-postgres-in-compose-for-production.md) · runbook từng bước: [08a](./08a-deploy-home-tunnel.md).
+
 ---
 
 ## 1. Môi trường (Environments)

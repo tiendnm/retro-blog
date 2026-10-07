@@ -32,6 +32,7 @@
 | 07 | [UI / UX & Design System](./07-ui-ux.md) | — | Ngôn ngữ thiết kế retro | Nên (trước UI) |
 | 08 | [Deployment](./08-deployment.md) | — | CI/CD, môi trường, release | Nên |
 | 09 | [Coding Standards](./09-coding-standards.md) | — | Quy ước code | ✅ |
+| 08a | [Runbook: server tại nhà + Cloudflare Tunnel](./08a-deploy-home-tunnel.md) | — | Dựng server J1900 + tunnel từng bước | Khi deploy |
 | 10 | [Decisions (ADR index)](./10-decisions.md) | — | Ghi nhận & tra cứu quyết định | ✅ |
 | 10a | [Tech Stack](./10a-tech-stack.md) | ⚙️ RÌA | Sổ đăng ký công nghệ theo vai trò | Nên |
 | 11 | [Testing Strategy](./11-testing.md) | — | Triết lý test, cổng chất lượng | Nên |

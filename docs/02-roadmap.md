@@ -34,6 +34,7 @@
 | [6.5](./sprints/sprint-6.5.md) | Product Polish (Content & UX) | ✅ |
 | [7](./sprints/sprint-7.md) | System Hardening & Quality (Biome, test, CI) | 🟡 Phase 1 xong; Phase 2–3 còn lại |
 | [8](./sprints/sprint-8.md) | Production Hardening (header, webhook, backup lịch, healthcheck) | ✅ (chưa kiểm chứng trên server thật) |
+| [9](./sprints/sprint-9.md) | Deploy tại nhà: Cloudflare Tunnel + Postgres trong compose | ✅ cấu hình + dry-run cục bộ; chờ máy thật |
 
 ## 4. Backlog cấp cao
 

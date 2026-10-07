@@ -62,7 +62,9 @@
 
 ## 4. Sao lưu & Khôi phục (Backup & Recovery)
 
-Công cụ (Sprint 6): [`services/ops/backup.sh`](../services/ops/backup.sh) (`pnpm backup`) · [`restore.sh`](../services/ops/restore.sh) (`pnpm restore <dir>`).
+Công cụ (Sprint 6): [`services/ops/backup.sh`](../services/ops/backup.sh) (`pnpm backup`) · [`restore.sh`](../services/ops/restore.sh) (`pnpm restore <dir>`). **Production (Postgres trong compose, [ADR-0014](./adr/0014-postgres-in-compose-for-production.md))**: đặt `PG_VIA_COMPOSE=1` (+ `COMPOSE_FILES`, `PGUSER`, `PGDB`) — `pg_dump`/`pg_restore` chạy trong container `postgres`; unit systemd đã đặt sẵn. Restore drill với Postgres-trong-compose: đạt (Sprint 9, dump → DB trống → posts 4=4).
+
+> ⚠️ **Hiện chưa có backup ra ngoài máy** (quyết định của Product, 2026-10-07): backup nằm cùng ổ HDD, chỉ cứu lỗi phần mềm/xoá nhầm — **không** cứu hỏng ổ hoặc mất máy. Xem [08a §0](./08a-deploy-home-tunnel.md).
 
 | Hạng mục | Chính sách |
 |---|---|

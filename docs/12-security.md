@@ -49,6 +49,8 @@
 - **Webhook rebuild siết** (`services/rebuild/webhook.mjs`): token chỉ qua header, so sánh hằng-thời-gian, mọi yêu cầu sai trả cùng 404, khoá tạm theo IP sau nhiều lần sai (429), mặc định bind `127.0.0.1` (`REBUILD_HOST`), token ≥ 32 ký tự. Có test (`node --test services/rebuild/`, chạy trong CI).
 - **Backup:** `umask 077`, tự dọn bản cũ (`BACKUP_KEEP`), chạy hằng ngày bằng systemd timer.
 
+**Sprint 9 (server tại nhà):** không mở/forward cổng nào — truy cập duy nhất qua Cloudflare Tunnel ([ADR-0015](./adr/0015-cloudflare-tunnel-ingress.md)); Postgres không publish cổng (chỉ `retro-net`); cookie Directus `Secure`; `ufw deny incoming` (SSH chỉ từ LAN). Đoạn tunnel→Caddy là HTTP trong mạng Docker nội bộ.
+
 **Còn lại (Backlog):** container không chạy root · quét lỗ hổng dependency định kỳ · rate limiting cho Directus (`RATE_LIMITER_*`; cần xác nhận IP client thật sau Caddy trước khi bật) · cập nhật vá lỗi.
 
 ## 7. Bảo mật chuỗi cung ứng (Supply chain)
