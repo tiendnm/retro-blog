@@ -1,24 +1,52 @@
-# ── Production override (Sprint 6 — ADR-0007/0008) ─────────────────────────
+# ── Production override (Sprint 6 — ADR-0007/0008; Sprint 9 — ADR-0014/0015) ──
 # Dùng CÙNG base (KHÔNG đụng docker-compose.yml dev):
 #   docker compose -f docker-compose.yml -f docker-compose.prod.yml \
 #     --env-file .env.production up -d
+# Chạy sau Cloudflare Tunnel (không mở cổng): thêm -f docker-compose.tunnel.yml (xem file đó).
 #
-# Topology: Caddy (edge, TLS) → site tĩnh (/srv/site) + Directus (cms).
+# Topology: Caddy (edge) → site tĩnh (/srv/site) + Directus (cms). Postgres chạy TRONG compose
+# (ADR-0014, thay ADR-0010 cho production) — không publish cổng, chỉ nội bộ retro-net.
 # - web = build-runner MỘT LẦN: astro build → volume site_dist (Caddy phục vụ). ADR-0008.
 # - directus: KHÔNG public trực tiếp (chỉ bind localhost server, debug); public qua Caddy.
-# - postgres: ngoài compose (instance có sẵn trên host, ADR-0010) — Directus nối qua DB_HOST.
 name: retro-blog
 
 services:
+  # ─── Content Store (ADR-0004/0014) ───
+  postgres:
+    image: postgres:16.8-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    # Tinh chỉnh cho máy nhỏ (≈4 GB RAM, HDD): ít kết nối, bộ đệm vừa phải.
+    command: ["postgres", "-c", "shared_buffers=128MB", "-c", "effective_cache_size=512MB", "-c", "max_connections=30"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - retro-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
   directus:
     # Ghi đè: chỉ bind localhost trên server (public đi qua Caddy, không expose 0.0.0.0).
     ports: !override
       - "127.0.0.1:${DIRECTUS_PORT}:8055"
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       PUBLIC_URL: ${PUBLIC_URL}
       # CORS cho site domain (browser trang site gọi asset/API Directus).
       CORS_ENABLED: "true"
       CORS_ORIGIN: ${PUBLIC_SITE_URL}
+      # Cookie đăng nhập chỉ đi qua HTTPS (trình duyệt luôn thấy HTTPS: Caddy TLS hoặc Cloudflare edge).
+      REFRESH_TOKEN_COOKIE_SECURE: "true"
+      SESSION_COOKIE_SECURE: "true"
 
   # Web = build-runner (ADR-0008): astro build → staging builds/<TS> → ATOMIC
   # SWAP symlink `current` (build-swap.sh) rồi THOÁT. First-boot chạy job này;
@@ -35,6 +63,8 @@ services:
       PUBLIC_DIRECTUS_URL: ${PUBLIC_DIRECTUS_URL}
       PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}
       KEEP_BUILDS: ${KEEP_BUILDS:-5}
+      # Máy nhỏ: giới hạn heap Node để astro build không ăn hết RAM.
+      NODE_OPTIONS: ${BUILD_NODE_OPTIONS:---max-old-space-size=1536}
     # Thay bind-mount dev bằng volume output (nguồn baked trong image) + script swap.
     volumes: !override
       - site_dist:/out
@@ -46,7 +76,7 @@ services:
       directus:
         condition: service_healthy
 
-  # Caddy edge: TLS tự động, phục vụ static, proxy Directus.
+  # Caddy edge: TLS tự động (hoặc HTTP sau Cloudflare Tunnel), phục vụ static, proxy Directus.
   caddy:
     image: caddy:2.8-alpine
     restart: unless-stopped
@@ -62,6 +92,9 @@ services:
       SITE_DOMAIN: ${SITE_DOMAIN}
       CMS_DOMAIN: ${CMS_DOMAIN}
       ACME_EMAIL: ${ACME_EMAIL}
+      # Địa chỉ lắng nghe của Caddy: mặc định = domain (auto-TLS). Tunnel override thành http://<domain>.
+      SITE_ADDRESS: ${SITE_ADDRESS:-${SITE_DOMAIN}}
+      CMS_ADDRESS: ${CMS_ADDRESS:-${CMS_DOMAIN}}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - site_dist:/srv/site:ro
@@ -71,6 +104,7 @@ services:
       - retro-net
 
 volumes:
+  pgdata:
   site_dist:
   caddy_data:
   caddy_config:

@@ -1,0 +1,25 @@
+# ── Cloudflare Tunnel override (Sprint 9 — ADR-0015) ──────────────────────────
+# Chạy server TẠI NHÀ, KHÔNG mở cổng ra internet: cloudflared dựng kết nối ra Cloudflare,
+# Cloudflare terminate TLS rồi đẩy HTTP vào Caddy (http://caddy:80) qua tunnel.
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.tunnel.yml \
+#     --env-file .env.production up -d
+# Cần trong .env.production: TUNNEL_TOKEN, SITE_ADDRESS=http://<SITE_DOMAIN>, CMS_ADDRESS=http://<CMS_DOMAIN>.
+# Public hostnames của tunnel (cấu hình trong Cloudflare dashboard) đều trỏ về http://caddy:80;
+# Caddy định tuyến theo Host nên giữ nguyên header bảo mật/CSP như chế độ TLS trực tiếp.
+name: retro-blog
+
+services:
+  caddy:
+    # Không publish 80/443 ra host: truy cập duy nhất đi qua tunnel.
+    ports: !reset []
+
+  cloudflared:
+    image: cloudflare/cloudflared:2026.10.0
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "run"]
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?cần TUNNEL_TOKEN (Cloudflare Zero Trust → Networks → Tunnels)}
+    depends_on:
+      - caddy
+    networks:
+      - retro-net

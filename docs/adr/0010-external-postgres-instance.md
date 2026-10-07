@@ -1,6 +1,6 @@
 # ADR-0010 — Dùng PostgreSQL instance có sẵn trên host (ngoài compose)
 
-> **Status:** Accepted <!-- 2026-10-06 -->
+> **Status:** Accepted cho **dev** <!-- 2026-10-06 --> · cho **production**: [thay thế bởi ADR-0014](./0014-postgres-in-compose-for-production.md)
 > **Ngày đề xuất:** 2026-10-06 · **Ngày Accepted:** 2026-10-06
 > **Người quyết định:** Product
 > **Nguyên tắc tuân thủ (Principles):** P6 (Low coupling) — vẫn là adapter PostgreSQL; chỉ đổi *nơi chạy* (tầng RÌA). Bổ sung (không thay thế) [ADR-0004](./0004-use-postgresql-content-store.md).
