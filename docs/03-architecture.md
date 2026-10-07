@@ -1,7 +1,5 @@
 # 03 — Architecture
 
-> **Trạng thái:** 🟢 Đã duyệt · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** Tech Lead (Sprint 0 close-out)
->
 > 🎯 **Mục đích:** Mô tả *hình dạng logic* của hệ thống theo **vai trò (roles)** và **ports & adapters** — tách phần ổn định (port/contract) khỏi phần thay thế được (adapter/công nghệ). Là bản đồ tổng thể, tech-neutral.
 > 🔗 **Liên quan:** [03a-architecture-principles](./03a-architecture-principles.md) · [03c-content-model](./03c-content-model.md) · [03d-api-contract](./03d-api-contract.md) · [03e-data-model](./03e-data-model.md) · [10a-tech-stack](./10a-tech-stack.md)
 

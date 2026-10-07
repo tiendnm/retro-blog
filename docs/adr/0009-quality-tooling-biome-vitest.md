@@ -55,4 +55,4 @@ Chúng ta sẽ dùng:
 ## Liên kết (Links)
 
 - Chuẩn code: [../09-coding-standards.md](../09-coding-standards.md) · Testing: [../11-testing.md](../11-testing.md) · Quality Gates: [../14-quality-gates.md](../14-quality-gates.md)
-- Sprint 7 Planning: [../sprints/sprint-7-planning.md](../sprints/sprint-7-planning.md)
+- Sprint 7 Planning: [../sprints/sprint-7.md](../sprints/sprint-7.md)

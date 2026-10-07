@@ -1,7 +1,5 @@
 # 03e — Data Model
 
-> **Trạng thái:** 🟢 Đã duyệt · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** Tech Lead (Sprint 0 close-out)
->
 > 🎯 **Mục đích:** Mô hình dữ liệu *logic* để lưu trữ — thực thể, khoá, quan hệ, ràng buộc toàn vẹn — **độc lập với hệ quản trị CSDL cụ thể**. Là SSOT cho cấu trúc lưu trữ ở mức logic.
 > 🔗 **Liên quan:** [03c-content-model](./03c-content-model.md) · [03b-domain-model](./03b-domain-model.md) · [04-database](./04-database.md)
 

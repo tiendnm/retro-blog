@@ -1,7 +1,5 @@
 # 13 — Operations (Runbook, Observability, Backup, Incident)
 
-> **Trạng thái:** 🟡 Đang bổ sung · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-26 · **Người duyệt:** _(chưa gán)_
->
 > 🎯 **Mục đích:** Hướng dẫn *vận hành hệ thống khi đã chạy* — thao tác thường ngày, giám sát, sao lưu/khôi phục và xử lý sự cố. Đảm bảo hệ thống chạy ổn định và phục hồi được.
 > 🔗 **Liên quan:** [08-deployment](./08-deployment.md) · [12-security](./12-security.md) · [04-database](./04-database.md)
 

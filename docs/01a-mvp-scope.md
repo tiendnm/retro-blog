@@ -1,7 +1,5 @@
 # 01a — MVP Scope
 
-> **Trạng thái:** 🟢 Đã duyệt · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** Tech Lead (Sprint 0 close-out)
->
 > 🎯 **Mục đích:** **Khóa phạm vi phiên bản đầu tiên (v1)** — là **SSOT** cho câu hỏi *"cái gì thuộc MVP?"*. Phân loại các hạng mục *đã có* thành **Must Have / Nice To Have / Future** để tránh mở rộng ngoài kế hoạch.
 > 🔗 **Liên quan:** [01-requirements](./01-requirements.md) (nguồn FR/NFR) · [03c-content-model](./03c-content-model.md) (content types) · [02-roadmap](./02-roadmap.md) · [14-quality-gates](./14-quality-gates.md)
 

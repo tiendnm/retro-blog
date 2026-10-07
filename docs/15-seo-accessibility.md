@@ -1,7 +1,5 @@
 # 15 — SEO & Accessibility
 
-> **Trạng thái:** 🟡 SEO baseline đã hiện thực (Sprint 5 Phase 2); a11y baseline (Sprint 3) · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-22 · **Người duyệt:** Product
->
 > 🎯 **Mục đích:** Đặt mục tiêu và tiêu chuẩn cho *khả năng được tìm thấy* (SEO) và *khả năng tiếp cận* (a11y) — hai yếu tố sống còn với một blog. Ghi sớm để thiết kế & code không phải sửa lại về sau.
 > 🔗 **Liên quan:** [01-requirements](./01-requirements.md) · [07-ui-ux](./07-ui-ux.md) · [06-api](./06-api.md) · [10-decisions `[S5-P0]`/`[S5-P2]`](./10-decisions.md)
 

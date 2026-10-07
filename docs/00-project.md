@@ -1,7 +1,5 @@
 # 00 — Project & Vision
 
-> **Trạng thái:** 🔴 Chưa bắt đầu · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chưa gán)_
->
 > 🎯 **Mục đích:** Xác lập *lý do tồn tại* của dự án — tầm nhìn, phạm vi, đối tượng và tiêu chí thành công. Đây là "hiến pháp" mà mọi tài liệu và quyết định khác phải nhất quán.
 > 🔗 **Liên quan:** [01-requirements](./01-requirements.md) · [02-roadmap](./02-roadmap.md) · [16-glossary](./16-glossary.md)
 

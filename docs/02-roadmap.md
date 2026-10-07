@@ -1,58 +1,48 @@
 # 02 — Roadmap
 
-> **Trạng thái:** 🔴 Chưa bắt đầu · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chưa gán)_
->
-> 🎯 **Mục đích:** Sắp xếp *khi nào* làm *cái gì* — chuyển yêu cầu thành các mốc (milestone), sprint và bản phát hành (release) theo thứ tự ưu tiên.
-> 🔗 **Liên quan:** [00-project](./00-project.md) · [01-requirements](./01-requirements.md) · [14-quality-gates](./14-quality-gates.md)
+> 🎯 **Mục đích:** Sắp xếp *khi nào* làm *cái gì* — các mốc, sprint và hướng đi tiếp theo.
+> 🔗 **Liên quan:** [00-project](./00-project.md) · [01-requirements](./01-requirements.md) · [01a-mvp-scope](./01a-mvp-scope.md) (SSOT phạm vi MVP) · [14-quality-gates](./14-quality-gates.md) · [17-contributing §2](./17-contributing.md) (quy trình sprint)
 
 ---
 
 ## 1. Nguyên tắc lập kế hoạch
 
-- Ưu tiên **MVP** (tập nhỏ nhất tạo giá trị) trước, mở rộng sau.
-- Mỗi mốc có tiêu chí ra (exit criteria) rõ ràng, kiểm chứng được.
-- Tài liệu ✅ (xem [docs/README](./README.md)) phải 🟢 trước khi mốc "Bắt đầu code" mở.
+- Ưu tiên **MVP** (tập nhỏ nhất tạo giá trị) trước, mở rộng sau. Phạm vi MVP là SSOT ở [01a-mvp-scope](./01a-mvp-scope.md).
+- Mỗi sprint = một file `docs/sprints/sprint-N.md` (mục tiêu, checklist, tiêu chí xong, kết quả).
+- Sprint còn lại phải **tiến gần Public MVP đo lường được**; feature không cải thiện launch-readiness thì để Backlog.
 
-## 2. Định nghĩa MVP
+## 2. Mốc (Milestones)
 
-> **Phạm vi MVP là SSOT ở [01a-mvp-scope](./01a-mvp-scope.md)** — phân loại Must / Nice / Future. Roadmap chỉ *sắp lịch* các hạng mục **Must**; không định nghĩa lại phạm vi ở đây.
+| Mốc | Mục tiêu | Trạng thái |
+|---|---|---|
+| M0 — Tài liệu nền tảng | Bộ `docs/` + ADR stack | ✅ Sprint 0 |
+| M1 — Khung hệ thống | Astro + Directus + PostgreSQL chạy local | ✅ Sprint 1 |
+| M2 — MVP nội dung | Editor publish → Reader xem (list/detail/category) | ✅ Sprint 2 |
+| M3 — Ra mắt (Launch) | Public HTTPS + SEO + a11y + checklist | 🟡 Cơ chế xong (Sprint 5–6); còn xác nhận trên domain thật ([08 §8](./08-deployment.md)) |
 
-## 3. Các mốc (Milestones)
+## 3. Sprint
 
-| Mốc | Mục tiêu | Yêu cầu liên quan | Tiêu chí ra (Exit criteria) | Mục tiêu thời gian |
-|---|---|---|---|---|
-| M0 — Tài liệu nền tảng | Hoàn thiện docs Sprint 0 | — | Tài liệu ✅ đạt 🟢 | Sprint 0 |
-| M1 — Khung hệ thống | Dựng khung Astro/Directus/Docker | FR-... | Chạy được local | Sprint 1 |
-| M2 — MVP nội dung | Đọc & xuất bản bài | FR-R1..R2, FR-E1..E2 | Xuất bản 1 bài end-to-end | ... |
-| M3 — Ra mắt (Launch) | Public + SEO + a11y | FR-..., NFR-... | Checklist launch đạt | ... |
+| Sprint | Chủ đề | Trạng thái |
+|---|---|---|
+| 0 | Tài liệu & kiến trúc | ✅ |
+| [1](./sprints/sprint-1.md) | Nền tảng local (infra + plumbing) | ✅ |
+| [2](./sprints/sprint-2.md) | Vertical slice nội dung | ✅ |
+| [3](./sprints/sprint-3.md) | Reader Experience | ✅ |
+| [4](./sprints/sprint-4.md) | Fixture Framework & dogfooding | ✅ |
+| [5](./sprints/sprint-5.md) | Pagination + SEO baseline | ✅ |
+| [6](./sprints/sprint-6.md) | Deployment & Public MVP | ✅ (mục @deploy chờ domain thật) |
+| [6.5](./sprints/sprint-6.5.md) | Product Polish (Content & UX) | ✅ |
+| [7](./sprints/sprint-7.md) | System Hardening & Quality (Biome, test, CI) | 🟡 Phase 1 xong; Phase 2–3 còn lại |
 
-## 4. Kế hoạch Sprint
+## 4. Backlog cấp cao
 
-| Sprint | Chủ đề | Kết quả mong đợi (Deliverables) | Trạng thái |
-|---|---|---|---|
-| 0 | Tài liệu & quy trình | Bộ `docs/` hoàn chỉnh | 🟡 Đang làm |
-| 1 | _(TBD sau review)_ | ... | ⏳ |
+- **Deploy hardening (@deploy):** xác nhận ACME/DNS trên domain thật, 2FA admin, security header (Caddy), siết webhook rebuild, backup theo lịch, uptime check.
+- **Kiểm thử mở rộng:** test độ bền thin client, axe a11y, link-check, Lighthouse budget, E2E.
+- **Reader feature:** Category discoverability, Search, RSS, Tags, Archive, Author pages.
+- **Refactor docs-architecture:** F1–F15 ([architecture review](./reviews/architecture-review-2026-07-21.md)).
 
-## 5. Kế hoạch phát hành (Release Plan)
+## 5. Phát hành
 
-| Phiên bản | Nội dung chính | Điều kiện phát hành | Ghi chú |
-|---|---|---|---|
-| v0.1 (MVP) | ... | DoD + Launch checklist | Xem [14](./14-quality-gates.md) |
-
-## 6. Backlog cấp cao (High-level Backlog)
-
-> Ý tưởng/tính năng chưa xếp lịch. Kéo lên sprint khi ưu tiên.
-
-- [ ] TODO.
-
-## 7. Phụ thuộc & Rủi ro lịch trình (Dependencies & Risks)
-
-| Hạng mục | Phụ thuộc vào | Rủi ro | Phương án |
-|---|---|---|---|
-| ... | ... | ... | ... |
-
-## 8. Nhịp rà soát (Review cadence)
-
-> Ai review roadmap, bao lâu một lần, dựa trên chỉ số nào (xem [00-project §4](./00-project.md)).
-
-TODO.
+| Phiên bản | Điều kiện phát hành |
+|---|---|
+| v0.1 (Public MVP) | DoD release ([14 §2.2](./14-quality-gates.md)) + checklist [08 §8](./08-deployment.md) đạt trên domain thật |

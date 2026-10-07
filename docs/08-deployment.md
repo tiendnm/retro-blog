@@ -1,9 +1,7 @@
 # 08 — Deployment
 
-> **Trạng thái:** 🟡 **Đang triển khai — Sprint 6** (quyết định kiến trúc đã CHỐT; chờ **domain thật** + hiện thực compose prod/proxy/rebuild/backup) · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-23 · **Người duyệt:** Product
->
 > 🎯 **Mục đích:** Mô tả *cách đưa code lên môi trường* — kiến trúc triển khai, phát hành nội dung, secrets, rollback. Đảm bảo phát hành lặp lại được và an toàn.
-> 🔗 **Liên quan:** [Sprint 6 Plan](./sprints/sprint-6-implementation-plan.md) · [03-architecture](./03-architecture.md) · [13-operations](./13-operations.md) · [12-security](./12-security.md) · [ADR-0005](./adr/0005-use-docker-packaging.md) · [ADR-0006](./adr/0006-render-strategy.md) · [ADR-0007](./adr/0007-reverse-proxy-and-tls.md) · [ADR-0008](./adr/0008-rebuild-on-publish.md).
+> 🔗 **Liên quan:** [Sprint 6 Plan](./sprints/sprint-6.md) · [03-architecture](./03-architecture.md) · [13-operations](./13-operations.md) · [12-security](./12-security.md) · [ADR-0005](./adr/0005-use-docker-packaging.md) · [ADR-0006](./adr/0006-render-strategy.md) · [ADR-0007](./adr/0007-reverse-proxy-and-tls.md) · [ADR-0008](./adr/0008-rebuild-on-publish.md).
 
 > ✅ **Quyết định đã CHỐT (Sprint 6 Phase 0, Product):** reverse proxy = **Caddy** + auto-TLS ([ADR-0007](./adr/0007-reverse-proxy-and-tls.md)); rebuild = **Flow→webhook→script→atomic swap** ([ADR-0008](./adr/0008-rebuild-on-publish.md)); topology = **`retro.<domain>` + `cms.<domain>`**. **`<domain>` thật** do Product cung cấp ở **Phase 2**.
 
@@ -42,7 +40,7 @@
 
 - **Web serving:** site là **static build** (`dist/` từ `astro build`) — reverse proxy **serve file tĩnh trực tiếp**, **không** chạy Node runtime cho site (nhanh, ít bề mặt tấn công). Đúng SSG ([ADR-0006](./adr/0006-render-strategy.md)).
 - **Directus:** ra ngoài **chỉ qua proxy** ở `cms.<domain>` (admin UI + REST API + `/assets`). **Postgres chạy ngoài compose** (instance có sẵn trên host, DB `retro-blog` — [ADR-0010](./adr/0010-external-postgres-instance.md)); không expose ra internet.
-- **Domain topology (Accepted):** **subdomain tách** — `retro.<domain>` (site) + `cms.<domain>` (Directus). Lợi: `PUBLIC_SITE_URL`/`PUBLIC_DIRECTUS_URL` rõ ràng, CORS gọn, khớp canonical/OG/sitemap của [Sprint 5](./sprints/sprint-5-completion-report.md). *(`<domain>` thật do Product cung cấp ở Phase 2.)*
+- **Domain topology (Accepted):** **subdomain tách** — `retro.<domain>` (site) + `cms.<domain>` (Directus). Lợi: `PUBLIC_SITE_URL`/`PUBLIC_DIRECTUS_URL` rõ ràng, CORS gọn, khớp canonical/OG/sitemap của [Sprint 5](./sprints/sprint-5.md). *(`<domain>` thật do Product cung cấp ở Phase 2.)*
 
 ## 3. Pipeline / Phát hành
 
@@ -76,7 +74,7 @@ Giải "SSG stale" ([ADR-0006](./adr/0006-render-strategy.md)): Editor publish t
 ## 6. Rollback *(Recommended)*
 
 - **Site (chính):** **atomic swap về static build TRƯỚC** — proxy trỏ tới bản `dist/` ổn định gần nhất (giữ N bản) → khôi phục tức thì khi deploy/rebuild lỗi. Đưa vào **Launch Checklist §8**.
-- **Directus/DB/config:** khôi phục từ backup ([13 §4](./13-operations.md), §3.4 [Plan](./sprints/sprint-6-implementation-plan.md)).
+- **Directus/DB/config:** khôi phục từ backup ([13 §4](./13-operations.md), §3.4 [Plan](./sprints/sprint-6.md)).
 - Zero-downtime nâng cao (blue-green/canary): **ngoài MVP**.
 
 ## 7. DNS, TLS, Domain + Reverse proxy *(Accepted = Caddy — [ADR-0007](./adr/0007-reverse-proxy-and-tls.md))*

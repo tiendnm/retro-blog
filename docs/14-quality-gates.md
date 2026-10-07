@@ -1,7 +1,5 @@
 # 14 — Quality Gates (Definition of Ready / Done, Review)
 
-> **Trạng thái:** 🔴 Chưa bắt đầu · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chưa gán)_
->
 > 🎯 **Mục đích:** Định nghĩa *các cổng chất lượng* — khi nào một hạng mục sẵn sàng làm (Ready), khi nào coi là hoàn thành (Done), và checklist review. Tạo tiêu chuẩn chung, tránh "định nghĩa hoàn thành" mỗi người một kiểu.
 > 🔗 **Liên quan:** [01-requirements](./01-requirements.md) · [09-coding-standards](./09-coding-standards.md) · [11-testing](./11-testing.md)
 
@@ -56,7 +54,7 @@ Một hạng mục (story/task) chỉ được kéo vào sprint khi:
 - Review ở ranh giới sprint; giữa sprint chỉ dừng cho thay đổi hạ tầng / bảo mật / schema / kiến trúc ([17 §2](./17-contributing.md)).
 - Branch protection + required checks: bật khi CI (Sprint 7 Phase 3) có mặt.
 
-## 5. Cổng "Sẵn sàng bắt đầu code" (Ready to Code — thoát Sprint 0)
+## 5. Cổng "Sẵn sàng bắt đầu code" (Ready to Code — thoát Sprint 0) — ✅ đã qua
 
 > Cổng riêng cho giai đoạn tài liệu. Không viết code cho tới khi:
 

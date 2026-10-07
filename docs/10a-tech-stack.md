@@ -1,7 +1,5 @@
 # 10a — Tech Stack (Implementation)
 
-> **Trạng thái:** 🟢 Đã duyệt · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** Tech Lead (Sprint 0 close-out)
->
 > 🎯 **Mục đích:** *Sổ đăng ký* các công nghệ cụ thể được chọn cho từng **vai trò/port** trong [Architecture](./03-architecture.md). Đây là nơi **duy nhất** tập trung tên công nghệ (cùng ADR & Principle), để các tài liệu LÕI không phải nhắc tới chúng.
 > 🔗 **Liên quan:** [03-architecture](./03-architecture.md) · [03a-architecture-principles](./03a-architecture-principles.md) · [10-decisions](./10-decisions.md)
 

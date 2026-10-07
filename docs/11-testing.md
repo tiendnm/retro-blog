@@ -1,7 +1,5 @@
 # 11 — Testing Strategy
 
-> **Trạng thái:** 🔴 Chưa bắt đầu · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chưa gán)_
->
 > 🎯 **Mục đích:** Xác định *cách chúng ta biết phần mềm đúng* — các tầng test, phạm vi, công cụ và cổng chất lượng. Bảo vệ chất lượng khi dự án lớn dần và nhiều người cùng sửa.
 > 🔗 **Liên quan:** [01-requirements](./01-requirements.md) · [09-coding-standards](./09-coding-standards.md) · [14-quality-gates](./14-quality-gates.md)
 

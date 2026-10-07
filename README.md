@@ -2,8 +2,7 @@
 
 > Một blog headless mang phong cách retro — **Astro** (site) + **Directus** (headless CMS) + **PostgreSQL**, đóng gói bằng **Docker**.
 
-> **Trạng thái:** 🟡 Sprint 6 — Deployment & **Public MVP** (Caddy TLS + build tái lập + rebuild-on-publish + backup/restore). Content Model/API/DTO/thin client không đổi.
-> **Cập nhật lần cuối:** 2026-07-23
+> **Trạng thái:** 🟡 Sprint 7 — System Hardening & Quality (Public MVP đã có cơ chế deploy; còn CI + test + checklist @deploy trên domain thật). Chi tiết: [docs/sprints](./docs/sprints/).
 
 ---
 
@@ -132,7 +131,9 @@ Bắt đầu từ [docs/README.md](./docs/README.md).
 | Sprint 3 | Reader Experience (Presentation Layer) | 🟢 Hoàn thành |
 | Sprint 4 | Fixture Framework & Dogfooding | 🟢 Hoàn thành |
 | Sprint 5 | Reader Completeness (Pagination + SEO baseline) | 🟢 Hoàn thành |
-| Sprint 6 | Deployment & Public MVP (TLS + rebuild-on-publish + backup) | 🟡 Đang tiến hành ([08-deployment](./docs/08-deployment.md)) |
+| Sprint 6 | Deployment & Public MVP (TLS + rebuild-on-publish + backup) | 🟢 Hoàn thành ([sprint-6](./docs/sprints/sprint-6.md)); mục @deploy chờ domain thật |
+| Sprint 6.5 | Product Polish (Content & UX) | 🟢 Hoàn thành ([sprint-6.5](./docs/sprints/sprint-6.5.md)) |
+| Sprint 7 | System Hardening & Quality (Biome, test, CI) | 🟡 Đang tiến hành — Phase 1 xong ([sprint-7](./docs/sprints/sprint-7.md)) |
 
 ## License
 

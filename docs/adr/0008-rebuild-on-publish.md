@@ -10,7 +10,7 @@
 
 ## Bối cảnh (Context)
 
-SSG static ([ADR-0006](./0006-render-strategy.md)): ở production nội dung mới **chỉ xuất hiện sau khi rebuild** — ADR-0006 để ngỏ "rebuild-on-publish qua CI/CD là future work". Sprint 6 cần: Editor publish trong Directus → site tự cập nhật, theo hướng **self-host tối giản**, **không** thêm hạ tầng nặng (CI ngoài / microservice) khi chưa cần ([Plan §3.3](../sprints/sprint-6-implementation-plan.md), yêu cầu Product).
+SSG static ([ADR-0006](./0006-render-strategy.md)): ở production nội dung mới **chỉ xuất hiện sau khi rebuild** — ADR-0006 để ngỏ "rebuild-on-publish qua CI/CD là future work". Sprint 6 cần: Editor publish trong Directus → site tự cập nhật, theo hướng **self-host tối giản**, **không** thêm hạ tầng nặng (CI ngoài / microservice) khi chưa cần ([Plan §3.3](../sprints/sprint-6.md), yêu cầu Product).
 
 ## Quyết định (Decision)
 
@@ -61,4 +61,4 @@ Ràng buộc thiết kế:
 
 ## Liên kết (Links)
 
-- [ADR-0006](./0006-render-strategy.md) (SSG — nêu future rebuild) · [ADR-0007](./0007-reverse-proxy-and-tls.md) (Caddy phục vụ static) · [08-deployment §4](../08-deployment.md) · [13-operations](../13-operations.md) · [Sprint 6 Plan](../sprints/sprint-6-implementation-plan.md)
+- [ADR-0006](./0006-render-strategy.md) (SSG — nêu future rebuild) · [ADR-0007](./0007-reverse-proxy-and-tls.md) (Caddy phục vụ static) · [08-deployment §4](../08-deployment.md) · [13-operations](../13-operations.md) · [Sprint 6 Plan](../sprints/sprint-6.md)

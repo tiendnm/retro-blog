@@ -1,7 +1,5 @@
 # 03a — Architecture Principles
 
-> **Trạng thái:** 🟢 Đã duyệt · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** Tech Lead (Sprint 0 close-out)
->
 > 🎯 **Mục đích:** Tuyên bố các nguyên tắc kiến trúc *bắt buộc* mà mọi tài liệu thiết kế, ADR và code phải tuân theo. Đây là tài liệu **governing** — khi có xung đột, nguyên tắc ở đây thắng.
 > 🔗 **Liên quan:** [03-architecture](./03-architecture.md) · [03b-domain-model](./03b-domain-model.md) · [10-decisions](./10-decisions.md) · [adr/](./adr/)
 

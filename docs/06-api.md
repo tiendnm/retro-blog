@@ -1,7 +1,5 @@
 # 06 — API Implementation (Directus Binding)
 
-> **Trạng thái:** 🟡 Draft (Sprint 2 Phase 3) · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chờ review)_
->
 > 🎯 **Mục đích:** Mô tả *cách hiện thực* API Contract bằng backend được chọn — endpoint/truy vấn thật, xác thực, phân trang, caching ở tầng vận chuyển. Tầng RÌA, gắn công nghệ.
 > 🔗 **Liên quan:** [03d-api-contract](./03d-api-contract.md) ← SSOT · [05-cms](./05-cms.md) · [08-deployment](./08-deployment.md) · [12-security](./12-security.md)
 

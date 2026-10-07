@@ -1,7 +1,5 @@
 # 16 — Glossary (Ngôn ngữ chung)
 
-> **Trạng thái:** 🔴 Chưa bắt đầu · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chưa gán)_
->
 > 🎯 **Mục đích:** Định nghĩa thống nhất các thuật ngữ nghiệp vụ & kỹ thuật (ubiquitous language) để mọi người — và tài liệu, code, giao diện — dùng cùng một từ với cùng một nghĩa. Tài liệu *sống*, bổ sung liên tục.
 > 🔗 **Liên quan:** [00-project](./00-project.md) · [03b-domain-model](./03b-domain-model.md) · [03c-content-model](./03c-content-model.md)
 

@@ -1,7 +1,5 @@
 # 03c — Content Model
 
-> **Trạng thái:** 🟢 Đã duyệt · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** Tech Lead (Sprint 0 close-out)
->
 > 🎯 **Mục đích:** Định nghĩa *các loại nội dung và field* mà người biên tập làm việc — độc lập với bất kỳ CMS nào. Đây là **nguồn sự thật (SSOT)** cho cấu trúc nội dung.
 > 🔗 **Liên quan:** [03b-domain-model](./03b-domain-model.md) · [03d-api-contract](./03d-api-contract.md) · [03e-data-model](./03e-data-model.md)
 > ▼ **Hiện thực (non-normative):** [05-cms](./05-cms.md)

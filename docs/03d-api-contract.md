@@ -1,7 +1,5 @@
 # 03d — API Contract
 
-> **Trạng thái:** 🟢 Đã duyệt · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** Tech Lead (hoàn thiện Sprint 2 Phase 0)
->
 > 🎯 **Mục đích:** Định nghĩa *hợp đồng logic* mà mọi consumer (frontend, kênh khác) và producer (backend) phải tuân theo — độc lập với transport và sản phẩm cụ thể. Hiện thực **API-first**.
 > 🔗 **Liên quan:** [03c-content-model](./03c-content-model.md) · [03b-domain-model](./03b-domain-model.md) · [03e-data-model](./03e-data-model.md) · [03a-architecture-principles (P3)](./03a-architecture-principles.md)
 > ▼ **Hiện thực (non-normative):** [06-api](./06-api.md)

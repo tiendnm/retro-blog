@@ -1,7 +1,5 @@
 # 03b — Domain Model
 
-> **Trạng thái:** 🟢 Đã duyệt · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** Tech Lead (Sprint 0 close-out)
->
 > 🎯 **Mục đích:** Mô tả *khái niệm và luật nghiệp vụ* của miền blog — tầng bền vững nhất, độc lập hoàn toàn với storage/CMS/API/framework. Là **nguồn sự thật** cho ngữ nghĩa nghiệp vụ.
 > 🔗 **Liên quan:** [16-glossary](./16-glossary.md) · [03c-content-model](./03c-content-model.md) · [03a-architecture-principles](./03a-architecture-principles.md)
 

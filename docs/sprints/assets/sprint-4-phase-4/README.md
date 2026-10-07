@@ -11,4 +11,4 @@ Chụp `2026-07-22` từ `astro dev` (desktop 1000px), fixture edge/stress đã 
 | ![many-headings](./many-headings.png) | 14 heading | ✅ phân cấp rõ |
 | ![long-word](./long-word.png) | Từ siêu dài (≥100 ký tự) | ⚠️ **cuộn ngang trang** → Finding **UI-1** (Visual Backlog, không sửa Reader ở Sprint 4) |
 
-Đo overflow (CDP @390 & desktop): mọi trang OK **trừ** `long-word`. Chi tiết: [sprint-4-completion-report §5-6](../../sprint-4-completion-report.md).
+Đo overflow (CDP @390 & desktop): mọi trang OK **trừ** `long-word`. Chi tiết: [sprint-4-completion-report §5-6](../../sprint-4.md).

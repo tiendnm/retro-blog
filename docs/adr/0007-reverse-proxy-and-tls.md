@@ -10,7 +10,7 @@
 
 ## Bối cảnh (Context)
 
-Sprint 6 đưa site **public qua HTTPS** ([Plan](../sprints/sprint-6-implementation-plan.md)). Kiến trúc self-host ([ADR-0005](./0005-use-docker-packaging.md)); site là **static** ([ADR-0006](./0006-render-strategy.md)) cần phục vụ file tĩnh nhanh, đồng thời Directus cần ra ngoài (admin UI + REST API + `/assets`). Cần một **edge**: chấm dứt TLS (chứng chỉ tự động, gia hạn), định tuyến theo host, phục vụ static, và **không** expose Postgres. Ràng buộc: **giữ đơn giản** cho self-host MVP, ít bề mặt vận hành.
+Sprint 6 đưa site **public qua HTTPS** ([Plan](../sprints/sprint-6.md)). Kiến trúc self-host ([ADR-0005](./0005-use-docker-packaging.md)); site là **static** ([ADR-0006](./0006-render-strategy.md)) cần phục vụ file tĩnh nhanh, đồng thời Directus cần ra ngoài (admin UI + REST API + `/assets`). Cần một **edge**: chấm dứt TLS (chứng chỉ tự động, gia hạn), định tuyến theo host, phục vụ static, và **không** expose Postgres. Ràng buộc: **giữ đơn giản** cho self-host MVP, ít bề mặt vận hành.
 
 ## Quyết định (Decision)
 
@@ -56,4 +56,4 @@ Chúng ta chọn **Caddy** làm **reverse proxy + edge TLS** (adapter cho "edge/
 
 ## Liên kết (Links)
 
-- [08-deployment](../08-deployment.md) · [ADR-0005](./0005-use-docker-packaging.md) · [ADR-0006](./0006-render-strategy.md) · [ADR-0008](./0008-rebuild-on-publish.md) (rebuild) · [12-security](../12-security.md) · [Sprint 6 Plan](../sprints/sprint-6-implementation-plan.md)
+- [08-deployment](../08-deployment.md) · [ADR-0005](./0005-use-docker-packaging.md) · [ADR-0006](./0006-render-strategy.md) · [ADR-0008](./0008-rebuild-on-publish.md) (rebuild) · [12-security](../12-security.md) · [Sprint 6 Plan](../sprints/sprint-6.md)

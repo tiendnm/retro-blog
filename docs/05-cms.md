@@ -1,7 +1,5 @@
 # 05 — CMS Mapping (Directus) — Implementation
 
-> **Trạng thái:** 🟡 Draft · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chờ review)_
->
 > 🎯 **Mục đích:** Mô tả *cách hiện thực* Content Model trên CMS được chọn — collections, interface field, phân quyền, workflow. Tầng RÌA, gắn công nghệ.
 > 🔗 **Liên quan:** [03c-content-model](./03c-content-model.md) ← SSOT · [03b-domain-model](./03b-domain-model.md) · [12-security](./12-security.md) · [06-api](./06-api.md)
 

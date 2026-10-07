@@ -1,7 +1,5 @@
 # 07 — UI / UX & Design System
 
-> **Trạng thái:** 🟢 Reader Experience hoàn thành (Sprint 3) · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-22 · **Người duyệt:** Tech Lead
->
 > ℹ️ Phong cách thị giác retro **chưa khóa** — tokens là *nền* (§2), hoàn thiện dần sau review thực tế.
 >
 > 🎯 **Mục đích:** Định nghĩa *ngôn ngữ thiết kế* của Retro Blog — phong cách retro, design tokens, thành phần UI, và nguyên tắc trải nghiệm. Đảm bảo giao diện nhất quán và tái sử dụng được.
@@ -14,7 +12,7 @@
 > Phong cách "retro" cụ thể là gì? (vd: pixel/8-bit, vintage print, 90s web...). Cảm giác muốn tạo ra?
 
 - **Hướng (provisional — CHƯA khóa):** vintage print / máy đánh chữ — nền giấy ngả vàng, phông monospace, đường kẻ nét đứt, bảng màu ấm trầm.
-- ⚠️ **Phong cách thị giác cuối cùng chưa chốt ở Sprint 3**; hoàn thiện dần sau khi review giao diện thực tế với Product Owner ([sprint-3 plan §4](./sprints/sprint-3-implementation-plan.md)). Phase 0 chỉ dựng **nền tokens** (§2).
+- ⚠️ **Phong cách thị giác cuối cùng chưa chốt ở Sprint 3**; hoàn thiện dần sau khi review giao diện thực tế với Product Owner ([sprint-3 plan §4](./sprints/sprint-3.md)). Phase 0 chỉ dựng **nền tokens** (§2).
 
 ## 2. Design Tokens (Design Foundation — Phase 0)
 

@@ -1,7 +1,5 @@
 # 01 — Requirements
 
-> **Trạng thái:** 🔴 Chưa bắt đầu · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chưa gán)_
->
 > 🎯 **Mục đích:** Định nghĩa *cái gì* hệ thống phải làm (chức năng) và *tốt đến đâu* (phi chức năng). Là nguồn để lập roadmap, thiết kế và kiểm thử.
 > 🔗 **Liên quan:** [00-project](./00-project.md) · [02-roadmap](./02-roadmap.md) · [11-testing](./11-testing.md) · [15-seo-accessibility](./15-seo-accessibility.md)
 

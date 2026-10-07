@@ -1,7 +1,5 @@
 # 04 — Persistence / Database (Implementation)
 
-> **Trạng thái:** 🔴 Chưa bắt đầu · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21 · **Người duyệt:** _(chưa gán)_
->
 > 🎯 **Mục đích:** Mô tả *cách hiện thực vật lý* việc lưu trữ trên CSDL được chọn — kiểu cột, index, migration, seeding, backup hooks. Tầng RÌA, gắn công nghệ.
 > 🔗 **Liên quan:** [03e-data-model](./03e-data-model.md) ← SSOT · [03c-content-model](./03c-content-model.md) · [05-cms](./05-cms.md) · [13-operations](./13-operations.md)
 

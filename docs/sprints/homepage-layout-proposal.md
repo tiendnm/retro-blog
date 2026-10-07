@@ -1,7 +1,7 @@
 # 🖼️ Design Proposal — Bố cục trang chủ có ảnh lớn
 
 > **Trạng thái:** 🟢 **Đã chọn Phương án D** (Product 2026-10-06) — đã hiện thực, chờ Product review · **Soạn:** Implementation
-> 🔗 (Mockup 4 phương án đã được thay bằng bản hiện thực thật — xem `PostListView` / `PostHero` / `PaperCard`.) · Tiền lệ: [sprint-3-postcard-proposal](./sprint-3-postcard-proposal.md) · [07-ui-ux](../07-ui-ux.md)
+> 🔗 (Mockup 4 phương án đã được thay bằng bản hiện thực thật — xem `PostListView` / `PostHero` / `PaperCard`.) · Tiền lệ: [sprint-3-postcard-proposal](./sprint-3.md) · [07-ui-ux](../07-ui-ux.md)
 
 ## 1. Vấn đề
 

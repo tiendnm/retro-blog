@@ -1,7 +1,5 @@
 # 09 — Coding Standards
 
-> **Trạng thái:** 🟡 Đang hiện thực (Sprint 7 — cổng tĩnh) · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-28 · **Người duyệt:** _(chờ review Phase 1)_
->
 > 🎯 **Mục đích:** Thống nhất *cách viết code* để mã nguồn nhất quán, dễ đọc, dễ review — giảm tranh luận về phong cách và tăng chất lượng. Bắt buộc phải chốt trước khi viết dòng code đầu tiên.
 > 🔗 **Liên quan:** [11-testing](./11-testing.md) · [14-quality-gates](./14-quality-gates.md) · [17-contributing](./17-contributing.md)
 

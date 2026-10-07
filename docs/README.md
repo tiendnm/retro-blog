@@ -1,7 +1,5 @@
 # 📚 Mục lục tài liệu — Retro Blog
 
-> **Trạng thái:** 🟡 Draft · **Owner:** _(chưa gán)_ · **Cập nhật lần cuối:** 2026-07-21
->
 > 🎯 **Mục đích:** Điểm vào (entry point) để **điều hướng** toàn bộ tài liệu. File này *chỉ* dùng để tìm & sắp thứ tự đọc — **không** chứa logic kiến trúc hay quyết định thiết kế (những nội dung đó ở [03a-architecture-principles](./03a-architecture-principles.md) và [03-architecture](./03-architecture.md)).
 
 ---
@@ -10,12 +8,6 @@
 
 - **Cột "Tầng":** 🧭 LÕI (tech-neutral) · ⚙️ RÌA (implementation) · 🏛️ Governing. *Ý nghĩa & quy tắc các tầng:* xem [03a-architecture-principles](./03a-architecture-principles.md).
 - **Đánh số là ĐỊNH DANH ổn định, không phải thứ tự bắt buộc.** Thứ tự đọc xem §3. Tài liệu chèn thêm dùng **hậu tố chữ** (vd `03a`, `10a`).
-
-### Trạng thái (Status legend)
-
-| Ký hiệu | Ý nghĩa |
-|---|---|
-| 🔴 Chưa bắt đầu · 🟡 Draft · 🟢 Đã duyệt · ⚪ Lỗi thời | (chi tiết như header mỗi file) |
 
 ---
 
@@ -73,6 +65,6 @@
 ## 4. Quy ước thêm/điều hướng tài liệu
 
 1. Chèn tài liệu mới bằng **hậu tố chữ** trên số gần nhất (không renumber); cập nhật bảng §2.
-2. Cập nhật **Cập nhật lần cuối** mỗi lần sửa file.
+2. Không dùng header trạng thái/owner/ngày — git ghi lịch sử ([17 §4](./17-contributing.md)).
 3. Quy tắc *tầng LÕI/RÌA*, *tech-neutral*, *link giữa các tầng* → xem [03a-architecture-principles](./03a-architecture-principles.md). Quy trình viết docs → [17-contributing](./17-contributing.md).
 4. Ngôn ngữ: tiếng Việt diễn giải, giữ nguyên thuật ngữ kỹ thuật tiếng Anh.
