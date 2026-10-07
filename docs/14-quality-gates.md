@@ -52,7 +52,9 @@ Một hạng mục (story/task) chỉ được kéo vào sprint khi:
 
 ## 4. Điều kiện merge
 
-- TODO _(cần bao nhiêu approval; branch protection; CI bắt buộc pass — chốt trong Sprint tới)_.
+- CI xanh (lint → format → typecheck → test → build) là điều kiện bắt buộc.
+- Review ở ranh giới sprint; giữa sprint chỉ dừng cho thay đổi hạ tầng / bảo mật / schema / kiến trúc ([17 §2](./17-contributing.md)).
+- Branch protection + required checks: bật khi CI (Sprint 7 Phase 3) có mặt.
 
 ## 5. Cổng "Sẵn sàng bắt đầu code" (Ready to Code — thoát Sprint 0)
 
