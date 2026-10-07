@@ -1,13 +1,48 @@
-# Caddy — reverse proxy + auto-TLS (Sprint 6, ADR-0007).
+# Caddy — reverse proxy + auto-TLS (Sprint 6, ADR-0007) + security headers (Sprint 8).
 # Biến {$SITE_DOMAIN}/{$CMS_DOMAIN}/{$ACME_EMAIL} nạp từ .env.production qua
 # docker-compose.prod.yml. Site tĩnh phục vụ trực tiếp; Directus qua reverse_proxy.
+#
+# Header bảo mật định nghĩa 1 lần (snippet) và import ở CẢ luồng chính LẪN `handle_errors`:
+# phản hồi lỗi do Caddy sinh (404 của file_server, 502 khi Directus down) đi qua luồng lỗi riêng,
+# nếu không import ở đó thì trang lỗi mất toàn bộ header (đã kiểm: Sprint 8).
+# HSTS khởi đầu 30 ngày (không preload): tăng lên 1 năm SAU khi TLS ổn định vài tuần —
+# HSTS là cam kết phía trình duyệt, đặt dài quá sớm mà TLS lỗi sẽ khoá người dùng ra.
 {
 	# Email ACME (Let's Encrypt) — thông báo hết hạn chứng chỉ.
 	email {$ACME_EMAIL}
 }
 
+# CSP chặt cho site tĩnh: KHÔNG có script/style inline (JSON-LD là data block, không thực thi).
+# Ảnh/asset tải từ domain CMS; font self-host (@fontsource). Thêm script ngoài/inline
+# hay embed → phải nới có chủ đích tại đây.
+(site_headers) {
+	header {
+		Strict-Transport-Security "max-age=2592000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://{$CMS_DOMAIN}; font-src 'self'; connect-src 'self'; media-src 'self' https://{$CMS_DOMAIN}; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		-Server
+	}
+}
+
+# CMS: KHÔNG áp CSP — Directus tự phát CSP riêng cho admin UI (helmet); đè sẽ làm hỏng admin.
+(cms_headers) {
+	header {
+		Strict-Transport-Security "max-age=2592000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+		-Server
+	}
+}
+
 # ── Site tĩnh (SSG — ADR-0006) ─────────────────────────────────────────────
 {$SITE_DOMAIN} {
+	import site_headers
+
 	# `current` = symlink tới bản build đang phục vụ (atomic swap — ADR-0008).
 	root * /srv/site/current
 	encode gzip zstd
@@ -17,9 +52,21 @@
 	# Thứ tự: .html → thư mục/index.html → chính path (file như sitemap.xml/robots.txt).
 	try_files {path}.html {path}/index.html {path}
 	file_server
+
+	# Trang lỗi: giữ nguyên status, kèm header bảo mật (nội dung tối giản).
+	handle_errors {
+		import site_headers
+		respond "{err.status_code} {err.status_text}"
+	}
 }
 
 # ── Directus: admin UI + REST API + /assets ────────────────────────────────
 {$CMS_DOMAIN} {
+	import cms_headers
 	reverse_proxy directus:8055
+
+	handle_errors {
+		import cms_headers
+		respond "{err.status_code} {err.status_text}"
+	}
 }
