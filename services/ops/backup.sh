@@ -4,7 +4,8 @@
 # sinh bằng astro build). Chạy TRÊN HOST. Dùng stdin/stdout redirect (không cần
 # mount volume → chạy được cả Linux/Windows).
 #   Env: COMPOSE_FILES (mặc định dev), PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDB, BACKUP_DIR, BACKUP_KEEP (mặc định 14), ENV_FILE.
-#   Postgres chạy NGOÀI compose (ADR-0010) → dùng pg_dump của HOST (cần client >= 16).
+#   Postgres: mặc định NGOÀI compose (dev, ADR-0010) → pg_dump của HOST (client >= 16).
+#   Production (ADR-0014) Postgres TRONG compose → đặt PG_VIA_COMPOSE=1: chạy pg_dump trong container `postgres`.
 set -eu
 umask 077 # backup chứa DB + secret → chỉ chủ sở hữu đọc được
 
@@ -16,7 +17,11 @@ export PGHOST="${PGHOST:-localhost}" PGPORT="${PGPORT:-5433}" PGUSER="${PGUSER:-
 PGDB="${PGDB:-retro-blog}"
 
 echo "[backup] database → db.dump (pg_dump -Fc)"
-pg_dump -Fc "$PGDB" >"$DEST/db.dump"
+if [ "${PG_VIA_COMPOSE:-0}" = "1" ]; then
+  $COMPOSE exec -T postgres pg_dump -U "$PGUSER" -Fc "$PGDB" >"$DEST/db.dump"
+else
+  pg_dump -Fc "$PGDB" >"$DEST/db.dump"
+fi
 
 echo "[backup] uploads → uploads.tgz (directus_uploads)"
 $COMPOSE exec -T directus tar czf - -C /directus/uploads . >"$DEST/uploads.tgz"

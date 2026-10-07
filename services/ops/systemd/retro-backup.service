@@ -12,5 +12,5 @@ Environment="COMPOSE_FILES=-f docker-compose.yml -f docker-compose.prod.yml --en
 Environment=ENV_FILE=.env.production
 Environment=BACKUP_DIR=/var/backups/retro-blog
 Environment=BACKUP_KEEP=14
-# pg_dump chạy trên HOST (ADR-0010): lấy mật khẩu/cổng/tên DB từ env file, host = localhost.
-ExecStart=/bin/sh -c 'PGHOST=localhost PGPORT="$$DB_PORT" PGUSER="$$DB_USER" PGPASSWORD="$$DB_PASSWORD" PGDB="$$DB_DATABASE" exec sh services/ops/backup.sh'
+# Postgres trong compose (ADR-0014): pg_dump chạy trong container, user/DB lấy từ env file.
+ExecStart=/bin/sh -c 'PG_VIA_COMPOSE=1 PGUSER="$$DB_USER" PGDB="$$DB_DATABASE" exec sh services/ops/backup.sh'
