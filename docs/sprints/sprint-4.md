@@ -19,7 +19,7 @@ Xây **Fixture Framework** (độc lập Directus, tái lập, có profile) + **
 | P3 — edge + stress | `66da1bc` | bộ `edge` (10 ca) + `stress` (3 ca); load/reset độc lập |
 | P4 — Dogfooding verify | _(commit này)_ | build scale + usability verify + báo cáo này |
 
-## 3. Acceptance Criteria (từ [Plan §8](./sprint-4.md))
+## 3. Acceptance Criteria (từ Kế hoạch §8 (phụ lục bên dưới))
 
 | # | Tiêu chí | Kết quả |
 |---|---|---|

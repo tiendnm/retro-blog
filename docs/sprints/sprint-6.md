@@ -24,7 +24,7 @@ Xây **toàn bộ máy móc triển khai** để đưa site **public qua HTTPS**
 | P3 — Rebuild-on-publish | `dc9c3ee` | Flow→webhook→script→atomic swap (`services/rebuild/*` + `apply-rebuild-flow.mjs`); verify end-to-end |
 | P4 — Backup/Launch/Report | _(commit này)_ | `services/ops/{backup,restore}.sh` + restore drill; Launch checklist; docs; báo cáo này |
 
-## 3. Acceptance Criteria (từ [Plan §6](./sprint-6.md))
+## 3. Acceptance Criteria (từ Kế hoạch §6 (phụ lục bên dưới))
 
 | # | Tiêu chí | Kết quả |
 |---|---|---|
@@ -89,11 +89,11 @@ Sprint 6 hoàn tất đúng phạm vi: **build tái lập · topology + Caddy/TL
 
 
 > 🎯 **Mục tiêu Sprint 6:** đưa site **public qua HTTPS** + **tự cập nhật khi publish** + **build tái lập** + **backup có kiểm chứng** → đạt **Public MVP** 🚀 (bắt đầu dogfooding thật).
-> 🔗 **Nguồn:** [Sprint 5 Planning §3 (Sprint 6) + §4 MVP](./sprint-5.md) · [02-roadmap M3 Launch](../02-roadmap.md) · [ADR-0005 Docker](../adr/0005-use-docker-packaging.md) · [ADR-0006 SSG](../adr/0006-render-strategy.md) · [08-deployment](../08-deployment.md) · [12-security](../12-security.md) · [13-operations](../13-operations.md) · [14-quality-gates](../14-quality-gates.md).
+> 🔗 **Nguồn:** Sprint 5 Planning §3 (Sprint 6) + §4 MVP (tài liệu planning đã gộp vào lịch sử git) · [02-roadmap M3 Launch](../02-roadmap.md) · [ADR-0005 Docker](../adr/0005-use-docker-packaging.md) · [ADR-0006 SSG](../adr/0006-render-strategy.md) · [08-deployment](../08-deployment.md) · [12-security](../12-security.md) · [13-operations](../13-operations.md) · [14-quality-gates](../14-quality-gates.md).
 
 ---
 
-> 📌 **Roadmap Principle (Product):** mọi Sprint còn lại phải **tiến gần Public MVP đo lường được**. Sprint 6 là **mốc Launch** — mọi hạng mục ở đây là điều kiện *đủ* để public + dogfooding thật (đúng tiêu chí "Public MVP" [Planning §4](./sprint-5.md)).
+> 📌 **Roadmap Principle (Product):** mọi Sprint còn lại phải **tiến gần Public MVP đo lường được**. Sprint 6 là **mốc Launch** — mọi hạng mục ở đây là điều kiện *đủ* để public + dogfooding thật (đúng tiêu chí "Public MVP" Planning §4 (tài liệu planning đã gộp vào lịch sử git)).
 
 > 🔒 **Ranh giới (đảo chiều đóng băng có kiểm soát):**
 > - Sprint 6 **được phép thay đổi HẠ TẦNG/vận hành** — đó là mục tiêu: thêm Dockerfile, reverse proxy, compose production, pipeline rebuild, backup. Các sprint Reader (S3–S5) đóng băng hạ tầng; Sprint này **mở** đúng phạm vi đó.
@@ -146,7 +146,7 @@ Chuyển sản phẩm từ "chạy local" → **public production**:
 - **Rollback (đưa vào Launch Checklist):** nếu deploy/rebuild thất bại → **khôi phục static build TRƯỚC bằng atomic swap** (giữ N bản build gần nhất; swap con trỏ về bản ổn định) → site trở lại trạng thái tốt gần nhất tức thì. Có cả rollback cấu hình/ảnh Directus qua backup (§3.4).
 
 ## 4. Out of scope (→ Sprint 7 Hardening)
-- ❌ **Sanitize HTML** markdown (XSS) · **security headers** · secrets rotation → **Sprint 7** (Public MVP: nội dung do **Editor tin cậy**, rủi ro thấp — [Planning Risk](./sprint-5.md)).
+- ❌ **Sanitize HTML** markdown (XSS) · **security headers** · secrets rotation → **Sprint 7** (Public MVP: nội dung do **Editor tin cậy**, rủi ro thấp — Planning Risk (tài liệu planning đã gộp vào lịch sử git)).
 - ❌ **Core Web Vitals** đo & tối ưu ảnh (srcset) → Sprint 7.
 - ❌ **CI/test tự động** (light CI dùng fixtures) → Sprint 7 (rebuild-on-publish ≠ CI test).
 - ❌ **Monitoring/observability/alerting** → sau MVP.
@@ -184,7 +184,7 @@ Chốt và ghi Decision Log + ADR mới. **Một số quyết định giữ ở 
 - **Rollback**: verify **atomic swap** đưa site về static build trước khi deploy lỗi.
 - Điền Launch checklist + docs 08/12/13/14; **Sprint 6 Completion Report** → **Public MVP đạt**.
 
-## 6. Acceptance Criteria *(từ [Planning §3 Sprint 6](./sprint-5.md))*
+## 6. Acceptance Criteria *(từ Planning §3 Sprint 6 (tài liệu planning đã gộp vào lịch sử git))*
 - [ ] **Public HTTPS**: truy cập site qua **HTTPS** (chứng chỉ hợp lệ); Directus admin reachable qua proxy; Postgres **không** expose.
 - [ ] **Build tái lập**: web build từ **lockfile** (`--frozen-lockfile`) trong Dockerfile → static output; build lại cho kết quả ổn định.
 - [ ] **Rebuild-on-publish**: **publish 1 bài → xuất hiện public sau rebuild** (tự động); unpublish → biến mất; draft không lộ.

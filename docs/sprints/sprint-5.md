@@ -21,7 +21,7 @@ Hoàn thiện **trải nghiệm reader** để đạt mốc *MVP-reader*: độc
 | P2 — SEO baseline | `c868f87` | `Base.astro` OG/Twitter/canonical (self-ref) · `sitemap.xml`/`robots.txt` endpoint · `PUBLIC_SITE_URL` → `Astro.site` |
 | P3 — Verify + Report | _(commit này)_ | build verification + regression + CDP overflow/a11y + screenshots + báo cáo này |
 
-## 3. Acceptance Criteria (từ [Plan §6](./sprint-5.md))
+## 3. Acceptance Criteria (từ Kế hoạch §6 (phụ lục bên dưới))
 
 | # | Tiêu chí | Kết quả |
 |---|---|---|
@@ -113,7 +113,7 @@ Sprint 5 hoàn tất đúng phạm vi: **pagination reach-all** + **SEO baseline
 
 >
 > 🎯 **Mục tiêu Sprint 5:** hoàn thiện **trải nghiệm reader** để đạt MVP-reader — độc giả **đọc được mọi bài published** (phân trang) và trang **chia sẻ/tìm thấy được** (SEO cơ bản).
-> 🔗 **Nguồn:** [Sprint 5 Planning](./sprint-5.md) (roadmap đã duyệt) · [01a-mvp-scope](../01a-mvp-scope.md) (NFR SEO/responsive) · [03d-api-contract §4](../03d-api-contract.md) (phân trang — ĐÓNG BĂNG) · [06-api](../06-api.md) · [15-seo-accessibility](../15-seo-accessibility.md) · [ADR-0006](../adr/0006-render-strategy.md) (SSG).
+> 🔗 **Nguồn:** Sprint 5 Planning (tài liệu planning đã gộp vào lịch sử git) (roadmap đã duyệt) · [01a-mvp-scope](../01a-mvp-scope.md) (NFR SEO/responsive) · [03d-api-contract §4](../03d-api-contract.md) (phân trang — ĐÓNG BĂNG) · [06-api](../06-api.md) · [15-seo-accessibility](../15-seo-accessibility.md) · [ADR-0006](../adr/0006-render-strategy.md) (SSG).
 
 ---
 

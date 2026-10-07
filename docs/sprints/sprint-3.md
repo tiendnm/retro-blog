@@ -40,7 +40,7 @@ Rà soát & **thống nhất** Homepage · Category · Post Detail:
 
 → **Người dùng cảm nhận toàn site là một hệ thống thống nhất.** Ảnh: [assets/sprint-3-phase-4/](./assets/sprint-3-phase-4/).
 
-## 4. Acceptance Criteria (từ [Plan §6](./sprint-3.md))
+## 4. Acceptance Criteria (từ Kế hoạch §6 (phụ lục bên dưới))
 
 | # | Tiêu chí | Kết quả |
 |---|---|---|
@@ -91,7 +91,7 @@ Search · Tag · SEO · Analytics · RSS · Comment · Deployment · Authenticat
 
 
 >
-> 🎯 **Mục tiêu Sprint 3:** biến *vertical slice* hiện tại ([Sprint 2 Completion](./sprint-2.md)) thành **một blog có trải nghiệm đọc hoàn chỉnh** — **CHỈ tầng Presentation, KHÔNG mở rộng chức năng**.
+> 🎯 **Mục tiêu Sprint 3:** biến *vertical slice* hiện tại (Sprint 2 ([sprint-2](./sprint-2.md))) thành **một blog có trải nghiệm đọc hoàn chỉnh** — **CHỈ tầng Presentation, KHÔNG mở rộng chức năng**.
 > 🔗 **Nguồn đã đọc (không định nghĩa lại):** [01a-mvp-scope](../01a-mvp-scope.md) · [02-roadmap](../02-roadmap.md) (M2→M3) · [03-architecture](../03-architecture.md) · [03d-api-contract](../03d-api-contract.md) (hợp đồng ĐÓNG BĂNG) · [ADR-0002](../adr/0002-use-astro-site-generator.md)/[ADR-0006](../adr/0006-render-strategy.md) · [07-ui-ux](../07-ui-ux.md) · [15-seo-accessibility](../15-seo-accessibility.md).
 
 ---
