@@ -134,6 +134,7 @@ Bắt đầu từ [docs/README.md](./docs/README.md).
 | Sprint 6 | Deployment & Public MVP (TLS + rebuild-on-publish + backup) | 🟢 Hoàn thành ([sprint-6](./docs/sprints/sprint-6.md)); mục @deploy chờ domain thật |
 | Sprint 6.5 | Product Polish (Content & UX) | 🟢 Hoàn thành ([sprint-6.5](./docs/sprints/sprint-6.5.md)) |
 | Sprint 7 | System Hardening & Quality (Biome, test, CI) | 🟢 Phase 1–3 xong; chờ remote GitHub để xác nhận CI xanh ([sprint-7](./docs/sprints/sprint-7.md)) |
+| Sprint 8 | Production Hardening (header bảo mật, webhook, backup lịch, healthcheck) | 🟢 Hoàn thành ([sprint-8](./docs/sprints/sprint-8.md)); chờ xác nhận trên server thật |
 
 ## License
 

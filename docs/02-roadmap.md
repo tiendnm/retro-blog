@@ -33,10 +33,11 @@
 | [6](./sprints/sprint-6.md) | Deployment & Public MVP | ✅ (mục @deploy chờ domain thật) |
 | [6.5](./sprints/sprint-6.5.md) | Product Polish (Content & UX) | ✅ |
 | [7](./sprints/sprint-7.md) | System Hardening & Quality (Biome, test, CI) | 🟡 Phase 1 xong; Phase 2–3 còn lại |
+| [8](./sprints/sprint-8.md) | Production Hardening (header, webhook, backup lịch, healthcheck) | ✅ (chưa kiểm chứng trên server thật) |
 
 ## 4. Backlog cấp cao
 
-- **Deploy hardening (@deploy):** xác nhận ACME/DNS trên domain thật, 2FA admin, security header (Caddy), siết webhook rebuild, backup theo lịch, uptime check.
+- **Deploy (@deploy):** xác nhận ACME/DNS + CSP trên domain thật, 2FA admin, nâng HSTS 1 năm, copy backup ra ngoài host; rate limiting Directus, container không chạy root, quét dependency.
 - **Kiểm thử mở rộng:** test độ bền thin client, axe a11y, link-check, Lighthouse budget, E2E.
 - **Reader feature:** Category discoverability, Search, RSS, Tags, Archive, Author pages.
 - **Refactor docs-architecture:** F1–F15 ([architecture review](./reviews/architecture-review-2026-07-21.md)).

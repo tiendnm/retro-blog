@@ -44,7 +44,12 @@
 - **Build tái lập:** `--frozen-lockfile` (chống drift → giảm rủi ro chuỗi cung ứng, [S6-P1](./10-decisions.md)).
 - **Secrets ngoài repo:** `.env.production` gitignored; chỉ commit `.env.production.example` (placeholder).
 
-**Sprint 7 (Hardening — sau Public MVP):** container không chạy root · **security headers** (§8) · quét lỗ hổng dependency định kỳ · cập nhật vá lỗi.
+**Sprint 8 (Hardening hạ tầng):**
+- **Security headers ở Caddy** (`Caddyfile`): HSTS (khởi đầu 30 ngày, tăng sau khi TLS ổn định), `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-Frame-Options`, ẩn `Server`; **CSP chặt cho site tĩnh** (không script/style inline; ảnh chỉ từ domain CMS). Admin Directus **không** bị đè CSP (Directus tự phát). Header cũng có trên trang lỗi (404/502) nhờ `handle_errors`.
+- **Webhook rebuild siết** (`services/rebuild/webhook.mjs`): token chỉ qua header, so sánh hằng-thời-gian, mọi yêu cầu sai trả cùng 404, khoá tạm theo IP sau nhiều lần sai (429), mặc định bind `127.0.0.1` (`REBUILD_HOST`), token ≥ 32 ký tự. Có test (`node --test services/rebuild/`, chạy trong CI).
+- **Backup:** `umask 077`, tự dọn bản cũ (`BACKUP_KEEP`), chạy hằng ngày bằng systemd timer.
+
+**Còn lại (Backlog):** container không chạy root · quét lỗ hổng dependency định kỳ · rate limiting cho Directus (`RATE_LIMITER_*`; cần xác nhận IP client thật sau Caddy trước khi bật) · cập nhật vá lỗi.
 
 ## 7. Bảo mật chuỗi cung ứng (Supply chain)
 
@@ -54,7 +59,8 @@
 
 - **Render nội dung từ CMS (`body`):** `body` lưu **HTML** (WYSIWYG, [ADR-0011](./adr/0011-body-stored-as-html-wysiwyg.md); trước đó markdown + `marked`) và hiển thị qua `set:html`. Nội dung do **Editor tin cậy** nhập (không có input công khai — không comment/không user-generated content ở MVP), nên rủi ro XSS thấp. **Đã hardening ([ADR-0013](./adr/0013-sanitize-body-html.md)):** HTML được sanitize bằng allowlist thẻ/thuộc tính/scheme lúc build (`apps/web/src/lib/sanitize-body.ts`) trước khi render — defense-in-depth kể cả khi tài khoản Editor bị chiếm.
 - **Không tự lộ field nội bộ:** Public API dùng **field allowlist** (không `*`) — field thêm về sau không tự ra Public ([05-cms §2](./05-cms.md), [06-api §1](./06-api.md)).
-- TODO _(CSRF, security headers, rate limiting)_.
+- **Security headers:** xem §6 (cấu hình ở Caddyfile, không ở code app). Site không có form/endpoint ghi công khai nên CSRF không áp dụng; admin Directus dùng cơ chế auth của Directus.
+- TODO _(rate limiting — xem §6 Còn lại)_.
 
 ## 9. Logging & Audit
 
@@ -70,7 +76,8 @@
 - [x] HTTPS/TLS bắt buộc — Caddy auto-TLS + HTTP→HTTPS _(S6, ADR-0007)_
 - [x] Quyền Directus theo least privilege — Public read + gate `published`/`$NOW` + field allowlist _(S2)_
 - [x] Postgres không expose; Directus chỉ qua proxy _(S6)_
-- [ ] **Security headers cấu hình** — **Sprint 7** (Hardening)
+- [x] **Security headers cấu hình** — Caddyfile, đã kiểm trên 200/404/502 _(S8)_; **@deploy:** xác nhận bằng trình duyệt trên domain thật (CSP không chặn tài nguyên hợp lệ), rồi nâng HSTS lên 1 năm
+- [x] **Webhook rebuild siết** — header-only token, hằng-thời-gian, khoá thử sai, bind loopback _(S8)_
 - [x] **Sanitize HTML body (XSS)** — allowlist lúc build, [ADR-0013](./adr/0013-sanitize-body-html.md) _(S7)_
-- [ ] **Dependencies quét lỗ hổng** — **Sprint 7**
+- [ ] **Dependencies quét lỗ hổng** — Backlog (vd `pnpm audit` trong CI / Dependabot)
 - [ ] 2FA admin — bật khi cấu hình server thật (khuyến nghị §3)

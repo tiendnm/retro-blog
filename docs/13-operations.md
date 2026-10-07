@@ -57,7 +57,7 @@
 |---|---|---|
 | Logging | TBD | — |
 | Metrics (CPU/mem/latency) | TBD | TODO |
-| Uptime / Health check | TBD | Down > x phút |
+| Uptime / Health check | [`services/ops/healthcheck.sh`](../services/ops/healthcheck.sh) chạy mỗi 5 phút bằng systemd timer ([`services/ops/systemd/`](../services/ops/systemd/README.md)); kiểm site/robots/sitemap, Directus `/server/health`, hạn chứng chỉ TLS. Báo động ngoài host: đặt `HEALTHCHECK_PING_URL` (kiểu healthchecks.io — cảnh báo khi **mất ping**, bắt được cả trường hợp host chết) | Hỏng ≥ 1 lần chạy → `FAIL` trong journal + ping `/fail`; chứng chỉ < 14 ngày |
 | Error tracking | TBD | TODO |
 
 ## 4. Sao lưu & Khôi phục (Backup & Recovery)
@@ -67,8 +67,8 @@ Công cụ (Sprint 6): [`services/ops/backup.sh`](../services/ops/backup.sh) (`p
 | Hạng mục | Chính sách |
 |---|---|
 | Sao lưu gì | **database** (`pg_dump -Fc`) · **uploads** (`directus_uploads`) · **config** (schema snapshot, compose, Caddyfile) · **env** (secret — lưu tách/mã hoá). **KHÔNG** `dist/` (tái sinh bằng `astro build`) |
-| Tần suất | Khuyến nghị **hằng ngày** (cron) + trước mỗi lần deploy/nâng cấp |
-| Lưu giữ (retention) | Giữ ≥ 7 bản gần nhất (điều chỉnh theo dung lượng) |
+| Tần suất | **Hằng ngày ~03:30** (`retro-backup.timer`, systemd — [mẫu](../services/ops/systemd/README.md)) + chạy tay trước mỗi lần deploy/nâng cấp |
+| Lưu giữ (retention) | `BACKUP_KEEP` bản gần nhất (mặc định 14), tự dọn bởi [`prune-backups.sh`](../services/ops/prune-backups.sh); thư mục backup `umask 077` |
 | Nơi lưu | **Tách khỏi host prod** (object storage/máy khác); thư mục backup NHẠY CẢM (có DB+secret) → mã hoá |
 | **RPO** | ≤ khoảng cách giữa 2 lần backup (hằng ngày → ≤ 24h) |
 | **RTO** | ≈ thời gian `restore.sh` (DB+uploads) + `rebuild.sh` (dựng lại static) |

@@ -57,7 +57,7 @@ Giải "SSG stale" ([ADR-0006](./adr/0006-render-strategy.md)): Editor publish t
 | Thành phần | File | Vai trò |
 |---|---|---|
 | Flow (reproducible) | [`services/directus/apply-rebuild-flow.mjs`](../services/directus/apply-rebuild-flow.mjs) | Tạo Flow + operation Webhook (idempotent, như apply-permissions) |
-| Receiver tối giản | [`services/rebuild/webhook.mjs`](../services/rebuild/webhook.mjs) | Kiểm token → gọi `rebuild.sh`; debounce (gộp khi đang build). **KHÔNG microservice** — ~50 dòng glue |
+| Receiver tối giản | [`services/rebuild/webhook.mjs`](../services/rebuild/webhook.mjs) | Kiểm token (header, hằng-thời-gian, khoá thử sai, bind `REBUILD_HOST`) → gọi `rebuild.sh`; debounce (gộp khi đang build). Chạy dài hạn bằng systemd ([`services/ops/systemd/`](../services/ops/systemd/README.md)). **KHÔNG microservice** — glue nhỏ, có test |
 | Orchestrator (host) | [`services/rebuild/rebuild.sh`](../services/rebuild/rebuild.sh) | `docker compose run web` (build-runner); serialize bằng `flock` |
 | Build + swap (in-container) | [`services/rebuild/build-swap.sh`](../services/rebuild/build-swap.sh) | `astro build` → staging `builds/<TS>` → **atomic** `ln -sfn current` → prune giữ `KEEP_BUILDS` |
 
@@ -104,5 +104,5 @@ Trạng thái Sprint 6: **✅ = cơ chế đã kiểm chứng** · **@deploy = x
 - [x] **Rollback = atomic swap** về static build trước — ✅ `builds/` giữ N, swap symlink (S6-P3)
 - [x] Không secret trong repo/log — ✅ `.env*` gitignored; **@deploy**: secrets prod mạnh + **2FA admin**
 - [x] SEO đúng ở prod (canonical/OG/sitemap domain thật) — ✅ build `PUBLIC_SITE_URL` (S6-P2); a11y giữ (S3–S5)
-- [ ] **@deploy:** DNS `retro.`/`cms.` trỏ host; mở 80/443; `.env.production` (domain+secrets); `docker compose -f … -f docker-compose.prod.yml up -d`; `pnpm rebuild:flow`; `pnpm theme:apply` (theme/branding Directus admin)
+- [ ] **@deploy:** DNS `retro.`/`cms.` trỏ host; mở 80/443; `.env.production` (domain+secrets); `docker compose -f … -f docker-compose.prod.yml up -d`; `pnpm rebuild:flow`; `pnpm theme:apply` (theme/branding Directus admin); cài systemd units `services/ops/systemd/` (webhook, backup timer, healthcheck timer) + đặt `REBUILD_HOST`/`HEALTHCHECK_PING_URL`; **copy backup ra ngoài host**; kiểm CSP bằng trình duyệt rồi nâng HSTS 1 năm
 - [x] DoD release ([14 §2.2](./14-quality-gates.md)) — cơ chế đạt; chốt cuối khi deploy
