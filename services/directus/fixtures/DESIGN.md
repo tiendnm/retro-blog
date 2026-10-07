@@ -1,7 +1,7 @@
 # Fixture Framework — Design Spec (Sprint 4 · Phase 0)
 
 > **Trạng thái:** 🟢 Chốt thiết kế (Phase 0) — *chưa code, chưa sinh dữ liệu*. Hiện thực: Phase 1.
-> Kế hoạch: [../../../docs/sprints/sprint-4-implementation-plan.md](../../../docs/sprints/sprint-4-implementation-plan.md) · Content Model (đóng băng): [03c](../../../docs/03c-content-model.md) · Prose: Sprint 3.
+> Kế hoạch: [../../../docs/sprints/sprint-4.md](../../../docs/sprints/sprint-4.md) · Content Model (đóng băng): [03c](../../../docs/03c-content-model.md) · Prose: Sprint 3.
 
 Đặc tả này **chốt các quyết định** để Phase 1 hiện thực. Nguyên tắc: **framework độc lập Directus** (ports & adapters), **providers mở**, **tái lập** (deterministic + seed), **DEV-only**.
 
