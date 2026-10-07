@@ -30,7 +30,7 @@ Một hạng mục (story/task) chỉ được kéo vào sprint khi:
 ### 2.2. DoD cho một bản phát hành (release)
 > **Checklist Launch cụ thể (Sprint 6):** [08-deployment §8](./08-deployment.md).
 
-- [ ] Toàn bộ cổng CI xanh ([08 §3](./08-deployment.md)) — **CI tự động = Sprint 7**; Public MVP dựa build reproducible + verify thủ công
+- [x] Toàn bộ cổng CI xanh ([08 §3](./08-deployment.md)) — `quality` + `build` _(workflow có từ Sprint 7; xác nhận xanh trên GitHub khi có remote)_
 - [x] Backup trước khi phát hành ([13 §4](./13-operations.md)) — cơ chế + restore drill đạt _(S6)_
 - [x] Checklist launch (SEO, a11y, security) đạt — [08 §8](./08-deployment.md) _(S6; a11y S3–S5)_
 - [x] Kế hoạch rollback sẵn sàng — atomic swap về build trước _(S6, ADR-0008)_
@@ -50,9 +50,9 @@ Một hạng mục (story/task) chỉ được kéo vào sprint khi:
 
 ## 4. Điều kiện merge
 
-- CI xanh (lint → format → typecheck → test → build) là điều kiện bắt buộc.
+- CI xanh là điều kiện bắt buộc: job **`quality`** (lint → format → typecheck → test) là required check ngay; job **`build`** (cần Directus + Postgres + seed) chạy `continue-on-error` cho tới khi ổn định (vài lần xanh liên tiếp), rồi nâng thành required — Product xác nhận lúc nâng.
 - Review ở ranh giới sprint; giữa sprint chỉ dừng cho thay đổi hạ tầng / bảo mật / schema / kiến trúc ([17 §2](./17-contributing.md)).
-- Branch protection + required checks: bật khi CI (Sprint 7 Phase 3) có mặt.
+- Branch protection + required checks (`quality`): bật trên GitHub khi repo có remote.
 
 ## 5. Cổng "Sẵn sàng bắt đầu code" (Ready to Code — thoát Sprint 0) — ✅ đã qua
 

@@ -35,7 +35,7 @@
 
 ## 5. Môi trường test & CI
 
-- Cục bộ: `pnpm --dir apps/web test` (Node 22). CI (Sprint 7 Phase 3) sẽ chạy `lint → format → typecheck → test → build` — xem [08 §3](./08-deployment.md).
+- Cục bộ: `pnpm --dir apps/web test` (Node 22). CI (`.github/workflows/ci.yml`): job `quality` chạy `lint → format → typecheck → test`; job `build` dựng Directus + seed rồi `astro build` — xem [08 §3](./08-deployment.md).
 
 ## 6. Mục tiêu độ phủ (Coverage)
 

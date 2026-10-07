@@ -178,3 +178,15 @@
 ---
 
 > 🛑 **Dừng — chờ Product xác nhận bản Planning cuối này.** Không bắt đầu Phase 1, không thay đổi code cho tới khi Product xác nhận.
+
+---
+
+## Kết quả (cập nhật 2026-10-07)
+
+| Phase | Trạng thái | Ghi chú |
+|---|---|---|
+| 1 — Static gates (Biome, `astro check`) | ✅ | commit `89d48ea`, `7b02a9d` |
+| 2 — Test foundation (Vitest) | ✅ | 38 test (thin client + helper); kiểm đột biến: phá code → test đỏ. Chưa phủ logic trong `.astro` (Backlog) |
+| 3 — CI (`.github/workflows/ci.yml`) | ✅ workflow, ⏳ xanh trên GitHub | Phương án **lai**: job `quality` (bắt buộc) + job `build` (`continue-on-error` → nâng required khi ổn định). Đã chạy thử cục bộ: actionlint sạch; schema → permissions → seed → `astro build` thành công (7 trang, draft không lộ). **Repo chưa có git remote** → chưa chạy được trên Actions |
+
+**Known limitations:** không E2E/axe/Lighthouse; build-in-CI dùng seed tối thiểu (`seed:dev`); chưa bật branch protection (cần remote); các mục @deploy chưa verify trên domain thật; `format:check` cục bộ trên Windows báo `global.css` (CRLF working tree, index là LF — CI Linux không gặp).

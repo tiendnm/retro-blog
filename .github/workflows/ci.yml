@@ -1,0 +1,122 @@
+# CI — Sprint 7 Phase 3. Hai job độc lập (phương án lai):
+#   quality : cổng tĩnh + test (nhanh, BẮT BUỘC)
+#   build   : dựng Directus + Postgres + seed rồi `astro build` (tích hợp end-to-end).
+#             Giai đoạn đầu KHÔNG chặn merge (continue-on-error); khi chạy ổn định thì
+#             bỏ `continue-on-error` và đặt làm required check (docs/14 §4).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+      # apps/web có lockfile riêng (khớp Dockerfile) → cài độc lập, không theo workspace gốc.
+      - run: pnpm install --frozen-lockfile --ignore-workspace
+      - run: pnpm exec biome lint .
+      - run: pnpm exec biome format .
+      - run: pnpm typecheck
+      - run: pnpm test
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Chưa chặn merge cho tới khi job ổn định (xem ghi chú đầu file).
+    continue-on-error: true
+    env:
+      DB_PASSWORD: ci-only-postgres
+      DIRECTUS_KEY: ci-only-key-0123456789abcdef0123456789abcdef
+      DIRECTUS_SECRET: ci-only-secret-0123456789abcdef0123456789abcdef
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD: ci-only-admin-password
+      DIRECTUS_URL: http://localhost:8055
+      DIRECTUS_INTERNAL_URL: http://localhost:8055
+      PUBLIC_DIRECTUS_URL: http://localhost:8055
+      PUBLIC_SITE_URL: http://localhost:4321
+    services:
+      postgres:
+        image: postgres:16.8-alpine
+        env:
+          POSTGRES_PASSWORD: ci-only-postgres
+          POSTGRES_DB: retro-blog
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: apps/web/pnpm-lock.yaml
+
+      # Directus: cùng image pin như docker-compose.yml. --network host để tới Postgres service.
+      - name: Start Directus
+        run: |
+          docker run -d --name directus --network host \
+            -e KEY="$DIRECTUS_KEY" -e SECRET="$DIRECTUS_SECRET" \
+            -e DB_CLIENT=pg -e DB_HOST=127.0.0.1 -e DB_PORT=5432 \
+            -e DB_DATABASE=retro-blog -e DB_USER=postgres -e DB_PASSWORD="$DB_PASSWORD" \
+            -e ADMIN_EMAIL="$ADMIN_EMAIL" -e ADMIN_PASSWORD="$ADMIN_PASSWORD" \
+            -e PUBLIC_URL="$DIRECTUS_URL" \
+            -v "$PWD/services/directus/snapshots:/directus/snapshots:ro" \
+            directus/directus:11.3.5
+      - name: Wait for Directus healthy
+        run: |
+          for _ in $(seq 1 40); do
+            if curl -fsS http://localhost:8055/server/health >/dev/null 2>&1; then echo "healthy"; exit 0; fi
+            sleep 3
+          done
+          echo "Directus không healthy"; docker logs directus | tail -50; exit 1
+
+      # Tái dùng bootstrap đã version-control (giống cơ chế deploy): schema → permissions → seed tối thiểu.
+      - name: Apply schema
+        run: docker exec directus npx directus schema apply --yes /directus/snapshots/schema.yaml
+      - name: Apply permissions
+        run: bash services/directus/apply-permissions.sh
+      # Cài deps web TRƯỚC seed: seed dùng `marked` từ apps/web (services/directus/lib/md-to-html.mjs).
+      - name: Install web deps
+        working-directory: apps/web
+        run: pnpm install --frozen-lockfile --ignore-workspace
+      - name: Seed (minimal)
+        run: node services/directus/seed/seed-dev.mjs
+      - name: Build (astro build)
+        working-directory: apps/web
+        run: pnpm build
+
+      - name: Directus logs (on failure)
+        if: failure()
+        run: docker logs directus | tail -100

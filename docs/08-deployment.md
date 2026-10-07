@@ -46,7 +46,7 @@
 
 - **Build web tái lập (Phase 1 ✅):** [`apps/web/Dockerfile`](../apps/web/Dockerfile) = **build-runner** — `pnpm install --frozen-lockfile` (pin `apps/web/pnpm-lock.yaml` + pnpm 10.33.2) lúc build image; **`astro build` chạy lúc RUNTIME** (fetch Directus nội bộ) → `dist/`. **Không bake nội dung vào image** (nội dung động; khớp [ADR-0008](./adr/0008-rebuild-on-publish.md)) → serve do Caddy ([ADR-0007](./adr/0007-reverse-proxy-and-tls.md)), không cần runtime-server stage. Loại "cài fresh không lockfile" của dev (nợ [S1-P3](./10-decisions.md)).
   - **Verify reproducibility (tiêu chí S6):** 2 lần build → `dist` **byte-identical** (aggregate sha256 khớp; 123 trang / 126 file).
-- **CI test tự động (lint/unit/e2e):** **KHÔNG** trong Sprint 6 — để **Sprint 7** (light CI dùng fixtures). Sprint 6 chỉ pipeline **phát hành nội dung** (§4).
+- **CI tự động** (Sprint 7 Phase 3, `.github/workflows/ci.yml`): job **`quality`** (biome lint · format · typecheck · test — nhanh, bắt buộc) + job **`build`** (Postgres + Directus pin như compose, bootstrap bằng `schema apply` → `apply-permissions.sh` → `seed-dev.mjs`, rồi `astro build`; hiện `continue-on-error`, nâng thành required khi ổn định). Pipeline **phát hành nội dung** ở §4. E2E/axe/Lighthouse: Backlog.
 
 ## 4. Phát hành nội dung — Rebuild-on-publish *(Accepted — [ADR-0008](./adr/0008-rebuild-on-publish.md))*
 

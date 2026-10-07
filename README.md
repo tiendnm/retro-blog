@@ -2,7 +2,7 @@
 
 > Một blog headless mang phong cách retro — **Astro** (site) + **Directus** (headless CMS) + **PostgreSQL**, đóng gói bằng **Docker**.
 
-> **Trạng thái:** 🟡 Sprint 7 — System Hardening & Quality (Public MVP đã có cơ chế deploy; còn CI + test + checklist @deploy trên domain thật). Chi tiết: [docs/sprints](./docs/sprints/).
+> **Trạng thái:** 🟡 Public MVP: cơ chế deploy + CI đã có; còn checklist @deploy trên domain thật và hardening hạ tầng (security header, webhook). Chi tiết: [docs/sprints](./docs/sprints/).
 
 ---
 
