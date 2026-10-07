@@ -49,7 +49,7 @@ jobs:
         run: docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.tunnel.yml --env-file .env.production.example config -q
       - name: Ops tests (webhook)
         working-directory: .
-        run: node --test services/rebuild/
+        run: node --test services/rebuild/webhook.test.mjs
 
   build:
     runs-on: ubuntu-latest

@@ -22,6 +22,6 @@
 | Backup prune | thử với thư mục giả: chỉ xoá thư mục `YYYYMMDD-HHMMSS` cũ, giữ file/thư mục lạ, từ chối `BACKUP_KEEP` không hợp lệ |
 | Healthcheck | stub: OK → exit 0 + ping; Directus down/sai nội dung → exit 1 + ping `/fail`; TLS: cert 5 ngày FAIL ở ngưỡng 14, OK ở ngưỡng 3 |
 | systemd units | `systemd-analyze verify` (Debian 12) không báo lỗi cú pháp |
-| CI | `actionlint` sạch; thêm bước `node --test services/rebuild/` vào job `quality` |
+| CI | `actionlint` sạch; thêm bước `node --test services/rebuild/webhook.test.mjs` vào job `quality` |
 
 **Chưa kiểm chứng (cần server thật):** CSP với trình duyệt trên domain thật (không chặn tài nguyên hợp lệ); systemd chạy thật (`systemctl`, `journalctl`); Linux `REBUILD_HOST`/docker0; `backup.sh` đầy đủ qua timer; backup copy ra ngoài host.
