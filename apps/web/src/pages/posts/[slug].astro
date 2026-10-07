@@ -18,7 +18,7 @@ const post = await getPostBySlug(slug!);
 if (!post) throw new Error(`Không tìm thấy bài đã xuất bản: ${slug}`);
 
 // body là HTML do CMS lưu (input-rich-text-html, ADR-0011). Nội dung do Editor tin cậy
-// nhập (MVP, không nhận input công khai). Sanitize HTML: hardening tương lai (12-security §8).
+// nhập; đã sanitize (allowlist) trong toDetail → sanitizeBody (ADR-0013, 12-security §8).
 const bodyHtml = post.body ?? '';
 
 // URL/ảnh tuyệt đối cho structured data + article meta (Sprint 6.5).

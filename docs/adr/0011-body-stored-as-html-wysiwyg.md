@@ -24,7 +24,7 @@
 - ➕ Render đã kiểm chứng: HTML trang chi tiết của 3 bài seed **giống hệt** trước/sau migration.
 - ➖ **Không hoàn tác bằng dữ liệu:** markdown gốc bị ghi đè; quay lại markdown cần chuyển ngược HTML→MD (mất định dạng). Khuyến nghị backup trước khi chạy migration trên môi trường có dữ liệu thật.
 - ➕ Ảnh/tệp chèn trong bài có thể lưu URL tuyệt đối theo domain CMS lúc soạn → **viết lại lúc build** (`apps/web/src/lib/rewrite-assets.ts`, gọi trong `toDetail`) thành `PUBLIC_DIRECTUS_URL` hiện hành; đổi domain CMS không làm hỏng ảnh. Chỉ xử lý thuộc tính `src/href/poster` trỏ `/assets/<uuid>`; URL ngoài giữ nguyên.
-- ➖ HTML tự do hơn markdown → bề mặt XSS lớn hơn. Hiện chấp nhận (Editor tin cậy); **sanitize** là bắt buộc trước khi có tác giả không tin cậy ([12-security §8](../12-security.md)).
+- ➖ HTML tự do hơn markdown → bề mặt XSS lớn hơn. Hiện chấp nhận (Editor tin cậy); **sanitize** là bắt buộc trước khi có tác giả không tin cậy ([12-security §8](../12-security.md)) — **đã xử lý ở [ADR-0013](./0013-sanitize-body-html.md)**.
 - ➖ Fixtures `stress/edge` mô phỏng "markdown dài" nay là HTML sinh từ markdown; HTML do TinyMCE sinh có thể khác (chưa kiểm).
 
 ## Khả nghịch

@@ -35,6 +35,7 @@ Tạo ADR khi quyết định: khó đảo ngược, ảnh hưởng nhiều ph�
 | [0008](./adr/0008-rebuild-on-publish.md) | **Rebuild-on-publish** (Flow→webhook→script→atomic swap) | Content release pipeline | P3,P4,P5 | **Accepted** |
 | [0010](./adr/0010-external-postgres-instance.md) | **PostgreSQL instance có sẵn trên host** (ngoài compose) | Content Store (hạ tầng) | P6 | **Accepted** |
 | [0011](./adr/0011-body-stored-as-html-wysiwyg.md) | **`posts.body` lưu HTML (WYSIWYG)** — thay `[S2-P3]` | Content format (RÌA) | P6 | **Accepted** |
+| [0013](./adr/0013-sanitize-body-html.md) | **Sanitize HTML `posts.body` lúc build (allowlist)** | Security (RÌA) | P6 | **Accepted** |
 | [0012](./adr/0012-site-settings-singleton.md) | **Cấu hình site động** — singleton `site_settings` (không gồm URL/secret hạ tầng) | Content config (RÌA) | P4,P6 | **Accepted** |
 
 > ℹ️ ADR 0002–0005 được ratify ở Sprint 0 close-out (2026-07-21). ADR-0001 (process) vẫn Proposed — có thể ratify ở đầu Sprint 1. ADR-0006 ratify Sprint 2 Phase 0. **ADR-0007/0008 ratify Sprint 6 Phase 0 (2026-07-23, Product chốt).**

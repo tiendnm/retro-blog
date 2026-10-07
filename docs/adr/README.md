@@ -39,3 +39,4 @@
 | [0010](./0010-external-postgres-instance.md) | PostgreSQL instance có sẵn trên host | **Accepted** |
 | [0011](./0011-body-stored-as-html-wysiwyg.md) | `posts.body` lưu HTML (WYSIWYG) | **Accepted** |
 | [0012](./0012-site-settings-singleton.md) | Cấu hình site động: singleton `site_settings` | **Accepted** |
+| [0013](./0013-sanitize-body-html.md) | Sanitize HTML `posts.body` lúc build | **Accepted** |
