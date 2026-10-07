@@ -3,9 +3,10 @@
 # Phạm vi: database + uploads + config (+ env riêng). KHÔNG backup dist/ (tái
 # sinh bằng astro build). Chạy TRÊN HOST. Dùng stdin/stdout redirect (không cần
 # mount volume → chạy được cả Linux/Windows).
-#   Env: COMPOSE_FILES (mặc định dev), PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDB, BACKUP_DIR, ENV_FILE.
+#   Env: COMPOSE_FILES (mặc định dev), PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDB, BACKUP_DIR, BACKUP_KEEP (mặc định 14), ENV_FILE.
 #   Postgres chạy NGOÀI compose (ADR-0010) → dùng pg_dump của HOST (cần client >= 16).
 set -eu
+umask 077 # backup chứa DB + secret → chỉ chủ sở hữu đọc được
 
 STAMP=$(date +%Y%m%d-%H%M%S)
 DEST="${BACKUP_DIR:-./backups}/$STAMP"
@@ -43,3 +44,6 @@ RPO = từ lần backup gần nhất; RTO = thời gian restore + rebuild-on-pub
 TXT
 
 echo "[backup] xong → $DEST"
+
+# Giữ BACKUP_KEEP bản gần nhất (mặc định 14) — dọn bản cũ, tránh đầy đĩa.
+BACKUP_DIR="${BACKUP_DIR:-./backups}" sh "$(dirname "$0")/prune-backups.sh"

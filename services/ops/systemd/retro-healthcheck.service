@@ -1,0 +1,12 @@
+[Unit]
+Description=Retro Blog — health check (site, CMS, TLS)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=retro
+WorkingDirectory=/opt/retro-blog
+# SITE_DOMAIN / CMS_DOMAIN / HEALTHCHECK_PING_URL (tuỳ chọn) lấy từ env file.
+EnvironmentFile=/opt/retro-blog/.env.production
+ExecStart=/bin/sh -c 'SITE_URL="https://$$SITE_DOMAIN" CMS_URL="https://$$CMS_DOMAIN" exec sh services/ops/healthcheck.sh'

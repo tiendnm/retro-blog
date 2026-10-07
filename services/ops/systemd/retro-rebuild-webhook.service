@@ -1,0 +1,22 @@
+[Unit]
+Description=Retro Blog — rebuild-on-publish webhook receiver (ADR-0008)
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=retro
+WorkingDirectory=/opt/retro-blog
+# Cần REBUILD_TOKEN (>= 32 ký tự), REBUILD_PORT, REBUILD_HOST. rebuild.sh đọc ENV_FILE (mặc định .env.production).
+EnvironmentFile=/opt/retro-blog/.env.production
+ExecStart=/usr/bin/node services/rebuild/webhook.mjs
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/opt/retro-blog /tmp
+
+[Install]
+WantedBy=multi-user.target

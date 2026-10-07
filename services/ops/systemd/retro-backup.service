@@ -1,0 +1,16 @@
+[Unit]
+Description=Retro Blog — backup (db + uploads + config + env)
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=retro
+WorkingDirectory=/opt/retro-blog
+EnvironmentFile=/opt/retro-blog/.env.production
+Environment="COMPOSE_FILES=-f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production"
+Environment=ENV_FILE=.env.production
+Environment=BACKUP_DIR=/var/backups/retro-blog
+Environment=BACKUP_KEEP=14
+# pg_dump chạy trên HOST (ADR-0010): lấy mật khẩu/cổng/tên DB từ env file, host = localhost.
+ExecStart=/bin/sh -c 'PGHOST=localhost PGPORT="$$DB_PORT" PGUSER="$$DB_USER" PGPASSWORD="$$DB_PASSWORD" PGDB="$$DB_DATABASE" exec sh services/ops/backup.sh'
