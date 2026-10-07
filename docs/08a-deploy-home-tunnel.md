@@ -47,7 +47,7 @@ sudo ufw enable && sudo ufw status
 
 ```bash
 sudo -iu retro
-cd /opt/retro-blog && git clone <repo-url> .          # cần repo trên GitHub/remote khác để clone
+cd /opt/retro-blog && git clone https://github.com/tiendnm/retro-blog.git .     # repo public: không cần token/deploy key
 ```
 
 ## 3. Tạo Cloudflare Tunnel (trên dashboard)
