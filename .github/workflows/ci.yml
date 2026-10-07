@@ -43,6 +43,10 @@ jobs:
       - run: pnpm exec biome format .
       - run: pnpm typecheck
       - run: pnpm test
+      # Test hạ tầng (webhook rebuild) — Node thuần, không cần cài deps.
+      - name: Ops tests (webhook)
+        working-directory: .
+        run: node --test services/rebuild/
 
   build:
     runs-on: ubuntu-latest
