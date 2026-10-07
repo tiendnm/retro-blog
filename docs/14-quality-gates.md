@@ -52,7 +52,7 @@ Một hạng mục (story/task) chỉ được kéo vào sprint khi:
 
 - CI xanh là điều kiện bắt buộc: job **`quality`** (lint → format → typecheck → test) là required check ngay; job **`build`** (cần Directus + Postgres + seed) chạy `continue-on-error` cho tới khi ổn định (vài lần xanh liên tiếp), rồi nâng thành required — Product xác nhận lúc nâng.
 - **Branch protection (đã bật, 2026-10-07)** trên `main` của repo public `tiendnm/retro-blog`: required check **`quality`**, cấm force-push và xoá nhánh. `enforce_admins=false` → chủ repo vẫn push thẳng được (repo một người); người khác chỉ merge được khi `quality` xanh. Job `build` chưa required (còn `continue-on-error`). Gói GitHub Free chỉ cho protection ở repo **public**.
-- Branch protection + required checks (`quality`): bật trên GitHub khi repo có remote.
+- Review ở ranh giới sprint; giữa sprint chỉ dừng cho thay đổi hạ tầng / bảo mật / schema / kiến trúc ([17 §2](./17-contributing.md)).
 
 ## 5. Cổng "Sẵn sàng bắt đầu code" (Ready to Code — thoát Sprint 0) — ✅ đã qua
 
