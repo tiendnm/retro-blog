@@ -140,4 +140,4 @@ Bắt đầu từ [docs/README.md](./docs/README.md).
 
 ## License
 
-> TODO: xác định giấy phép (ví dụ MIT) — chưa quyết định.
+[MIT](./LICENSE) © 2026 Đỗ Ngọc Minh Tiến.
