@@ -10,6 +10,7 @@ Giả định: domain `tiendnm.com` ở Cloudflare; site `retro.tiendnm.com`, CM
 ## 0. Rủi ro đã được chấp nhận (ghi lại để nhớ)
 
 - **Không UPS:** mất điện = site tắt; HDD có thể hỏng dữ liệu nếu tắt đột ngột (Postgres chịu được crash, nhưng vẫn là rủi ro).
+- **Không bật 2FA cho admin (quyết định 2026-10-30):** `/admin` công khai qua tunnel, chỉ bảo vệ bằng mật khẩu → dùng mật khẩu dài ngẫu nhiên, và dùng tài khoản Editor cho việc viết bài hằng ngày. Bật lại khi cần (Profile → Two-Factor Authentication).
 - **Chưa backup ra ngoài máy:** một ổ HDD hỏng = mất toàn bộ nội dung. Backup cục bộ (§8) chỉ cứu lỗi phần mềm, **không** cứu hỏng ổ. Khi sẵn sàng, thêm rclone → Cloudflare R2/Backblaze B2.
 
 ## 1. Chuẩn bị máy (một lần)
@@ -21,6 +22,11 @@ sudo apt -y install ca-certificates curl git ufw
 
 # Docker Engine + Compose v2: làm theo https://docs.docker.com/engine/install/ (apt repo chính thức)
 docker --version && docker compose version     # kiểm tra: Compose v2.24+ (cần cho !override/!reset)
+
+# Node 22 trên HOST (bản hệ thống, vì systemd không đọc môi trường nvm): cần cho apply-permissions.sh,
+# apply-*.mjs và webhook rebuild. Site/CMS tự chạy trong container, không cần Node ở host.
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt -y install nodejs
+node --version && which node        # v22.x, /usr/bin/node
 
 # User chạy dịch vụ
 sudo useradd -r -m -s /bin/bash -G docker retro
@@ -88,6 +94,11 @@ ADMIN_EMAIL=<email thật>      ADMIN_PASSWORD=<mật khẩu mạnh>
 ```
 Thay mọi giá trị `__CHANGE_ME_*__`. **Kiểm tra:** `grep -c CHANGE_ME .env.production` phải bằng `0`.
 
+> ⚠️ **Quy tắc cho `.env.production`** (webhook đọc file này qua systemd `EnvironmentFile`, khác cách `bash source` và Docker Compose đọc):
+> - **Mỗi biến một dòng, không chú thích cuối dòng.** systemd giữ nguyên `# ...` làm một phần giá trị → `REBUILD_TOKEN` dài hơn thực tế → webhook trả **404**. Chú thích phải nằm trên dòng riêng.
+> - **`REBUILD_HOST=172.17.0.1`** (IP `docker0`) — file mẫu mặc định `127.0.0.1` chỉ dành cho Docker Desktop; để nguyên thì Directus gọi webhook bị `ECONNREFUSED`.
+> - File thuộc user `retro`, quyền 600 → user khác phải dùng `sudo` để xem/sửa.
+
 ## 5. Khởi động stack
 
 ```bash
@@ -112,7 +123,9 @@ $COMPOSE logs cloudflared | tail              # kiểm tra: "Registered tunnel c
 > Nếu `cloudflared` restart liên tục với lỗi `Couldn't resolve SRV record ... server misbehaving`: DNS của router nhà không xử lý SRV. `docker-compose.tunnel.yml` đã đặt `dns: 1.1.1.1, 1.0.0.1` cho `cloudflared` để tránh lỗi này; nếu vẫn lỗi, kiểm tra host có chặn DNS ra ngoài không (`resolvectl status`).
 
 **Kiểm tra từ máy khác (4G/wifi khác):** `https://retro.tiendnm.com` (site), `https://retro-cms.tiendnm.com/admin` (đăng nhập).
-Sau khi đăng nhập admin: **đổi mật khẩu và bật 2FA** (Settings → Users/Profile).
+Sau khi đăng nhập admin: **đổi mật khẩu** (Settings → Users/Profile); 2FA tuỳ chọn (xem §0).
+
+> `up -d` có thể in `pull access denied for retro-web` — vô hại: `retro-web:prod` chỉ có local, Compose thử pull rồi tự chuyển sang build.
 
 ## 6. Rebuild-on-publish (webhook)
 
@@ -130,6 +143,11 @@ ADMIN_EMAIL=... ADMIN_PASSWORD=... DIRECTUS_URL=http://127.0.0.1:8055 node servi
 DIRECTUS_URL=http://127.0.0.1:8055 ADMIN_EMAIL=... ADMIN_PASSWORD=... node services/directus/apply-theme.mjs
 ```
 **Kiểm tra:** tạo một bài `published` trong admin → ~1–2 phút sau xuất hiện trên site (HDD + J1900 build chậm hơn máy dev). Draft không được lộ.
+
+> **Chẩn đoán webhook** (Flow trong Directus hiện lỗi):
+> - `ECONNREFUSED 172.17.0.1:9000` → webhook không nghe ở địa chỉ đó: `ss -ltnp | grep 9000` phải ra `172.17.0.1:9000`; nếu ra `127.0.0.1` thì sửa `REBUILD_HOST` rồi `sudo systemctl restart retro-rebuild-webhook`.
+> - `404` → receiver cố ý trả 404 cho sai method/path/**token**. So token mà bash đọc với token tiến trình thật sự nhận: độ dài/hash của `REBUILD_TOKEN` từ `sudo bash -c 'source .env.production; …'` và từ `/proc/$(systemctl show -p MainPID --value retro-rebuild-webhook)/environ`. Khác nhau (thường vì chú thích cuối dòng) → sửa dòng token rồi restart webhook. Gọi sai nhiều lần từ một IP sẽ bị `429` tạm thời.
+> - Gọi ngay sau `restart` có thể ra `000` (chưa mở cổng) — thử lại sau vài giây.
 
 > Nếu webhook không tới được từ container: `docker0` có thể không phải `172.17.0.1` — kiểm `ip -4 addr show docker0` và đặt `REBUILD_HOST` cho khớp; rule `ufw` ở §1 cần bao dải này.
 

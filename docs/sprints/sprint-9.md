@@ -28,3 +28,20 @@
 
 **Chưa kiểm chứng (cần máy thật + tài khoản Cloudflare):** kết nối `cloudflared` ↔ Cloudflare và hostname → `caddy:80`; chạy trên J1900 (HDD, 4 GB — thời gian build, RAM); `REBUILD_HOST=172.17.0.1` + ufw; systemd thật; CSP bằng trình duyệt trên domain thật.
 **Lưu ý:** host lạ (không khớp site nào) trả `200` rỗng ở chế độ HTTP — vô hại vì chỉ hostname đã cấu hình mới vào được qua tunnel.
+
+## Kết quả trên máy thật (2026-10-30) — J1900, 4 GB, HDD, Ubuntu 22.04
+| Hạng mục | Kết quả |
+|---|---|
+| Stack production | Postgres → Directus → job build → Caddy → `cloudflared` chạy; site `retro.tiendnm.com` và CMS `retro-cms.tiendnm.com` truy cập được qua tunnel |
+| Thời gian | build image `retro-web` lần đầu ~136 s; job `astro build` + swap ~21 s (khi chưa có nội dung) |
+| Rebuild-on-publish | ✅ publish bài → rebuild thành công, bài hiện trên site |
+| Tunnel | dùng **tunnel mới** riêng cho project (không dùng chung connector với tunnel có sẵn trên máy) |
+
+**Lỗi gặp khi triển khai thật (đã sửa, ghi vào runbook 08a):**
+1. `cloudflared` restart liên tục — `Couldn't resolve SRV record … server misbehaving`: DNS router nhà không xử lý SRV → đặt `dns: 1.1.1.1, 1.0.0.1` cho `cloudflared` (`f30d1e2`).
+2. Flow báo `ECONNREFUSED 172.17.0.1:9000`: `REBUILD_HOST` còn mặc định `127.0.0.1` từ file mẫu → phải là IP `docker0` trên Linux.
+3. Flow báo `404`: `REBUILD_TOKEN` trong file mẫu có chú thích cuối dòng; systemd `EnvironmentFile` giữ nguyên chú thích làm giá trị (token 123 ký tự thay vì 64) → bỏ chú thích cuối dòng ở file mẫu.
+4. `apply-permissions.sh` cần Node 22 trên host (`node: command not found`) → thêm bước cài Node vào §1.
+
+**Quyết định (2026-10-30):** không bật 2FA admin (rủi ro chấp nhận, ghi ở 08a §0).
+**Chưa xác nhận:** backup/healthcheck timers trên máy thật, restore drill, backup ra ngoài máy, HSTS 1 năm.

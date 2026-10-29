@@ -18,7 +18,7 @@
 | M0 — Tài liệu nền tảng | Bộ `docs/` + ADR stack | ✅ Sprint 0 |
 | M1 — Khung hệ thống | Astro + Directus + PostgreSQL chạy local | ✅ Sprint 1 |
 | M2 — MVP nội dung | Editor publish → Reader xem (list/detail/category) | ✅ Sprint 2 |
-| M3 — Ra mắt (Launch) | Public HTTPS + SEO + a11y + checklist | 🟡 Cơ chế xong (Sprint 5–6); còn xác nhận trên domain thật ([08 §8](./08-deployment.md)) |
+| M3 — Ra mắt (Launch) | Public HTTPS + SEO + a11y + checklist | 🟡 Site + CMS + rebuild-on-publish đã chạy trên domain thật (2026-10-30); còn backup/healthcheck timers, restore drill, backup ngoài máy, HSTS 1 năm ([08 §8](./08-deployment.md)) |
 
 ## 3. Sprint
 
@@ -33,12 +33,12 @@
 | [6](./sprints/sprint-6.md) | Deployment & Public MVP | ✅ (mục @deploy chờ domain thật) |
 | [6.5](./sprints/sprint-6.5.md) | Product Polish (Content & UX) | ✅ |
 | [7](./sprints/sprint-7.md) | System Hardening & Quality (Biome, test, CI) | ✅ Phase 1–3 xong (Biome + astro check, 38 test Vitest, CI phương án lai: job `quality` bắt buộc, job `build` continue-on-error) |
-| [8](./sprints/sprint-8.md) | Production Hardening (header, webhook, backup lịch, healthcheck) | ✅ (chưa kiểm chứng trên server thật) |
-| [9](./sprints/sprint-9.md) | Deploy tại nhà: Cloudflare Tunnel + Postgres trong compose | ✅ cấu hình + dry-run cục bộ; chờ máy thật |
+| [8](./sprints/sprint-8.md) | Production Hardening (header, webhook, backup lịch, healthcheck) | ✅ (webhook rebuild đã kiểm chứng trên máy thật; backup/healthcheck timers chưa) |
+| [9](./sprints/sprint-9.md) | Deploy tại nhà: Cloudflare Tunnel + Postgres trong compose | ✅ đã chạy trên máy thật (2026-10-30): site + CMS + rebuild-on-publish qua tunnel |
 
 ## 4. Backlog cấp cao
 
-- **Deploy (@deploy):** xác nhận ACME/DNS + CSP trên domain thật, 2FA admin, nâng HSTS 1 năm, copy backup ra ngoài host; rate limiting Directus, container không chạy root, quét dependency.
+- **Deploy (@deploy):** xác nhận ACME/DNS + CSP trên domain thật, (2FA admin: bỏ qua có chủ đích), nâng HSTS 1 năm, copy backup ra ngoài host; rate limiting Directus, container không chạy root, quét dependency.
 - **Kiểm thử mở rộng:** test độ bền thin client, axe a11y, link-check, Lighthouse budget, E2E.
 - **Reader feature:** Category discoverability, Search, RSS, Tags, Archive, Author pages.
 - **Refactor docs-architecture:** F1–F15 ([architecture review](./reviews/architecture-review-2026-07-21.md)).
