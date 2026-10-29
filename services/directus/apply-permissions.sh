@@ -14,7 +14,10 @@
 set -uo pipefail
 BASE="${DIRECTUS_URL:-http://localhost:8055}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-if [ -f "$ROOT/.env" ]; then source <(grep -E '^(ADMIN_EMAIL|ADMIN_PASSWORD)=' "$ROOT/.env"); fi
+# Biến môi trường truyền vào được ưu tiên; chỉ đọc .env (dev) khi thiếu.
+if [ -z "${ADMIN_EMAIL:-}" ] || [ -z "${ADMIN_PASSWORD:-}" ]; then
+  if [ -f "$ROOT/.env" ]; then source <(grep -E '^(ADMIN_EMAIL|ADMIN_PASSWORD)=' "$ROOT/.env"); fi
+fi
 ADMIN_EMAIL="${ADMIN_EMAIL:?}"; ADMIN_PASSWORD="${ADMIN_PASSWORD:?}"
 
 val() { node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const p=JSON.parse(d);let v=p.data;process.argv.slice(1).forEach(k=>{v=Array.isArray(v)?(v[0]||{})[k]:(v||{})[k]});console.log(v==null?'':v)}catch(e){console.log('')}})" "$@"; }

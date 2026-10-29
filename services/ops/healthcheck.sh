@@ -1,8 +1,8 @@
 #!/bin/sh
 # ── Health check / uptime (Sprint 8) ───────────────────────────────────────
 # Kiểm: site trả 200 · /robots.txt & /sitemap.xml · Directus /server/health = ok ·
-# chứng chỉ TLS còn hạn. Exit 0 nếu tất cả đạt, 1 nếu có mục hỏng. Chạy TRÊN HOST
-# (timer: services/ops/systemd/retro-healthcheck.timer) hoặc từ máy khác.
+# chứng chỉ TLS còn hạn. Exit 0 nếu tất cả đạt, 1 nếu có mục hỏng. Production: service `ops`
+# (scheduler.sh, ADR-0017) chạy định kỳ; cũng chạy tay được trên host hoặc máy khác.
 #
 #   Env bắt buộc: SITE_URL (vd https://retro.example.com), CMS_URL (vd https://cms.example.com)
 #   Env tuỳ chọn:

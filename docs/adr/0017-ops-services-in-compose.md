@@ -19,14 +19,14 @@ Sau [ADR-0014](./0014-postgres-in-compose-for-production.md) (Postgres trong com
 
 ## Quyết định (Decision)
 
-1. Thêm service **`ops`** vào stack production, dựng từ một image nhỏ (Alpine: PostgreSQL client 16, Node, bash, curl, openssl). Một image dùng cho cả vận hành định kỳ và tác vụ chạy một lần (`profiles: [setup]`: schema/permissions/Flow/theme — dùng cho script triển khai).
-2. **Lập lịch trong container bằng một vòng lặp `sh` tối giản** (không `crond`, để chạy được **non-root**): backup hằng ngày (mặc định 03:30, giờ theo `TZ`), healthcheck định kỳ (mặc định 5 phút). Khi khởi động, nếu bản backup mới nhất **cũ hơn 24 giờ** thì chạy bù ngay (thay cho `Persistent=true` của systemd timer).
+1. Thêm service **`ops`** vào stack production, dựng từ `services/ops/Dockerfile` (base `node:22.12.0-alpine` + PostgreSQL client 16, bash, curl, openssl, tzdata). Một image dùng cho cả vận hành định kỳ và tác vụ chạy một lần (`docker compose run --rm ops <lệnh>`: schema/permissions/Flow/theme — dùng cho script triển khai). Mã dự án **không** nằm trong image: repo được mount chỉ-đọc tại `/repo`.
+2. **Lập lịch trong container bằng một vòng lặp `sh` tối giản** (`services/ops/scheduler.sh`, không `crond`, để chạy được **non-root**): backup hằng ngày khi đã qua `BACKUP_AT` (mặc định 03:30, giờ theo `TZ`) và **hôm nay chưa có bản hoàn chỉnh** — nên máy tắt lúc 03:30 thì bật lại sẽ chạy bù (thay cho `Persistent=true`); lỗi thì thử lại sau 1 giờ. Khi khởi động, nếu **không có bản nào trong 24 giờ qua** thì chạy ngay. Healthcheck mỗi 5 phút, chỉ log chi tiết khi FAIL và khi đổi trạng thái. Backup ghi vào `<stamp>.tmp` rồi đổi tên → không bao giờ để lại bản dở.
 3. Nguồn dữ liệu qua **mạng và mount chỉ đọc**, **không `docker.sock`**:
    - Database: `pg_dump` tới service `postgres`.
-   - Uploads: volume `directus_uploads` mount `:ro`.
-   - Config/env: file trong repo mount `:ro`.
+   - Uploads: volume `directus_uploads` mount `:ro` (`/data/uploads`).
+   - Config/env: cả repo mount `:ro` tại `/repo` (`.env.production`, compose, Caddyfile, schema).
 4. Đích: thư mục host `${BACKUP_DIR:-./backups}` (bind mount, `umask 077`), nên lấy ra ngoài máy bằng `rclone`/`scp` rất dễ. Giữ `BACKUP_KEEP` như cũ.
-5. Restore: `docker compose run --rm ops restore <timestamp>` (bọc `restore.sh`).
+5. Restore: giữ `services/ops/restore.sh` chạy **trên host** (`PG_VIA_COMPOSE=1`, qua `docker compose exec`) vì việc ghi lại uploads cần quyền ghi vào volume của Directus, mà `ops` mount volume đó **chỉ đọc**. Restore hiếm khi dùng nên chấp nhận.
 6. **Không tạo user hệ thống riêng.** Stack chạy dưới **user triển khai** (ở đây `tiendnm`, đã thuộc nhóm `docker`). Container `ops` chạy với `user: "<uid>:<gid>"` của user đó để file backup thuộc đúng chủ sở hữu và đọc/sao chép được không cần `sudo`.
 7. **Bỏ hoàn toàn** `services/ops/systemd/*` khỏi đường production. Việc duy nhất còn cần `sudo` là tạo swap (một lần, tuỳ chọn).
 

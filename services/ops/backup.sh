@@ -6,12 +6,18 @@
 #   Env: COMPOSE_FILES (mặc định dev), PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDB, BACKUP_DIR, BACKUP_KEEP (mặc định 14), ENV_FILE.
 #   Postgres: mặc định NGOÀI compose (dev, ADR-0010) → pg_dump của HOST (client >= 16).
 #   Production (ADR-0014) Postgres TRONG compose → đặt PG_VIA_COMPOSE=1: chạy pg_dump trong container `postgres`.
+#   Trong service `ops` (ADR-0017): KHÔNG docker — pg_dump qua mạng (PGHOST=postgres, PGPASSWORD), uploads đọc từ
+#   volume mount (UPLOADS_DIR), cwd = repo mount chỉ-đọc (/repo). Ghi vào "$DEST.tmp" rồi đổi tên → không bao giờ để lại bản dở.
 set -eu
 umask 077 # backup chứa DB + secret → chỉ chủ sở hữu đọc được
 
 STAMP=$(date +%Y%m%d-%H%M%S)
-DEST="${BACKUP_DIR:-./backups}/$STAMP"
+FINAL="${BACKUP_DIR:-./backups}/$STAMP"
+DEST="$FINAL.tmp"
+rm -rf "$DEST"
 mkdir -p "$DEST"
+# Lỗi giữa chừng → xoá bản dở (scheduler/prune chỉ nhận thư mục YYYYMMDD-HHMMSS hoàn chỉnh).
+trap 'rc=$?; [ "$rc" -eq 0 ] || rm -rf "$DEST"' EXIT
 COMPOSE="docker compose ${COMPOSE_FILES:-}"
 export PGHOST="${PGHOST:-localhost}" PGPORT="${PGPORT:-5433}" PGUSER="${PGUSER:-postgres}"
 PGDB="${PGDB:-retro-blog}"
@@ -24,12 +30,17 @@ else
 fi
 
 echo "[backup] uploads → uploads.tgz (directus_uploads)"
-$COMPOSE exec -T directus tar czf - -C /directus/uploads . >"$DEST/uploads.tgz"
+if [ -n "${UPLOADS_DIR:-}" ]; then
+  tar czf - -C "$UPLOADS_DIR" . >"$DEST/uploads.tgz"
+else
+  $COMPOSE exec -T directus tar czf - -C /directus/uploads . >"$DEST/uploads.tgz"
+fi
 
 echo "[backup] config (schema, compose, Caddyfile)"
 cp services/directus/snapshots/schema.yaml "$DEST/schema.yaml" 2>/dev/null || true
 cp docker-compose.yml "$DEST/" 2>/dev/null || true
 cp docker-compose.prod.yml "$DEST/" 2>/dev/null || true
+cp docker-compose.tunnel.yml "$DEST/" 2>/dev/null || true
 cp Caddyfile "$DEST/" 2>/dev/null || true
 
 # Env (secret): sao lưu RIÊNG + mã hoá. Cả thư mục backup là NHẠY CẢM.
@@ -48,7 +59,8 @@ KHÔNG gồm dist/ (tái sinh bằng astro build).
 RPO = từ lần backup gần nhất; RTO = thời gian restore + rebuild-on-publish.
 TXT
 
-echo "[backup] xong → $DEST"
+mv "$DEST" "$FINAL"
+echo "[backup] xong → $FINAL"
 
 # Giữ BACKUP_KEEP bản gần nhất (mặc định 14) — dọn bản cũ, tránh đầy đĩa.
 BACKUP_DIR="${BACKUP_DIR:-./backups}" sh "$(dirname "$0")/prune-backups.sh"

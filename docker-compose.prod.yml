@@ -8,6 +8,7 @@
 # (ADR-0014, thay ADR-0010 cho production) — không publish cổng, chỉ nội bộ retro-net.
 # - web = build-runner + receiver webhook (ADR-0008, ADR-0016): build lần đầu → volume site_dist (Caddy phục vụ),
 #   rồi lắng nghe POST /rebuild từ Directus (chỉ trong mạng compose, KHÔNG publish cổng).
+# - ops = backup hằng ngày + healthcheck (ADR-0017): không docker.sock, mount chỉ-đọc, chạy bằng uid của user triển khai.
 # - directus: KHÔNG public trực tiếp (chỉ bind localhost server, debug); public qua Caddy.
 name: retro-blog
 
@@ -88,6 +89,54 @@ services:
     depends_on:
       directus:
         condition: service_healthy
+
+  # Vận hành định kỳ (ADR-0017): scheduler.sh → backup.sh (03:30) + healthcheck.sh (5 phút). Cũng dùng cho tác vụ
+  # chạy một lần khi dựng server:  docker compose run --rm ops <lệnh>  (node, bash, curl, pg_dump có sẵn).
+  ops:
+    build:
+      context: ./services/ops
+      dockerfile: Dockerfile
+    image: retro-ops:prod
+    restart: unless-stopped
+    # Ghi file backup bằng đúng uid/gid của user triển khai → đọc/chép được không cần sudo.
+    user: "${DEPLOY_UID:-1000}:${DEPLOY_GID:-1000}"
+    working_dir: /repo
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      TZ: ${TZ:-Asia/Ho_Chi_Minh}
+      # Postgres qua mạng compose (pg_dump), không docker exec.
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGUSER: ${DB_USER}
+      PGPASSWORD: ${DB_PASSWORD}
+      PGDB: ${DB_DATABASE}
+      BACKUP_DIR: /backups
+      BACKUP_KEEP: ${BACKUP_KEEP:-14}
+      BACKUP_AT: ${BACKUP_AT:-03:30}
+      UPLOADS_DIR: /data/uploads
+      ENV_FILE: .env.production
+      # Healthcheck đi theo đường công khai (qua Cloudflare/tunnel) để bắt cả lỗi ingress.
+      SITE_URL: ${HEALTHCHECK_SITE_URL:-https://${SITE_DOMAIN}}
+      CMS_URL: ${HEALTHCHECK_CMS_URL:-https://${CMS_DOMAIN}}
+      HEALTHCHECK_PING_URL: ${HEALTHCHECK_PING_URL:-}
+      HEALTHCHECK_INTERVAL: ${HEALTHCHECK_INTERVAL:-300}
+      # Dùng cho tác vụ một lần (apply-*.mjs, apply-permissions.sh) khi chạy trong container.
+      DIRECTUS_URL: http://directus:8055
+    volumes:
+      - .:/repo:ro
+      - directus_uploads:/data/uploads:ro
+      - ${BACKUP_DIR:-./backups}:/backups
+    networks:
+      - retro-net
+    healthcheck:
+      # Còn sống = vòng lặp đã ghi heartbeat trong 3 phút qua.
+      test: ["CMD-SHELL", "test $(( $(date +%s) - $(cat /tmp/ops-alive 2>/dev/null || echo 0) )) -lt 180"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
 
   # Caddy edge: TLS tự động (hoặc HTTP sau Cloudflare Tunnel), phục vụ static, proxy Directus.
   caddy:

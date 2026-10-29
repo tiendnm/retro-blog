@@ -32,7 +32,7 @@ Vận hành: đăng bài → tự rebuild; cập nhật code → `./scripts/upda
 
 ## Phạm vi (Phases)
 - [x] **P1 — Webhook trong `web` ([ADR-0016](../adr/0016-rebuild-receiver-in-web-container.md)):** `webhook.mjs` hỗ trợ `REBUILD_COMMAND`; `web` prod = build lần đầu rồi chạy receiver; healthcheck; Caddy `depends_on: service_healthy`; URL Flow → `http://web:9000/rebuild`; cập nhật `webhook.test.mjs`; bỏ unit systemd + `REBUILD_HOST`.
-- [ ] **P2 — Service `ops` ([ADR-0017](../adr/0017-ops-services-in-compose.md)):** Dockerfile + `scheduler.sh` (backup 03:30, healthcheck 5 phút, chạy bù nếu bản mới nhất > 24 giờ); mount `:ro` + bind `backups/`; chạy non-root theo uid của user triển khai; `restore` qua `compose run`; profile `setup` cho tác vụ một lần; bỏ `services/ops/systemd/`.
+- [x] **P2 — Service `ops` ([ADR-0017](../adr/0017-ops-services-in-compose.md)):** Dockerfile + `scheduler.sh` (backup 03:30, healthcheck 5 phút, chạy bù nếu bản mới nhất > 24 giờ); mount `:ro` + bind `backups/`; chạy non-root theo uid của user triển khai; `restore` qua `compose run`; profile `setup` cho tác vụ một lần; bỏ `services/ops/systemd/`.
 - [ ] **P3 — Gọn compose:** bỏ publish cổng Directus ra host; chọn file compose không cần `-f` dài (ưu tiên `COMPOSE_FILE` trong env; nếu Compose không nhận qua `--env-file` thì dùng wrapper `scripts/compose.sh` — **chốt bằng spike ở P3**); giữ DNS `1.1.1.1` cho `cloudflared`.
 - [ ] **P4 — Script:** `scripts/deploy-home.sh`, `scripts/update.sh`; kiểm tra bằng `shellcheck` trong CI (job `quality`).
 - [ ] **P5 — Tài liệu:** viết lại gọn `08a` (4 việc ở trên + xử lý sự cố), cập nhật `13-operations`, `12-security` (không `docker.sock`, mạng nội bộ), `08-deployment`, `10-decisions`, `adr/README`, roadmap, README.
@@ -78,7 +78,22 @@ Vận hành: đăng bài → tự rebuild; cập nhật code → `./scripts/upda
 | Khởi động lại | `restart web` → healthy sau ~vài giây, site 200 |
 | Fallback | `rebuild.sh` đổi thành "gọi receiver trong container" (trước đó `compose run web` sẽ chạy entrypoint mới và không thoát) → trả 202 |
 
-**Đã gỡ:** `services/ops/systemd/retro-rebuild-webhook.service`, `REBUILD_HOST` (file mẫu env), `host.docker.internal` (mặc định URL Flow).
+### P2 — Service `ops` ✅ (dry-run cục bộ, project riêng `retro-p2`, đã dọn)
+| Hạng mục | Kiểm chứng |
+|---|---|
+| Image | `services/ops/Dockerfile` build được; `pg_dump` 16.15, Node 22.12, bash 5.2, curl có sẵn; chạy non-root (uid 1000 trong dry-run) |
+| Backup trong container | không docker: `pg_dump` qua mạng, uploads từ volume `:ro`, config/env từ repo `:ro` → bản đủ `db.dump`, `uploads.tgz`, schema, compose, Caddyfile, `env.bak`, README; không còn `.tmp` |
+| Lập lịch | khởi động chưa có bản nào trong 24 giờ → chạy bù ngay; restart không sinh bản trùng; "hôm nay chưa có bản" (bản cũ đổi sang hôm qua) → chạy ở vòng lặp đầu |
+| Lỗi | Postgres không với tới → `pg_dump` lỗi, **không để lại bản dở**, số bản giữ nguyên |
+| Dọn bản cũ | `BACKUP_KEEP=3` → xoá bản cũ nhất; thêm dọn `*.tmp` bị bỏ dở > 24 giờ |
+| Healthcheck | OK → log chuyển trạng thái; dừng Caddy → `health FAIL` kèm chi tiết; bật lại → `health OK`; heartbeat → `ops` báo healthy |
+| Restore drill | đặt giá trị A → backup bằng `ops` → đổi thành B → `restore.sh` (host, `PG_VIA_COMPOSE=1`) → quay về A |
+| Tác vụ một lần | `apply-permissions.sh` (bash+curl+node, chạy 2 lần: idempotent), `apply-rebuild-flow.mjs`, `apply-theme.mjs` chạy trong `ops` → **dựng server không cần Node trên host** |
+
+**Thay đổi kèm theo:** gỡ toàn bộ `services/ops/systemd/`; `backup.sh` ghi `<stamp>.tmp` rồi đổi tên + hỗ trợ `UPLOADS_DIR`; `apply-permissions.sh` ưu tiên biến môi trường trước `.env` (sửa quirk phát hiện ở P1); **`.env.production` được thêm vào `.gitignore` của repo** (trước đây chỉ nhờ `.gitignore_global` trên máy dev — trên server clone mới có thể bị `git add -A` commit nhầm); ADR-0017 cập nhật cho khớp (restore giữ chạy trên host vì uploads mount `:ro`).
+**Chưa kiểm chứng:** ghi file backup đúng chủ sở hữu trên Linux thật (`DEPLOY_UID`/`GID` — dry-run trên Windows không phân biệt uid) và đọc/chép không `sudo`; `HEALTHCHECK` qua Cloudflare thật; RAM/thời gian `pg_dump` trên J1900+HDD → P6.
+
+**Đã gỡ (P1):** `services/ops/systemd/retro-rebuild-webhook.service`, `REBUILD_HOST` (file mẫu env), `host.docker.internal` (mặc định URL Flow).
 **Phát hiện:** `apply-permissions.sh` tự `source` file `.env` ở thư mục gốc và **ghi đè** `ADMIN_*` truyền vào (chỉ ảnh hưởng máy dev; trong container `ops` không có `.env` đó) — xử lý ở P4. Git Bash trên Windows đổi đường dẫn `/directus/...` khi `docker exec` (cần `MSYS_NO_PATHCONV=1`), không ảnh hưởng Linux.
 **Chưa kiểm chứng:** thời gian build lần đầu và RAM trên J1900 (đo ở P6).
 **Còn lại ở P5 (tài liệu vẫn nhắc cơ chế cũ):** `08a §1/§6` (ufw 9000, systemd webhook), `12-security`, `13-operations`, `08-deployment`.
