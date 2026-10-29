@@ -1,7 +1,7 @@
 # ADR-0016 — Webhook rebuild chạy trong container `web` (thay cơ chế host + systemd của ADR-0008)
 
-> **Status:** Proposed <!-- 2026-10-30, chờ Product duyệt -->
-> **Ngày đề xuất:** 2026-10-30 · **Ngày Accepted:** —
+> **Status:** Accepted <!-- 2026-10-30, Product duyệt -->
+> **Ngày đề xuất:** 2026-10-30 · **Ngày Accepted:** 2026-10-30
 > **Người quyết định:** Product
 > **Nguyên tắc tuân thủ (Principles):** P4/P5 (self-host, tái lập — một lệnh compose), P6 (Low coupling). Thay thế **một phần** [ADR-0008](./0008-rebuild-on-publish.md): chỉ phần *nơi chạy* receiver và cách kích hoạt build; Flow → webhook → build → atomic swap giữ nguyên.
 

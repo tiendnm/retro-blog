@@ -1,7 +1,7 @@
 # ADR-0017 — Backup & healthcheck chạy trong compose (service `ops`), vận hành bằng user triển khai
 
-> **Status:** Proposed <!-- 2026-10-30, chờ Product duyệt -->
-> **Ngày đề xuất:** 2026-10-30 · **Ngày Accepted:** —
+> **Status:** Accepted <!-- 2026-10-30, Product duyệt -->
+> **Ngày đề xuất:** 2026-10-30 · **Ngày Accepted:** 2026-10-30
 > **Người quyết định:** Product
 > **Nguyên tắc tuân thủ (Principles):** P4/P5 (self-host, tái lập), P6 (Low coupling). Thay thế phần *systemd timer + user `retro`* của Sprint 8; **giữ nguyên** nội dung backup/restore/healthcheck ([13-operations](../13-operations.md)).
 

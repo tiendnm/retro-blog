@@ -42,5 +42,5 @@
 | [0013](./0013-sanitize-body-html.md) | Sanitize HTML `posts.body` lúc build | **Accepted** |
 | [0014](./0014-postgres-in-compose-for-production.md) | Production chạy Postgres trong compose | **Accepted** |
 | [0015](./0015-cloudflare-tunnel-ingress.md) | Cloudflare Tunnel làm đường vào (server tại nhà) | **Accepted** |
-| [0016](./0016-rebuild-receiver-in-web-container.md) | Webhook rebuild chạy trong container `web` (thay một phần ADR-0008) | **Proposed** |
-| [0017](./0017-ops-services-in-compose.md) | Backup + healthcheck trong compose (service `ops`), vận hành bằng user triển khai | **Proposed** |
+| [0016](./0016-rebuild-receiver-in-web-container.md) | Webhook rebuild chạy trong container `web` (thay một phần ADR-0008) | **Accepted** |
+| [0017](./0017-ops-services-in-compose.md) | Backup + healthcheck trong compose (service `ops`), vận hành bằng user triển khai | **Accepted** |
