@@ -2,9 +2,9 @@
 
 > 🔄 **Cập nhật theo quy ước tinh gọn (2026-10-07, [17 §2](../17-contributing.md)):** bỏ "Quality Report" riêng (CI xanh là bằng chứng); review ở cuối sprint thay vì sau mỗi Phase (trừ thay đổi hạ tầng/bảo mật). Phạm vi Phase 1–3 không đổi.
 
-> **Trạng thái:** 🟢 **Approved with minor revisions** (Product 2026-07-28) — bản Planning cuối, chờ Product xác nhận trước khi implement · **Người soạn:** Implementation (Software Architect)
+> **Trạng thái:** ✅ **Hoàn thành** (Phase 1–3 đã implement; xem [Kết quả](#kết-quả-cập-nhật-2026-10-07)) · Duyệt kế hoạch: Product 2026-07-28 (Approved with minor revisions) · **Người soạn:** Implementation (Software Architect)
 >
-> ⚠️ Đây là **tài liệu lập kế hoạch** (bản 3 — đã áp các điều chỉnh của Product). Chưa implement, chưa commit, chưa đụng code. Phase 1 chỉ bắt đầu **sau khi Product xác nhận bản cuối này**.
+> ℹ️ Phần Scope/Phase bên dưới giữ nguyên là **kế hoạch gốc (bản 3)** để đối chiếu; kết quả thực tế ở cuối file. Từ sau Sprint 9, repo đã có remote public và branch protection (required check `quality`).
 > 🔗 [11-testing](../11-testing.md) · [14-quality-gates](../14-quality-gates.md) · [09-coding-standards](../09-coding-standards.md) · [08-deployment](../08-deployment.md) · [Sprint 6 Completion](./sprint-6.md) · [Architecture Review 2026-07-21](../reviews/architecture-review-2026-07-21.md).
 >
 > 📌 **Bối cảnh:** roadmap định vị Sprint 7 là **Hardening** (`14 §2.2`: "CI tự động = Sprint 7"; `08 §3`: "CI test tự động… để Sprint 7"). Bản 1 (Category Discoverability) đã bị Product từ chối; bản này (bản 2→3) tập trung chất lượng hệ thống, không thêm feature Reader.
@@ -189,4 +189,4 @@
 | 2 — Test foundation (Vitest) | ✅ | 38 test (thin client + helper); kiểm đột biến: phá code → test đỏ. Chưa phủ logic trong `.astro` (Backlog) |
 | 3 — CI (`.github/workflows/ci.yml`) | ✅ workflow, ⏳ xanh trên GitHub | Phương án **lai**: job `quality` (bắt buộc) + job `build` (`continue-on-error` → nâng required khi ổn định). Đã chạy thử cục bộ: actionlint sạch; schema → permissions → seed → `astro build` thành công (7 trang, draft không lộ). **Repo chưa có git remote** → chưa chạy được trên Actions |
 
-**Known limitations:** không E2E/axe/Lighthouse; build-in-CI dùng seed tối thiểu (`seed:dev`); chưa bật branch protection (cần remote); các mục @deploy chưa verify trên domain thật; `format:check` cục bộ trên Windows báo `global.css` (CRLF working tree, index là LF — CI Linux không gặp).
+**Known limitations:** không E2E/axe/Lighthouse; build-in-CI dùng seed tối thiểu (`seed:dev`); branch protection đã bật sau đó (commit `eb8515e`, required check `quality`); các mục @deploy chưa verify trên domain thật; `format:check` cục bộ trên Windows báo `global.css` (CRLF working tree, index là LF — CI Linux không gặp).
