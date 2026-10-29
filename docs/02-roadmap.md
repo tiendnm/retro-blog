@@ -32,7 +32,7 @@
 | [5](./sprints/sprint-5.md) | Pagination + SEO baseline | ✅ |
 | [6](./sprints/sprint-6.md) | Deployment & Public MVP | ✅ (mục @deploy chờ domain thật) |
 | [6.5](./sprints/sprint-6.5.md) | Product Polish (Content & UX) | ✅ |
-| [7](./sprints/sprint-7.md) | System Hardening & Quality (Biome, test, CI) | 🟡 Phase 1 xong; Phase 2–3 còn lại |
+| [7](./sprints/sprint-7.md) | System Hardening & Quality (Biome, test, CI) | ✅ Phase 1–3 xong (Biome + astro check, 38 test Vitest, CI phương án lai: job `quality` bắt buộc, job `build` continue-on-error) |
 | [8](./sprints/sprint-8.md) | Production Hardening (header, webhook, backup lịch, healthcheck) | ✅ (chưa kiểm chứng trên server thật) |
 | [9](./sprints/sprint-9.md) | Deploy tại nhà: Cloudflare Tunnel + Postgres trong compose | ✅ cấu hình + dry-run cục bộ; chờ máy thật |
 
