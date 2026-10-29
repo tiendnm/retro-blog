@@ -33,7 +33,7 @@ services:
       #   docker compose exec directus npx directus schema apply --yes //directus/snapshots/schema.yaml
       - ./services/directus/snapshots:/directus/snapshots:ro
     ports:
-      - "${DIRECTUS_PORT}:8055"
+      - "${DIRECTUS_PORT:-8055}:8055"
     networks:
       - retro-net
     healthcheck:

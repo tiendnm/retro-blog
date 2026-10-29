@@ -33,7 +33,7 @@
 |---|---|---|---|
 | caddy | `caddy:2.8-alpine` | 80/443 (public) | Edge: TLS + serve static `current` + proxy Directus |
 | web (build-runner) | build từ `apps/web/Dockerfile` | — | Chạy-1-lần: `astro build` → `site_dist/builds/<TS>` → swap `current` |
-| directus | `directus/directus:11.3.5` | 127.0.0.1:8055 | Chỉ localhost host; public qua Caddy `cms.` |
+| directus | `directus/directus:11.3.5` | (không publish) | Chỉ trong mạng compose; public qua Caddy `cms.` |
 | postgres | instance host (PG 16, :5433) | — | Ngoài compose, DB `retro-blog` ([ADR-0010](./adr/0010-external-postgres-instance.md)); không còn volume `pgdata` |
 
 > **Volumes:** `directus_uploads`, `site_dist` (builds + `current`), `caddy_data`/`caddy_config`.

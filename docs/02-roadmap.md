@@ -35,7 +35,7 @@
 | [7](./sprints/sprint-7.md) | System Hardening & Quality (Biome, test, CI) | ✅ Phase 1–3 xong (Biome + astro check, 38 test Vitest, CI phương án lai: job `quality` bắt buộc, job `build` continue-on-error) |
 | [8](./sprints/sprint-8.md) | Production Hardening (header, webhook, backup lịch, healthcheck) | ✅ (webhook rebuild đã kiểm chứng trên máy thật; backup/healthcheck timers chưa) |
 | [9](./sprints/sprint-9.md) | Deploy tại nhà: Cloudflare Tunnel + Postgres trong compose | ✅ đã chạy trên máy thật (2026-10-30): site + CMS + rebuild-on-publish qua tunnel |
-| [10](./sprints/sprint-10.md) | Đóng gói deploy (webhook + backup vào compose, script dựng server) | 📝 Đề xuất — chờ Product duyệt |
+| [10](./sprints/sprint-10.md) | Đóng gói deploy (webhook + backup vào compose, script dựng server) | 🟡 Đã duyệt, đang thực hiện (P1–P3 xong) |
 
 ## 4. Backlog cấp cao
 

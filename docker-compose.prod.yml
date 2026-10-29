@@ -9,7 +9,7 @@
 # - web = build-runner + receiver webhook (ADR-0008, ADR-0016): build lần đầu → volume site_dist (Caddy phục vụ),
 #   rồi lắng nghe POST /rebuild từ Directus (chỉ trong mạng compose, KHÔNG publish cổng).
 # - ops = backup hằng ngày + healthcheck (ADR-0017): không docker.sock, mount chỉ-đọc, chạy bằng uid của user triển khai.
-# - directus: KHÔNG public trực tiếp (chỉ bind localhost server, debug); public qua Caddy.
+# - directus: KHÔNG publish cổng ra host; chỉ tới được trong mạng compose (Caddy, ops). Public qua Caddy.
 name: retro-blog
 
 services:
@@ -35,9 +35,8 @@ services:
       start_period: 20s
 
   directus:
-    # Ghi đè: chỉ bind localhost trên server (public đi qua Caddy, không expose 0.0.0.0).
-    ports: !override
-      - "127.0.0.1:${DIRECTUS_PORT}:8055"
+    # Không publish cổng ra host (public đi qua Caddy; script vận hành chạy trong `ops` gọi http://directus:8055).
+    ports: !reset []
     depends_on:
       postgres:
         condition: service_healthy
