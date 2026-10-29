@@ -129,6 +129,8 @@ Sau khi đăng nhập admin: **đổi mật khẩu** (Settings → Users/Profile
 
 ## 6. Rebuild-on-publish (webhook)
 
+> ⚠️ **Đang được thay thế (Sprint 10 P1, [ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md)):** receiver giờ chạy **trong container `web`** (không systemd, không Node trên host, không `REBUILD_HOST`/rule ufw 9000); Flow gọi `http://web:9000/rebuild`. Phần dưới mô tả cơ chế cũ và sẽ được viết lại ở P5 cùng script `deploy-home.sh`. Server hiện tại (dựng ở Sprint 9) vẫn chạy cơ chế cũ cho tới khi dựng lại theo Sprint 10.
+
 Directus (trong container) gọi webhook chạy trên host qua `host.docker.internal` (= `172.17.0.1` trên Linux). Webhook **chỉ lắng nghe** địa chỉ `REBUILD_HOST`:
 ```bash
 sudo cp services/ops/systemd/*.service services/ops/systemd/*.timer /etc/systemd/system/

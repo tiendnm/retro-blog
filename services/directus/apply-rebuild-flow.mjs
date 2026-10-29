@@ -2,13 +2,13 @@
 // Reproducible + idempotent (như apply-permissions). Tạo Flow:
 //   trigger event "action" (items.create/update/delete trên posts/categories/authors/site_settings)
 //   → operation Webhook POST tới REBUILD_WEBHOOK_URL kèm token bảo vệ.
-// Chạy TRÊN HOST:  node services/directus/apply-rebuild-flow.mjs
+// Chạy TRÊN HOST hoặc trong container `ops`:  node services/directus/apply-rebuild-flow.mjs
 // Env: DIRECTUS_URL (admin API, mặc định http://localhost:8055),
 //      ADMIN_EMAIL, ADMIN_PASSWORD, REBUILD_WEBHOOK_URL, REBUILD_TOKEN.
 const DIRECTUS_URL = process.env.DIRECTUS_URL || 'http://localhost:8055';
 const EMAIL = process.env.ADMIN_EMAIL;
 const PASSWORD = process.env.ADMIN_PASSWORD;
-const WEBHOOK_URL = process.env.REBUILD_WEBHOOK_URL || 'http://host.docker.internal:9000/rebuild';
+const WEBHOOK_URL = process.env.REBUILD_WEBHOOK_URL || 'http://web:9000/rebuild';
 const TOKEN = process.env.REBUILD_TOKEN;
 const FLOW_NAME = 'Rebuild on publish';
 const COLLECTIONS = ['posts', 'categories', 'authors', 'site_settings'];

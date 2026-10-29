@@ -31,7 +31,7 @@ Vận hành: đăng bài → tự rebuild; cập nhật code → `./scripts/upda
 `deploy-home.sh` tự làm: kiểm tra môi trường (Docker/Compose/RAM/đĩa/cổng-tên container trùng) → swap 2 GB nếu thiếu (hỏi, cần `sudo`) → sinh secret + ghi `.env.production` (quyền 600, mỗi biến một dòng, **không chú thích cuối dòng**) → Postgres + Directus → schema/permissions/Flow/theme (trong container `ops`, profile `setup`) → build site, Caddy, `cloudflared` → smoke test (site 200, tunnel đã đăng ký, webhook 202, API công khai không lộ bài nháp) → in tóm tắt (URL, email, mật khẩu một lần). **Idempotent**: chạy lại bỏ qua phần đã xong, không sinh lại secret.
 
 ## Phạm vi (Phases)
-- [ ] **P1 — Webhook trong `web` ([ADR-0016](../adr/0016-rebuild-receiver-in-web-container.md)):** `webhook.mjs` hỗ trợ `REBUILD_COMMAND`; `web` prod = build lần đầu rồi chạy receiver; healthcheck; Caddy `depends_on: service_healthy`; URL Flow → `http://web:9000/rebuild`; cập nhật `webhook.test.mjs`; bỏ unit systemd + `REBUILD_HOST`.
+- [x] **P1 — Webhook trong `web` ([ADR-0016](../adr/0016-rebuild-receiver-in-web-container.md)):** `webhook.mjs` hỗ trợ `REBUILD_COMMAND`; `web` prod = build lần đầu rồi chạy receiver; healthcheck; Caddy `depends_on: service_healthy`; URL Flow → `http://web:9000/rebuild`; cập nhật `webhook.test.mjs`; bỏ unit systemd + `REBUILD_HOST`.
 - [ ] **P2 — Service `ops` ([ADR-0017](../adr/0017-ops-services-in-compose.md)):** Dockerfile + `scheduler.sh` (backup 03:30, healthcheck 5 phút, chạy bù nếu bản mới nhất > 24 giờ); mount `:ro` + bind `backups/`; chạy non-root theo uid của user triển khai; `restore` qua `compose run`; profile `setup` cho tác vụ một lần; bỏ `services/ops/systemd/`.
 - [ ] **P3 — Gọn compose:** bỏ publish cổng Directus ra host; chọn file compose không cần `-f` dài (ưu tiên `COMPOSE_FILE` trong env; nếu Compose không nhận qua `--env-file` thì dùng wrapper `scripts/compose.sh` — **chốt bằng spike ở P3**); giữ DNS `1.1.1.1` cho `cloudflared`.
 - [ ] **P4 — Script:** `scripts/deploy-home.sh`, `scripts/update.sh`; kiểm tra bằng `shellcheck` trong CI (job `quality`).
@@ -65,4 +65,20 @@ Vận hành: đăng bài → tự rebuild; cập nhật code → `./scripts/upda
 - Có số liệu đo thật từ máy nhà (thời gian dựng, RAM, build, publish→hiện).
 
 ## Kết quả
-_(điền khi hoàn thành sprint)_
+### P1 — Webhook trong container `web` ✅ (dry-run cục bộ, project riêng `retro-p1`, đã dọn)
+| Hạng mục | Kiểm chứng |
+|---|---|
+| Test receiver | 10 test `node --test` (thêm: `resolveCommand`, `runShell` exit code, không spawn được → `done(-1)` đúng 1 lần, build lỗi không làm trigger kẹt); kiểm đột biến (bỏ chốt "gọi done 1 lần") → 1 test đỏ |
+| Compose | `config` hợp lệ cho prod và prod+tunnel với `.env.production.example` (đúng bước CI); `web`: không publish cổng, `restart: unless-stopped`, healthcheck mới (`current` tồn tại + receiver lắng nghe, `start_period` 15 phút) |
+| First boot | `web` healthy → Caddy mới khởi động (`depends_on: service_healthy`); site qua Caddy 200 |
+| Receiver | từ container Directus: sai token → 404, thiếu token → 404, đúng token → 202 và build chạy (`code 0`) |
+| Flow end-to-end | PATCH `site_settings` → Flow gọi `http://web:9000/rebuild` → build + swap thành công |
+| Build lỗi | dừng Directus rồi POST → build `code 1`, **`web` vẫn sống & healthy, `current` giữ nguyên, site vẫn 200**; bật lại Directus → lần sau build `code 0` |
+| Retry lần đầu | build đầu lỗi → thử lại `BUILD_RETRIES` lần rồi vẫn chạy receiver |
+| Khởi động lại | `restart web` → healthy sau ~vài giây, site 200 |
+| Fallback | `rebuild.sh` đổi thành "gọi receiver trong container" (trước đó `compose run web` sẽ chạy entrypoint mới và không thoát) → trả 202 |
+
+**Đã gỡ:** `services/ops/systemd/retro-rebuild-webhook.service`, `REBUILD_HOST` (file mẫu env), `host.docker.internal` (mặc định URL Flow).
+**Phát hiện:** `apply-permissions.sh` tự `source` file `.env` ở thư mục gốc và **ghi đè** `ADMIN_*` truyền vào (chỉ ảnh hưởng máy dev; trong container `ops` không có `.env` đó) — xử lý ở P4. Git Bash trên Windows đổi đường dẫn `/directus/...` khi `docker exec` (cần `MSYS_NO_PATHCONV=1`), không ảnh hưởng Linux.
+**Chưa kiểm chứng:** thời gian build lần đầu và RAM trên J1900 (đo ở P6).
+**Còn lại ở P5 (tài liệu vẫn nhắc cơ chế cũ):** `08a §1/§6` (ufw 9000, systemd webhook), `12-security`, `13-operations`, `08-deployment`.

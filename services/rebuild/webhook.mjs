@@ -1,18 +1,17 @@
 // ── Webhook receiver tối giản (Sprint 6 Phase 3 — ADR-0008; siết ở Sprint 8) ─
 // KHÔNG phải microservice: glue nhỏ. Nhận Directus Flow webhook, kiểm token, chạy
-// services/rebuild/rebuild.sh (build + atomic swap). Debounce: gộp các webhook tới
-// trong lúc đang build thành 1 lần chạy lại.
-// Chạy TRÊN HOST:  REBUILD_TOKEN=... node services/rebuild/webhook.mjs
-//   (chạy dài hạn bằng systemd: services/ops/systemd/retro-rebuild-webhook.service)
+// lệnh build (REBUILD_COMMAND). Debounce: gộp các webhook tới trong lúc đang build thành 1 lần chạy lại.
+// Production (ADR-0016): chạy TRONG container `web` (xem services/rebuild/web-entrypoint.sh), mặc định
+//   REBUILD_COMMAND="sh /rebuild/build-swap.sh", REBUILD_HOST=0.0.0.0 (chỉ mạng compose, KHÔNG publish cổng).
+// Dev/thủ công trên host:  REBUILD_TOKEN=... node services/rebuild/webhook.mjs  (mặc định chạy rebuild.sh)
 //
 // Bảo mật:
 //  - Token CHỈ qua header `x-rebuild-token` (không query string — URL hay lọt vào log/proxy).
 //  - So sánh hằng-thời-gian (timingSafeEqual trên SHA-256 của 2 vế).
 //  - Mọi yêu cầu sai (token/method/path) trả CÙNG 404 → không lộ endpoint tồn tại.
 //  - Giới hạn thử sai: quá MAX_FAILS lần/phút từ một IP → 429 (làm chậm dò token).
-//  - Mặc định chỉ lắng nghe 127.0.0.1 (REBUILD_HOST). Docker Desktop tới được loopback host;
-//    trên Linux container tới host qua docker0 → đặt REBUILD_HOST=<IP docker0> (vd 172.17.0.1)
-//    và CHẶN cổng này ở firewall từ ngoài.
+//  - Mặc định chỉ lắng nghe 127.0.0.1 (REBUILD_HOST). Trong container production đặt 0.0.0.0 — an toàn vì
+//    cổng KHÔNG được publish ra host và không route qua Caddy/tunnel (chỉ Directus trong mạng compose tới được).
 import { spawn } from 'node:child_process';
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -66,6 +65,31 @@ export function createHandler({
   };
 }
 
+/**
+ * Chạy lệnh shell build; luôn gọi `done` đúng MỘT lần (kể cả khi không spawn được) để trigger không kẹt "running".
+ * Build lỗi chỉ ghi log — receiver vẫn sống và giữ nguyên bản đang phục vụ (build-swap.sh thoát trước khi swap).
+ */
+export function runShell(command, done, spawnFn = spawn) {
+  let finished = false;
+  const finish = (code) => {
+    if (finished) return;
+    finished = true;
+    done(code);
+  };
+  const child = spawnFn('sh', ['-c', command], { stdio: 'inherit' });
+  child.on('error', (err) => {
+    console.error(`[webhook] không chạy được lệnh build: ${err.message}`);
+    finish(-1);
+  });
+  child.on('exit', (code) => finish(code ?? -1));
+}
+
+/** Lệnh build: REBUILD_COMMAND nếu đặt, ngược lại `sh <rebuildSh>` (hành vi cũ trên host). */
+export function resolveCommand(env, rebuildSh) {
+  const c = env.REBUILD_COMMAND?.trim();
+  return c ? c : `sh "${rebuildSh}"`;
+}
+
 /** Trigger với debounce: đang build thì gộp các sự kiện tới thành 1 lần chạy lại. */
 export function createTrigger(run) {
   let running = false;
@@ -98,9 +122,10 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     process.exit(1);
   }
   const REBUILD = join(dirname(fileURLToPath(import.meta.url)), 'rebuild.sh');
+  const COMMAND = resolveCommand(process.env, REBUILD);
   const trigger = createTrigger((done) => {
-    console.log(`[webhook] ${new Date().toISOString()} → rebuild`);
-    spawn('sh', [REBUILD], { stdio: 'inherit' }).on('exit', done);
+    console.log(`[webhook] ${new Date().toISOString()} → rebuild (${COMMAND})`);
+    runShell(COMMAND, done);
   });
   createServer(createHandler({ token: TOKEN, onTrigger: trigger })).listen(PORT, HOST, () =>
     console.log(`[webhook] receiver lắng nghe ${HOST}:${PORT} (POST /rebuild)`),

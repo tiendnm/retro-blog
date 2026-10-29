@@ -1,10 +1,13 @@
 // Test receiver webhook — chạy: node --test services/rebuild/
 import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
+import { EventEmitter } from 'node:events';
 import { createServer } from 'node:http';
 import { test } from 'node:test';
-import { createHandler, createTrigger, tokenMatches } from './webhook.mjs';
+import { createHandler, createTrigger, resolveCommand, runShell, tokenMatches } from './webhook.mjs';
 
 const TOKEN = 'a'.repeat(40);
+const spawnQuiet = (cmd, args) => spawn(cmd, args, { stdio: 'ignore' });
 
 /** Dựng server thật trên cổng ngẫu nhiên; trả hàm gọi + số lần trigger. */
 async function start(opts = {}) {
@@ -79,5 +82,40 @@ test('createTrigger: webhook tới khi đang build được gộp thành đúng 
   finishers[0](0); // build #1 xong → chạy lại đúng 1 lần
   assert.equal(finishers.length, 2);
   finishers[1](0); // build #2 xong → không còn gì
+  assert.equal(finishers.length, 2);
+});
+
+test('resolveCommand: REBUILD_COMMAND thắng; không đặt → rebuild.sh (hành vi cũ)', () => {
+  assert.equal(resolveCommand({ REBUILD_COMMAND: ' sh /rebuild/build-swap.sh ' }, '/x/rebuild.sh'), 'sh /rebuild/build-swap.sh');
+  assert.equal(resolveCommand({}, '/x/rebuild.sh'), 'sh "/x/rebuild.sh"');
+  assert.equal(resolveCommand({ REBUILD_COMMAND: '   ' }, '/x/rebuild.sh'), 'sh "/x/rebuild.sh"');
+});
+
+test('runShell: chạy lệnh thật, trả đúng exit code (0 và khác 0), mỗi lần đúng 1 callback', async () => {
+  const run = (cmd) =>
+    new Promise((resolve) => {
+      const codes = [];
+      runShell(cmd, (c) => codes.push(c), (...a) => spawnQuiet(...a));
+      setTimeout(() => resolve(codes), 500);
+    });
+  assert.deepEqual(await run('exit 0'), [0]);
+  assert.deepEqual(await run('exit 7'), [7]);
+});
+
+test('runShell: không spawn được → vẫn gọi done(-1) đúng 1 lần (trigger không kẹt)', () => {
+  const fake = new EventEmitter();
+  const codes = [];
+  runShell('x', (c) => codes.push(c), () => fake);
+  fake.emit('error', new Error('ENOENT'));
+  fake.emit('exit', null); // exit tới sau error không được gọi done lần nữa
+  assert.deepEqual(codes, [-1]);
+});
+
+test('build lỗi không làm trigger kẹt: lần webhook sau vẫn chạy', () => {
+  const finishers = [];
+  const trigger = createTrigger((done) => finishers.push(done));
+  trigger();
+  finishers[0](1); // build #1 lỗi (exit 1)
+  trigger(); // webhook kế tiếp phải chạy được
   assert.equal(finishers.length, 2);
 });

@@ -6,7 +6,8 @@
 #
 # Topology: Caddy (edge) → site tĩnh (/srv/site) + Directus (cms). Postgres chạy TRONG compose
 # (ADR-0014, thay ADR-0010 cho production) — không publish cổng, chỉ nội bộ retro-net.
-# - web = build-runner MỘT LẦN: astro build → volume site_dist (Caddy phục vụ). ADR-0008.
+# - web = build-runner + receiver webhook (ADR-0008, ADR-0016): build lần đầu → volume site_dist (Caddy phục vụ),
+#   rồi lắng nghe POST /rebuild từ Directus (chỉ trong mạng compose, KHÔNG publish cổng).
 # - directus: KHÔNG public trực tiếp (chỉ bind localhost server, debug); public qua Caddy.
 name: retro-blog
 
@@ -48,17 +49,19 @@ services:
       REFRESH_TOKEN_COOKIE_SECURE: "true"
       SESSION_COOKIE_SECURE: "true"
 
-  # Web = build-runner (ADR-0008): astro build → staging builds/<TS> → ATOMIC
-  # SWAP symlink `current` (build-swap.sh) rồi THOÁT. First-boot chạy job này;
-  # rebuild-on-publish (services/rebuild/rebuild.sh) chạy lại job này.
+  # Web = build-runner + receiver (ADR-0008/0016): web-entrypoint.sh build lần đầu (astro build →
+  # staging builds/<TS> → ATOMIC SWAP symlink `current`, build-swap.sh), rồi chạy webhook.mjs;
+  # Directus Flow POST http://web:9000/rebuild → chạy lại build-swap.sh. Không cần host/systemd.
   web:
     build:
       context: ./apps/web
       dockerfile: Dockerfile
     image: retro-web:prod
-    restart: "no"
-    command: ["sh", "/rebuild/build-swap.sh"]
+    restart: unless-stopped
+    command: ["sh", "/rebuild/web-entrypoint.sh"]
     environment:
+      REBUILD_TOKEN: ${REBUILD_TOKEN:?cần REBUILD_TOKEN (>= 32 ký tự, openssl rand -hex 32)}
+      REBUILD_PORT: ${REBUILD_PORT:-9000}
       DIRECTUS_INTERNAL_URL: ${DIRECTUS_INTERNAL_URL}
       PUBLIC_DIRECTUS_URL: ${PUBLIC_DIRECTUS_URL}
       PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}
@@ -69,9 +72,19 @@ services:
     volumes: !override
       - site_dist:/out
       - ./services/rebuild:/rebuild:ro
-    # Không publish cổng dev, không healthcheck (job chạy-1-lần).
+    # Không publish cổng nào ra host (receiver chỉ tới được trong mạng compose).
     ports: !reset []
-    healthcheck: !reset {}
+    # Healthy = đã có bản build đầu tiên (`current`) VÀ receiver đang lắng nghe. start_period dài cho máy yếu (J1900).
+    healthcheck: !override
+      test:
+        - CMD-SHELL
+        - >-
+          test -L /out/current && node -e
+          "require('net').connect(Number(process.env.REBUILD_PORT||9000),'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 900s
     depends_on:
       directus:
         condition: service_healthy
@@ -82,7 +95,7 @@ services:
     restart: unless-stopped
     depends_on:
       web:
-        condition: service_completed_successfully
+        condition: service_healthy
       directus:
         condition: service_healthy
     ports:
