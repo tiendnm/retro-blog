@@ -38,6 +38,8 @@ Tạo ADR khi quyết định: khó đảo ngược, ảnh hưởng nhiều ph�
 | [0012](./adr/0012-site-settings-singleton.md) | **Cấu hình site động** — singleton `site_settings` (không gồm URL/secret hạ tầng) | Content config (RÌA) | P4,P6 | **Accepted** |
 | [0014](./adr/0014-postgres-in-compose-for-production.md) | **Production chạy Postgres trong compose** (thay ADR-0010 cho prod) | Content Store (hạ tầng) | P4,P5,P6 | **Accepted** |
 | [0015](./adr/0015-cloudflare-tunnel-ingress.md) | **Cloudflare Tunnel** làm đường vào cho server tại nhà (bổ sung ADR-0007) | Edge / Ingress | P4,P5,P6 | **Accepted** |
+| [0016](./adr/0016-rebuild-receiver-in-web-container.md) | **Webhook rebuild trong container `web`** (thay một phần ADR-0008) | Build / Ops | P4,P5,P6 | **Proposed** |
+| [0017](./adr/0017-ops-services-in-compose.md) | **Backup + healthcheck trong compose** (service `ops`), user triển khai | Ops | P4,P5,P6 | **Proposed** |
 
 > ℹ️ ADR 0002–0005 được ratify ở Sprint 0 close-out (2026-07-21). ADR-0001 (process) vẫn Proposed — có thể ratify ở đầu Sprint 1. ADR-0006 ratify Sprint 2 Phase 0. **ADR-0007/0008 ratify Sprint 6 Phase 0 (2026-07-23, Product chốt).**
 
