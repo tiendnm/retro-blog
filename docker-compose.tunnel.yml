@@ -17,6 +17,11 @@ services:
     image: cloudflare/cloudflared:2026.10.0
     restart: unless-stopped
     command: ["tunnel", "--no-autoupdate", "run"]
+    # DNS công cộng: cloudflared tra bản ghi SRV (region1.v2.argotunnel.com); DNS nhúng của Docker
+    # chuyển tiếp lên router nhà, nhiều router không xử lý SRV → "server misbehaving", container restart mãi.
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
     environment:
       TUNNEL_TOKEN: ${TUNNEL_TOKEN:?cần TUNNEL_TOKEN (Cloudflare Zero Trust → Networks → Tunnels)}
     depends_on:

@@ -109,6 +109,8 @@ $COMPOSE up -d                               # chạy job build (astro build →
 $COMPOSE logs web | tail                      # kiểm tra: "[build-swap] current -> builds/..."
 $COMPOSE logs cloudflared | tail              # kiểm tra: "Registered tunnel connection"
 ```
+> Nếu `cloudflared` restart liên tục với lỗi `Couldn't resolve SRV record ... server misbehaving`: DNS của router nhà không xử lý SRV. `docker-compose.tunnel.yml` đã đặt `dns: 1.1.1.1, 1.0.0.1` cho `cloudflared` để tránh lỗi này; nếu vẫn lỗi, kiểm tra host có chặn DNS ra ngoài không (`resolvectl status`).
+
 **Kiểm tra từ máy khác (4G/wifi khác):** `https://retro.tiendnm.com` (site), `https://retro-cms.tiendnm.com/admin` (đăng nhập).
 Sau khi đăng nhập admin: **đổi mật khẩu và bật 2FA** (Settings → Users/Profile).
 
