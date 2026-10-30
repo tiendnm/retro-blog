@@ -9,7 +9,7 @@
 # Heartbeat: /tmp/ops-alive (epoch) — compose healthcheck đọc file này.
 set -u
 
-OPS_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+OPS_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
 BACKUP_DIR="${BACKUP_DIR:-/backups}"
 BACKUP_AT="${BACKUP_AT:-03:30}"
 RETRY="${BACKUP_RETRY_SECS:-3600}"
@@ -30,6 +30,7 @@ TARGET="${BACKUP_AT%:*}${BACKUP_AT#*:}"
 
 # Bản backup hoàn chỉnh mới nhất (tên YYYYMMDD-HHMMSS; thư mục dở dang là *.tmp nên không khớp).
 latest_day() {
+  # shellcheck disable=SC2010  # tên thư mục do backup.sh đặt
   ls -1 "$BACKUP_DIR" 2>/dev/null | grep -E '^[0-9]{8}-[0-9]{6}$' | sort | tail -1 | cut -c1-8
 }
 # Có bản nào trong 24 giờ qua không (dựa mtime của thư mục backup)

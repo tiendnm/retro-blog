@@ -17,6 +17,7 @@ DEST="$FINAL.tmp"
 rm -rf "$DEST"
 mkdir -p "$DEST"
 # Lỗi giữa chừng → xoá bản dở (scheduler/prune chỉ nhận thư mục YYYYMMDD-HHMMSS hoàn chỉnh).
+# shellcheck disable=SC2154  # rc gán bên trong chuỗi trap
 trap 'rc=$?; [ "$rc" -eq 0 ] || rm -rf "$DEST"' EXIT
 COMPOSE="docker compose ${COMPOSE_FILES:-}"
 export PGHOST="${PGHOST:-localhost}" PGPORT="${PGPORT:-5433}" PGUSER="${PGUSER:-postgres}"

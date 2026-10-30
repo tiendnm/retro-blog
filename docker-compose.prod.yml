@@ -37,6 +37,9 @@ services:
   directus:
     # Không publish cổng ra host (public đi qua Caddy; script vận hành chạy trong `ops` gọi http://directus:8055).
     ports: !reset []
+    # Lần đầu Directus chạy toàn bộ migration trên DB trống (>2 phút, lâu hơn trên máy yếu) — start_period dài để --wait không báo unhealthy sớm.
+    healthcheck:
+      start_period: 300s
     depends_on:
       postgres:
         condition: service_healthy

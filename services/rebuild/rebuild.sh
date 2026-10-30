@@ -6,7 +6,7 @@
 set -eu
 
 # Về repo root (script nằm ở services/rebuild/).
-cd "$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)"
+cd "$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd)"
 
 echo "[rebuild] $(date '+%F %T') gửi yêu cầu rebuild tới receiver trong container web"
 docker compose -f docker-compose.yml -f docker-compose.prod.yml \

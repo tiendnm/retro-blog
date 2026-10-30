@@ -18,6 +18,7 @@ esac
 # Dọn thư mục *.tmp bị bỏ dở (tiến trình bị giết giữa chừng) quá 24 giờ.
 find "$DIR" -maxdepth 1 -type d -name '*.tmp' -mmin +1440 -exec rm -rf {} + 2>/dev/null || true
 
+# shellcheck disable=SC2010  # tên thư mục do chính backup.sh đặt (YYYYMMDD-HHMMSS)
 ls -1 "$DIR" | grep -E '^[0-9]{8}-[0-9]{6}$' | sort -r | tail -n "+$((KEEP + 1))" | while read -r old; do
   echo "[prune] xoá backup cũ: $old"
   rm -rf "${DIR:?}/$old"

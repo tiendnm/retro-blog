@@ -16,6 +16,7 @@ BASE="${DIRECTUS_URL:-http://localhost:8055}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 # Biến môi trường truyền vào được ưu tiên; chỉ đọc .env (dev) khi thiếu.
 if [ -z "${ADMIN_EMAIL:-}" ] || [ -z "${ADMIN_PASSWORD:-}" ]; then
+  # shellcheck disable=SC1090
   if [ -f "$ROOT/.env" ]; then source <(grep -E '^(ADMIN_EMAIL|ADMIN_PASSWORD)=' "$ROOT/.env"); fi
 fi
 ADMIN_EMAIL="${ADMIN_EMAIL:?}"; ADMIN_PASSWORD="${ADMIN_PASSWORD:?}"

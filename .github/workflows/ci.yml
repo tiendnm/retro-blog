@@ -47,6 +47,9 @@ jobs:
       - name: Compose config hợp lệ (prod + tunnel)
         working-directory: .
         run: docker compose --env-file .env.production.example config -q
+      - name: Shellcheck (script triển khai & vận hành)
+        working-directory: .
+        run: shellcheck -S warning -x --source-path=SCRIPTDIR scripts/*.sh scripts/lib/*.sh services/ops/*.sh services/rebuild/*.sh services/directus/apply-permissions.sh
       - name: Ops tests (webhook)
         working-directory: .
         run: node --test services/rebuild/webhook.test.mjs
