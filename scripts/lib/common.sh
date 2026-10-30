@@ -68,10 +68,16 @@ smoke_tests() {
 
   # Tunnel (bỏ qua nếu không dùng tunnel hoặc SKIP_TUNNEL_CHECK=1).
   if [ "${SKIP_TUNNEL_CHECK:-0}" != "1" ] && dc config --services | grep -qx cloudflared; then
-    if dc logs --no-color cloudflared 2>&1 | grep -q "Registered tunnel connection"; then
+    # Container báo "running" trước khi tunnel đăng ký xong (vài giây) → chờ tối đa 60 giây.
+    local registered=0
+    for _ in $(seq 1 12); do
+      if dc logs --no-color cloudflared 2>&1 | grep -q "Registered tunnel connection"; then registered=1; break; fi
+      sleep 5
+    done
+    if [ "$registered" = 1 ]; then
       info "OK   cloudflared đã đăng ký tunnel"
     else
-      warn "cloudflared chưa đăng ký tunnel — xem: docker compose --env-file $ENV_FILE logs cloudflared"; fail=$((fail+1))
+      warn "cloudflared chưa đăng ký tunnel sau 60 giây — xem: docker compose --env-file $ENV_FILE logs cloudflared"; fail=$((fail+1))
     fi
   fi
   return "$fail"

@@ -79,7 +79,7 @@ docker compose --env-file .env.production logs -f ops        # backup + healthch
 | Script báo Directus `unhealthy` ở lần đầu | Lần đầu chạy migration lâu (>2 phút, lâu hơn trên máy yếu); đã đặt `start_period` 300s. Cứ chạy lại script. |
 | Bài đăng nhưng site không đổi | `logs web` xem build; Flow trong Directus (Settings → Flows) xem lỗi. Webhook trả **404** nghĩa là sai token/method/path (cố ý đồng nhất); **429** là khoá tạm do gọi sai nhiều lần. `REBUILD_TOKEN` trong `.env.production` phải ≥ 32 ký tự và **không có chú thích cuối dòng**. Đổi token xong chạy `./scripts/update.sh` để áp lại Flow. |
 | Build chết giữa chừng/hết RAM | Tạo swap (script đã hỏi); `current` luôn giữ bản cũ nên site không sập. `KEEP_BUILDS` giữ N bản để rollback. |
-| `pull access denied for retro-web` | Vô hại: ảnh `retro-web:prod` chỉ có local, Compose thử pull rồi tự build. |
+| `pull access denied for retro-web` (hoặc `retro-ops`) | Vô hại: ảnh `retro-web:prod`, `retro-ops:prod` chỉ có local, Compose thử pull rồi tự build. |
 | Ghi file backup lỗi quyền | `backups/` phải thuộc `DEPLOY_UID` (user chạy script). Đừng chạy script bằng `sudo`. |
 
 ## 6. Sau go-live
