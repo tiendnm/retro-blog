@@ -21,6 +21,24 @@ load_env() {
   # shellcheck disable=SC1090
   . "./$ENV_FILE"
   set +a
+  # Mật khẩu admin trong env file chỉ đúng tới lúc bạn đổi nó trong Directus → cho phép ghi đè trong phiên này.
+  if [ -n "${ADMIN_PASSWORD_OVERRIDE:-}" ]; then export ADMIN_PASSWORD="$ADMIN_PASSWORD_OVERRIDE"; fi
+}
+
+# Kiểm tra đăng nhập admin; nếu sai (đã đổi mật khẩu) thì hỏi mật khẩu hiện tại — không lưu ra đĩa.
+ensure_admin_login() {
+  load_env
+  local code attempt=0
+  while :; do
+    code=$(ops_run sh -c 'curl -s -o /dev/null -w "%{http_code}" -X POST "$DIRECTUS_URL/auth/login" -H "Content-Type: application/json" -d "{\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\"}"' 2>/dev/null || true)
+    [ "$code" = "200" ] && return 0
+    attempt=$((attempt+1))
+    [ "$attempt" -le 3 ] && [ -t 0 ] || die "Không đăng nhập được admin ($ADMIN_EMAIL). Đặt ADMIN_PASSWORD_OVERRIDE=<mật khẩu hiện tại> rồi chạy lại."
+    warn "Đăng nhập admin thất bại (mật khẩu trong $ENV_FILE là mật khẩu ban đầu, có thể bạn đã đổi)."
+    read -r -s -p "Mật khẩu admin hiện tại: " ADMIN_PASSWORD_OVERRIDE; echo
+    export ADMIN_PASSWORD_OVERRIDE
+    load_env
+  done
 }
 
 step_done() { [ -f "$STATE_FILE" ] && grep -qx "$1" "$STATE_FILE"; }
@@ -34,7 +52,7 @@ ops_run() {
 
 # Cấu hình CMS (idempotent): schema → permissions → Flow rebuild → theme.
 setup_cms() {
-  load_env
+  ensure_admin_login
   say "Áp schema Directus"
   dc exec -T directus npx directus schema apply --yes /directus/snapshots/schema.yaml
   say "Áp quyền (Roles/Policies/Permissions)"
