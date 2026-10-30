@@ -1,176 +1,89 @@
 # 08a — Runbook: dựng server tại nhà + Cloudflare Tunnel
 
-> 🎯 **Mục đích:** Từng bước đưa Retro Blog lên máy tại nhà (Intel J1900, 4 GB RAM, HDD) và công khai qua **Cloudflare Tunnel**, không mở cổng nào. Làm **một lần**.
-> 🔗 **Liên quan:** [08-deployment](./08-deployment.md) · [ADR-0014](./adr/0014-postgres-in-compose-for-production.md) · [ADR-0015](./adr/0015-cloudflare-tunnel-ingress.md) · [13-operations](./13-operations.md) · [systemd units](../services/ops/systemd/README.md)
+> 🎯 **Mục đích:** Đưa Retro Blog lên máy tại nhà (Intel J1900, 4 GB RAM, HDD) và công khai qua **Cloudflare Tunnel**, không mở cổng nào. Chỉ **4 việc tay**, còn lại do script.
+> 🔗 **Liên quan:** [08-deployment](./08-deployment.md) · [ADR-0014](./adr/0014-postgres-in-compose-for-production.md) · [ADR-0015](./adr/0015-cloudflare-tunnel-ingress.md) · [ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md) · [ADR-0017](./adr/0017-ops-services-in-compose.md) · [13-operations](./13-operations.md)
 
-Giả định: domain `tiendnm.com` ở Cloudflare; site `retro.tiendnm.com`, CMS `retro-cms.tiendnm.com`; máy chạy Linux (Debian/Ubuntu), repo ở `/opt/retro-blog`, user `retro`.
+Giả định: domain (vd `tiendnm.com`) ở Cloudflare; site `retro.<domain>`, CMS `retro-cms.<domain>` (**cố định**, chỉ hỏi domain gốc); máy Linux (Ubuntu/Debian) đã cài **Docker + Compose ≥ 2.24**; mọi lệnh chạy bằng **một tài khoản** thuộc nhóm `docker` (vd `tiendnm`) — không cần user riêng, không cần Node/systemd trên host.
 
-> ⚠️ **Đã kiểm chứng cục bộ (Windows + Docker):** compose prod ở chế độ tunnel (Postgres trong compose, build site, Caddy HTTP, header bảo mật, cookie `Secure`, backup + restore). **Chưa kiểm chứng trên J1900 thật** và **chưa kiểm phần kết nối tunnel tới Cloudflare** (cần tài khoản thật). Mỗi bước dưới đây có "kiểm tra" để bạn tự xác nhận.
-
-## 0. Rủi ro đã được chấp nhận (ghi lại để nhớ)
+## 0. Rủi ro đã được chấp nhận
 
 - **Không UPS:** mất điện = site tắt; HDD có thể hỏng dữ liệu nếu tắt đột ngột (Postgres chịu được crash, nhưng vẫn là rủi ro).
-- **Không bật 2FA cho admin (quyết định 2026-10-30):** `/admin` công khai qua tunnel, chỉ bảo vệ bằng mật khẩu → dùng mật khẩu dài ngẫu nhiên, và dùng tài khoản Editor cho việc viết bài hằng ngày. Bật lại khi cần (Profile → Two-Factor Authentication).
-- **Chưa backup ra ngoài máy:** một ổ HDD hỏng = mất toàn bộ nội dung. Backup cục bộ (§8) chỉ cứu lỗi phần mềm, **không** cứu hỏng ổ. Khi sẵn sàng, thêm rclone → Cloudflare R2/Backblaze B2.
+- **Không bật 2FA cho admin (2026-10-30):** `/admin` công khai qua tunnel, chỉ bảo vệ bằng mật khẩu → mật khẩu admin do script sinh ngẫu nhiên, dùng tài khoản Editor cho việc viết bài hằng ngày. Bật lại khi cần (Profile → Two-Factor Authentication).
+- **Chưa backup ra ngoài máy:** một ổ HDD hỏng = mất toàn bộ nội dung. Backup tự động (§4) chỉ cứu lỗi phần mềm. Khi sẵn sàng, thêm rclone → Cloudflare R2/Backblaze B2 (thư mục `backups/` là bind mount, dễ lấy ra).
 
-## 1. Chuẩn bị máy (một lần)
+## 1. Việc tay #1 — Tạo Tunnel (Cloudflare dashboard)
 
-```bash
-# Cập nhật + công cụ cơ bản
-sudo apt update && sudo apt -y upgrade
-sudo apt -y install ca-certificates curl git ufw
+1. **Zero Trust → Networks → Tunnels → Create a tunnel** → loại **Cloudflared**, tên `retro-blog`.
+2. Chọn **Docker**, **chỉ sao chép `TUNNEL_TOKEN`** (chuỗi dài sau `--token`). Không chạy lệnh nó đưa ra — compose chạy `cloudflared`.
+3. Tab **Public Hostname**, thêm 2 mục **cùng một service**:
 
-# Docker Engine + Compose v2: làm theo https://docs.docker.com/engine/install/ (apt repo chính thức)
-docker --version && docker compose version     # kiểm tra: Compose v2.24+ (cần cho !override/!reset)
-
-# Node 22 trên HOST (bản hệ thống, vì systemd không đọc môi trường nvm): cần cho apply-permissions.sh,
-# apply-*.mjs và webhook rebuild. Site/CMS tự chạy trong container, không cần Node ở host.
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt -y install nodejs
-node --version && which node        # v22.x, /usr/bin/node
-
-# User chạy dịch vụ
-sudo useradd -r -m -s /bin/bash -G docker retro
-sudo install -d -o retro -g retro /opt/retro-blog /var/backups/retro-blog
-```
-
-**Swap (khuyến nghị với 4 GB RAM)** — đệm khi `astro build`:
-```bash
-sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile
-echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-free -h        # kiểm tra: Swap 2.0Gi
-```
-
-**Firewall:** không cần mở cổng vào nào (tunnel chỉ kết nối ra ngoài).
-```bash
-sudo ufw default deny incoming && sudo ufw default allow outgoing
-sudo ufw allow from 192.168.0.0/16 to any port 22 proto tcp   # SSH chỉ từ LAN; chỉnh dải mạng nhà bạn
-# Cho container Directus gọi webhook rebuild trên host (xem §6):
-sudo ufw allow from 172.16.0.0/12 to any port 9000 proto tcp
-sudo ufw enable && sudo ufw status
-```
-
-## 2. Lấy mã nguồn
-
-```bash
-sudo -iu retro
-cd /opt/retro-blog && git clone https://github.com/tiendnm/retro-blog.git .     # repo public: không cần token/deploy key
-```
-
-## 3. Tạo Cloudflare Tunnel (trên dashboard)
-
-1. Cloudflare → **Zero Trust** → **Networks** → **Tunnels** → **Create a tunnel** → loại **Cloudflared**, đặt tên `retro-blog`.
-2. Ở bước cài đặt, chọn **Docker** và **chỉ sao chép giá trị `TUNNEL_TOKEN`** (chuỗi dài sau `--token`/`TUNNEL_TOKEN=`). Không chạy lệnh nó đưa ra — compose sẽ chạy `cloudflared`.
-3. Thẻ **Public Hostname** — thêm 2 mục, **cùng một service**:
    | Hostname | Service |
    |---|---|
-   | `retro.tiendnm.com` | `HTTP` → `caddy:80` |
-   | `retro-cms.tiendnm.com` | `HTTP` → `caddy:80` |
-   Cloudflare tự tạo bản ghi DNS (CNAME, đã proxy). Không cần tạo tay.
-4. (Khuyến nghị) **SSL/TLS** của domain: chế độ **Full** hoặc để mặc định — vì tunnel đã mã hoá, không cần chứng chỉ origin.
+   | `retro.<domain>` | `HTTP` → `caddy:80` |
+   | `retro-cms.<domain>` | `HTTP` → `caddy:80` |
 
-> Zero Trust có thể yêu cầu xác nhận gói miễn phí/phương thức thanh toán lúc đăng ký lần đầu — hãy chọn gói **Free** và kiểm tra các điều khoản hiện hành.
+   Cloudflare tự tạo DNS (CNAME). SSL/TLS để mặc định hoặc **Full** (tunnel đã mã hoá).
 
-## 4. Cấu hình `.env.production`
+> Zero Trust có thể yêu cầu xác nhận gói/phương thức thanh toán lúc đăng ký lần đầu — chọn gói **Free**.
+
+## 2. Việc tay #2–#3 — Clone và chạy script (trên server, bằng `tiendnm`)
 
 ```bash
+sudo install -d -o "$USER" -g "$USER" /opt/retro-blog     # một lần, nếu /opt/retro-blog chưa có
+git clone https://github.com/tiendnm/retro-blog.git /opt/retro-blog
 cd /opt/retro-blog
-cp .env.production.example .env.production && chmod 600 .env.production
-# Sinh secret:  openssl rand -hex 32   (cho KEY, SECRET, REBUILD_TOKEN) ; mật khẩu mạnh cho DB_PASSWORD, ADMIN_PASSWORD
-nano .env.production
+./scripts/deploy-home.sh
 ```
-Điền (xem file mẫu):
-```
-SITE_DOMAIN=retro.tiendnm.com
-CMS_DOMAIN=retro-cms.tiendnm.com
-PUBLIC_URL=https://retro-cms.tiendnm.com
-PUBLIC_DIRECTUS_URL=https://retro-cms.tiendnm.com
-PUBLIC_SITE_URL=https://retro.tiendnm.com
-SITE_ADDRESS=http://retro.tiendnm.com
-CMS_ADDRESS=http://retro-cms.tiendnm.com
-DB_HOST=postgres   DB_PORT=5432
-TUNNEL_TOKEN=<giá trị ở bước 3>
-REBUILD_TOKEN=<>= 32 ký tự>   REBUILD_HOST=172.17.0.1
-ADMIN_EMAIL=<email thật>      ADMIN_PASSWORD=<mật khẩu mạnh>
-```
-Thay mọi giá trị `__CHANGE_ME_*__`. **Kiểm tra:** `grep -c CHANGE_ME .env.production` phải bằng `0`.
 
-> ⚠️ **Quy tắc cho `.env.production`** (webhook đọc file này qua systemd `EnvironmentFile`, khác cách `bash source` và Docker Compose đọc):
-> - **Mỗi biến một dòng, không chú thích cuối dòng.** systemd giữ nguyên `# ...` làm một phần giá trị → `REBUILD_TOKEN` dài hơn thực tế → webhook trả **404**. Chú thích phải nằm trên dòng riêng.
-> - **`REBUILD_HOST=172.17.0.1`** (IP `docker0`) — file mẫu mặc định `127.0.0.1` chỉ dành cho Docker Desktop; để nguyên thì Directus gọi webhook bị `ECONNREFUSED`.
-> - File thuộc user `retro`, quyền 600 → user khác phải dùng `sudo` để xem/sửa.
+Script hỏi **3 thứ**: domain gốc, `TUNNEL_TOKEN`, email admin. Rồi tự làm:
 
-## 5. Khởi động stack
+1. Kiểm tra môi trường (Docker/Compose, RAM, đĩa; **hỏi** tạo swap 2 GB nếu RAM thấp — bước duy nhất cần `sudo`).
+2. Sinh secret, ghi `.env.production` (quyền 600, mỗi biến một dòng, không chú thích cuối dòng), điền `DEPLOY_UID/GID` từ `id`.
+3. Dựng Postgres + Directus → áp schema, quyền, Flow rebuild-on-publish, theme (trong container `ops`).
+4. Dựng toàn stack: `web` (build site lần đầu **5–15 phút** trên J1900), Caddy, `cloudflared`, `ops`.
+5. Smoke test (site/CMS qua Caddy, webhook từ chối token sai, API công khai, `/users` bị chặn, tunnel đã đăng ký) và in tóm tắt — kèm **mật khẩu admin, chỉ hiện một lần**.
+
+Chạy lại script an toàn (idempotent): bỏ qua phần đã xong, **không sinh lại secret**. Làm lại từ đầu: xoá `.deploy-state` (và `.env.production` nếu muốn secret mới — Directus đã tạo admin bằng mật khẩu cũ, nên cần xoá luôn volume).
+
+Tuỳ chọn: `DEPLOY_COMPOSE_FILE=docker-compose.yml,docker-compose.prod.yml` (VPS không dùng tunnel; Caddy tự lấy TLS và cần mở 80/443), `ASSUME_YES=1` (tự đồng ý tạo swap).
+
+## 3. Việc tay #4 — Đăng nhập
+
+Mở `https://retro-cms.<domain>/admin` bằng email + mật khẩu in ra → **đổi mật khẩu ngay**. Kiểm tra từ mạng khác (4G): `https://retro.<domain>`.
+
+## 4. Vận hành hằng ngày
+
+Mọi lệnh compose chạy ở `/opt/retro-blog` và **không cần `-f`** (danh sách file nằm trong `COMPOSE_FILE` của `.env.production`):
 
 ```bash
-cd /opt/retro-blog
-export COMPOSE="docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.tunnel.yml --env-file .env.production"
-$COMPOSE up -d postgres directus            # lần đầu: kéo image (HDD chậm, chờ vài phút)
-$COMPOSE ps                                  # kiểm tra: postgres + directus healthy
+docker compose --env-file .env.production ps
+docker compose --env-file .env.production logs -f web        # rebuild-on-publish
+docker compose --env-file .env.production logs -f ops        # backup + healthcheck
 ```
-Nạp schema + quyền (một lần, cần Node 22 trên host cho seed/script `.mjs`; hoặc chạy các lệnh trong container Node):
-```bash
-$COMPOSE exec -T directus npx directus schema apply --yes /directus/snapshots/schema.yaml
-DIRECTUS_URL=http://127.0.0.1:8055 ADMIN_EMAIL=... ADMIN_PASSWORD=... bash services/directus/apply-permissions.sh
-```
-(`DIRECTUS_PORT` trong `.env.production` là cổng bind `127.0.0.1` trên host.) Dữ liệu mẫu **không** nạp trên production; tạo nội dung thật qua admin.
 
-Dựng site + bật Caddy + tunnel:
-```bash
-$COMPOSE up -d                               # chạy job build (astro build → atomic swap) rồi caddy + cloudflared
-$COMPOSE logs web | tail                      # kiểm tra: "[build-swap] current -> builds/..."
-$COMPOSE logs cloudflared | tail              # kiểm tra: "Registered tunnel connection"
-```
-> Nếu `cloudflared` restart liên tục với lỗi `Couldn't resolve SRV record ... server misbehaving`: DNS của router nhà không xử lý SRV. `docker-compose.tunnel.yml` đã đặt `dns: 1.1.1.1, 1.0.0.1` cho `cloudflared` để tránh lỗi này; nếu vẫn lỗi, kiểm tra host có chặn DNS ra ngoài không (`resolvectl status`).
+| Việc | Cách |
+|---|---|
+| Đăng bài | Admin → publish → Flow gọi `http://web:9000/rebuild` → site tự cập nhật (~1–3 phút trên J1900) |
+| Cập nhật code | `./scripts/update.sh` (git pull → build lại image → `up -d` → áp lại schema/quyền/Flow → smoke test) |
+| Backup | Tự động ~03:30 hằng ngày vào `backups/` (chạy bù khi bật lại máy sau khi tắt); xem [13 §4](./13-operations.md) |
+| Healthcheck | Tự động mỗi 5 phút trong `ops`; thêm `HEALTHCHECK_PING_URL` (healthchecks.io) để biết khi cả máy/mạng sập |
+| Rebuild tay | `sh services/rebuild/rebuild.sh` (POST vào receiver trong `web`) |
+| Khôi phục | [13 §4](./13-operations.md) (`restore.sh`, chạy trên host) |
 
-**Kiểm tra từ máy khác (4G/wifi khác):** `https://retro.tiendnm.com` (site), `https://retro-cms.tiendnm.com/admin` (đăng nhập).
-Sau khi đăng nhập admin: **đổi mật khẩu** (Settings → Users/Profile); 2FA tuỳ chọn (xem §0).
+## 5. Xử lý sự cố
 
-> `up -d` có thể in `pull access denied for retro-web` — vô hại: `retro-web:prod` chỉ có local, Compose thử pull rồi tự chuyển sang build.
+| Triệu chứng | Nguyên nhân thường gặp → cách xử lý |
+|---|---|
+| `cloudflared` restart, lỗi `Couldn't resolve SRV record … server misbehaving` | Router nhà không xử lý SRV. `docker-compose.tunnel.yml` đã đặt DNS `1.1.1.1`; nếu vẫn lỗi, host đang chặn DNS ra ngoài (`resolvectl status`). |
+| Site/CMS 502 hoặc Cloudflare error 1033 | Tunnel chưa kết nối: `logs cloudflared` phải có `Registered tunnel connection`; kiểm tra 2 public hostname trỏ `HTTP caddy:80`. |
+| Script báo Directus `unhealthy` ở lần đầu | Lần đầu chạy migration lâu (>2 phút, lâu hơn trên máy yếu); đã đặt `start_period` 300s. Cứ chạy lại script. |
+| Bài đăng nhưng site không đổi | `logs web` xem build; Flow trong Directus (Settings → Flows) xem lỗi. Webhook trả **404** nghĩa là sai token/method/path (cố ý đồng nhất); **429** là khoá tạm do gọi sai nhiều lần. `REBUILD_TOKEN` trong `.env.production` phải ≥ 32 ký tự và **không có chú thích cuối dòng**. Đổi token xong chạy `./scripts/update.sh` để áp lại Flow. |
+| Build chết giữa chừng/hết RAM | Tạo swap (script đã hỏi); `current` luôn giữ bản cũ nên site không sập. `KEEP_BUILDS` giữ N bản để rollback. |
+| `pull access denied for retro-web` | Vô hại: ảnh `retro-web:prod` chỉ có local, Compose thử pull rồi tự build. |
+| Ghi file backup lỗi quyền | `backups/` phải thuộc `DEPLOY_UID` (user chạy script). Đừng chạy script bằng `sudo`. |
 
-## 6. Rebuild-on-publish (webhook)
-
-> ⚠️ **Đang được thay thế (Sprint 10 P1, [ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md)):** receiver giờ chạy **trong container `web`** (không systemd, không Node trên host, không `REBUILD_HOST`/rule ufw 9000); Flow gọi `http://web:9000/rebuild`. Phần dưới mô tả cơ chế cũ và sẽ được viết lại ở P5 cùng script `deploy-home.sh`. Server hiện tại (dựng ở Sprint 9) vẫn chạy cơ chế cũ cho tới khi dựng lại theo Sprint 10.
-
-Directus (trong container) gọi webhook chạy trên host qua `host.docker.internal` (= `172.17.0.1` trên Linux). Webhook **chỉ lắng nghe** địa chỉ `REBUILD_HOST`:
-```bash
-sudo cp services/ops/systemd/*.service services/ops/systemd/*.timer /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now retro-rebuild-webhook.service
-journalctl -u retro-rebuild-webhook -n 20      # kiểm tra: "receiver lắng nghe 172.17.0.1:9000"
-```
-Tạo Flow rebuild-on-publish:
-```bash
-REBUILD_WEBHOOK_URL=http://host.docker.internal:9000/rebuild REBUILD_TOKEN=... \
-ADMIN_EMAIL=... ADMIN_PASSWORD=... DIRECTUS_URL=http://127.0.0.1:8055 node services/directus/apply-rebuild-flow.mjs
-DIRECTUS_URL=http://127.0.0.1:8055 ADMIN_EMAIL=... ADMIN_PASSWORD=... node services/directus/apply-theme.mjs
-```
-**Kiểm tra:** tạo một bài `published` trong admin → ~1–2 phút sau xuất hiện trên site (HDD + J1900 build chậm hơn máy dev). Draft không được lộ.
-
-> **Chẩn đoán webhook** (Flow trong Directus hiện lỗi):
-> - `ECONNREFUSED 172.17.0.1:9000` → webhook không nghe ở địa chỉ đó: `ss -ltnp | grep 9000` phải ra `172.17.0.1:9000`; nếu ra `127.0.0.1` thì sửa `REBUILD_HOST` rồi `sudo systemctl restart retro-rebuild-webhook`.
-> - `404` → receiver cố ý trả 404 cho sai method/path/**token**. So token mà bash đọc với token tiến trình thật sự nhận: độ dài/hash của `REBUILD_TOKEN` từ `sudo bash -c 'source .env.production; …'` và từ `/proc/$(systemctl show -p MainPID --value retro-rebuild-webhook)/environ`. Khác nhau (thường vì chú thích cuối dòng) → sửa dòng token rồi restart webhook. Gọi sai nhiều lần từ một IP sẽ bị `429` tạm thời.
-> - Gọi ngay sau `restart` có thể ra `000` (chưa mở cổng) — thử lại sau vài giây.
-
-> Nếu webhook không tới được từ container: `docker0` có thể không phải `172.17.0.1` — kiểm `ip -4 addr show docker0` và đặt `REBUILD_HOST` cho khớp; rule `ufw` ở §1 cần bao dải này.
-
-## 7. Giám sát
-
-```bash
-sudo systemctl enable --now retro-healthcheck.timer
-journalctl -u retro-healthcheck -n 20           # kiểm tra: toàn "OK"
-```
-Khuyến nghị thêm **ping ngoài máy** (HEALTHCHECK_PING_URL, kiểu healthchecks.io) để biết khi **cả máy/mạng nhà sập** (health check chạy trên chính máy đó nên không tự báo được).
-
-## 8. Backup cục bộ (chưa ra ngoài máy)
-
-```bash
-sudo systemctl enable --now retro-backup.timer
-sudo systemctl start retro-backup.service && ls -la /var/backups/retro-blog     # kiểm tra: có thư mục YYYYMMDD-HHMMSS
-```
-Khôi phục: [13-operations §4](./13-operations.md) (`PG_VIA_COMPOSE=1 sh services/ops/restore.sh <thư-mục>`).
-
-## 9. Việc sau go-live
+## 6. Sau go-live
 
 - Sau vài tuần ổn định: nâng HSTS lên 1 năm (`Caddyfile`).
-- Đặt `services/ops` timers chạy tự khởi động sau mất điện (`enable` đã lo); kiểm bằng cách reboot thử một lần.
-- Cân nhắc: UPS nhỏ; backup ra ngoài máy; thay HDD bằng SSD (giảm nguy cơ hỏng + build nhanh hơn).
+- Reboot thử một lần: mọi service `restart: unless-stopped` phải tự lên; `ops` chạy bù backup nếu lỡ giờ.
+- Cân nhắc: UPS nhỏ; backup ra ngoài máy; thay HDD bằng SSD.

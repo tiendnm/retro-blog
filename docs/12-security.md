@@ -46,10 +46,12 @@
 
 **Sprint 8 (Hardening hạ tầng):**
 - **Security headers ở Caddy** (`Caddyfile`): HSTS (khởi đầu 30 ngày, tăng sau khi TLS ổn định), `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-Frame-Options`, ẩn `Server`; **CSP chặt cho site tĩnh** (không script/style inline; ảnh chỉ từ domain CMS). Admin Directus **không** bị đè CSP (Directus tự phát). Header cũng có trên trang lỗi (404/502) nhờ `handle_errors`.
-- **Webhook rebuild siết** (`services/rebuild/webhook.mjs`): token chỉ qua header, so sánh hằng-thời-gian, mọi yêu cầu sai trả cùng 404, khoá tạm theo IP sau nhiều lần sai (429), mặc định bind `127.0.0.1` (`REBUILD_HOST`), token ≥ 32 ký tự. Có test (`node --test services/rebuild/webhook.test.mjs`, chạy trong CI).
-- **Backup:** `umask 077`, tự dọn bản cũ (`BACKUP_KEEP`), chạy hằng ngày bằng systemd timer.
+- **Webhook rebuild siết** (`services/rebuild/webhook.mjs`): token chỉ qua header, so sánh hằng-thời-gian, mọi yêu cầu sai trả cùng 404, khoá tạm theo IP sau nhiều lần sai (429), receiver chạy trong container `web`, chỉ tới được trong mạng compose (không publish cổng), token ≥ 32 ký tự. Có test (`node --test services/rebuild/webhook.test.mjs`, chạy trong CI).
+- **Backup:** `umask 077`, tự dọn bản cũ (`BACKUP_KEEP`), chạy hằng ngày trong service `ops`.
 
 **Sprint 9 (server tại nhà):** không mở/forward cổng nào — truy cập duy nhất qua Cloudflare Tunnel ([ADR-0015](./adr/0015-cloudflare-tunnel-ingress.md)); Postgres không publish cổng (chỉ `retro-net`); cookie Directus `Secure`; `ufw deny incoming` (SSH chỉ từ LAN). Đoạn tunnel→Caddy là HTTP trong mạng Docker nội bộ.
+
+**Sprint 10 (đóng gói deploy):** **không `docker.sock`** ở bất kỳ container nào ([ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md): webhook ngay trong `web`; [ADR-0017](./adr/0017-ops-services-in-compose.md): `ops` mount repo/uploads `:ro`, chạy non-root theo uid của user triển khai); Directus không publish cổng ra host (chỉ Caddy/`ops` tới được qua `retro-net`); không user hệ thống riêng, không unit systemd, không rule `ufw` cho cổng 9000; `.env.production` quyền 600 do script sinh, cấm chú thích cuối dòng.
 
 **Còn lại (Backlog):** container không chạy root · quét lỗ hổng dependency định kỳ · rate limiting cho Directus (`RATE_LIMITER_*`; cần xác nhận IP client thật sau Caddy trước khi bật) · cập nhật vá lỗi.
 

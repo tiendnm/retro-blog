@@ -44,11 +44,11 @@ pnpm fixtures:reset -- --set edge       # remove only fixture slugs (safe for ot
 ### Production deploy
 
 ```bash
-cp .env.production.example .env.production
-docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production up -d
-pnpm rebuild:flow           # create Directus Flow for rebuild-on-publish
-pnpm backup                 # backup db + uploads + config
-pnpm restore <dir>          # restore from a backup
+./scripts/deploy-home.sh      # first setup on the home server (generates .env.production, brings up the stack)
+./scripts/update.sh           # update later
+docker compose --env-file .env.production ps   # no -f needed: COMPOSE_FILE lives in .env.production
+# backup + healthcheck run automatically in the `ops` service
+# restore: ENV_FILE=.env.production PG_VIA_COMPOSE=1 sh services/ops/restore.sh <dir>
 ```
 
 ---

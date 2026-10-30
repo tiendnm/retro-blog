@@ -3,11 +3,11 @@
 # Khôi phục database + uploads từ 1 thư mục backup vào stack ĐANG CHẠY.
 # ⚠ GHI ĐÈ dữ liệu hiện tại — chỉ dùng khi khôi phục sự cố. Chạy TRÊN HOST.
 #   Cách dùng: sh services/ops/restore.sh <thư-mục-backup>
-#   Env: COMPOSE_FILES, PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDB; PG_VIA_COMPOSE=1 khi Postgres trong compose (production, ADR-0014) — mặc định dùng pg_restore của HOST (ADR-0010).
+#   Env: ENV_FILE (vd .env.production — lấy danh sách file compose từ COMPOSE_FILE trong đó), COMPOSE_FILES, PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDB; PG_VIA_COMPOSE=1 khi Postgres trong compose (production, ADR-0014) — mặc định dùng pg_restore của HOST (ADR-0010).
 set -eu
 
 SRC="${1:?cần đường dẫn thư mục backup, vd: ./backups/20260723-...}"
-COMPOSE="docker compose ${COMPOSE_FILES:-}"
+COMPOSE="docker compose ${ENV_FILE:+--env-file $ENV_FILE} ${COMPOSE_FILES:-}"
 export PGHOST="${PGHOST:-localhost}" PGPORT="${PGPORT:-5433}" PGUSER="${PGUSER:-postgres}"
 PGDB="${PGDB:-retro-blog}"
 

@@ -59,12 +59,12 @@ Giải "SSG stale" ([ADR-0006](./adr/0006-render-strategy.md)): Editor publish t
 | Thành phần | File | Vai trò |
 |---|---|---|
 | Flow (reproducible) | [`services/directus/apply-rebuild-flow.mjs`](../services/directus/apply-rebuild-flow.mjs) | Tạo Flow + operation Webhook (idempotent, như apply-permissions) |
-| Receiver tối giản | [`services/rebuild/webhook.mjs`](../services/rebuild/webhook.mjs) | Kiểm token (header, hằng-thời-gian, khoá thử sai, bind `REBUILD_HOST`) → gọi `rebuild.sh`; debounce (gộp khi đang build). Chạy dài hạn bằng systemd ([`services/ops/systemd/`](../services/ops/systemd/README.md)). **KHÔNG microservice** — glue nhỏ, có test |
-| Orchestrator (host) | [`services/rebuild/rebuild.sh`](../services/rebuild/rebuild.sh) | `docker compose run web` (build-runner); serialize bằng `flock` |
+| Receiver tối giản | [`services/rebuild/webhook.mjs`](../services/rebuild/webhook.mjs) | Kiểm token (header, hằng-thời-gian, khoá thử sai) → chạy `build-swap.sh` ngay trong container `web` ([ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md)); debounce (gộp khi đang build). Chỉ tới được trong mạng compose (`http://web:9000/rebuild`), không publish cổng. **KHÔNG microservice** — glue nhỏ, có test |
+| Khởi động web | [`services/rebuild/web-entrypoint.sh`](../services/rebuild/web-entrypoint.sh) | Build lần đầu (có retry) rồi `exec` receiver; healthcheck = có `current` + receiver đang lắng nghe |
 | Build + swap (in-container) | [`services/rebuild/build-swap.sh`](../services/rebuild/build-swap.sh) | `astro build` → staging `builds/<TS>` → **atomic** `ln -sfn current` → prune giữ `KEEP_BUILDS` |
 
 - **Layout phục vụ:** volume `site_dist` chứa `builds/<TS>/` + symlink `current`; **Caddy root = `/srv/site/current`**. Swap = đổi symlink (1 thao tác) → không phục vụ bản dở; build **fail → `current` giữ bản cũ** (an toàn).
-- **KHÔNG microservice riêng** trừ khi có lý do rõ ràng (queue phức tạp). **Fallback:** chạy tay `services/rebuild/rebuild.sh` (runbook [13](./13-operations.md)).
+- **KHÔNG microservice riêng** trừ khi có lý do rõ ràng (queue phức tạp). **Fallback:** chạy tay `services/rebuild/rebuild.sh` (POST vào receiver) (runbook [13](./13-operations.md)).
 - **Verify (Phase 3):** publish 1 bài → sau rebuild **xuất hiện** (trước rebuild vẫn stale); unpublish → **biến mất**; `builds/` giữ N (rollback); Directus Flow **fire webhook** kèm token (đã kiểm).
 
 ## 5. Secrets & cấu hình
@@ -106,5 +106,5 @@ Trạng thái Sprint 6: **✅ = cơ chế đã kiểm chứng** · **@deploy = x
 - [x] **Rollback = atomic swap** về static build trước — ✅ `builds/` giữ N, swap symlink (S6-P3)
 - [x] Không secret trong repo/log — ✅ `.env*` gitignored; **@deploy**: secrets prod mạnh + **2FA admin**
 - [x] SEO đúng ở prod (canonical/OG/sitemap domain thật) — ✅ build `PUBLIC_SITE_URL` (S6-P2); a11y giữ (S3–S5)
-- [ ] **@deploy** (✅ 2026-10-30: tunnel + DNS, `.env.production`, `up -d`, rebuild flow + webhook, site/CMS lên domain thật; 2FA admin **bỏ qua có chủ đích** — [08a §0](./08a-deploy-home-tunnel.md); **còn lại**: backup/healthcheck timers, restore drill, backup ra ngoài host, HSTS 1 năm). Danh mục gốc: DNS `retro.`/`cms.` trỏ host; mở 80/443; `.env.production` (domain+secrets); `docker compose -f … -f docker-compose.prod.yml up -d`; `pnpm rebuild:flow`; `pnpm theme:apply` (theme/branding Directus admin); cài systemd units `services/ops/systemd/` (webhook, backup timer, healthcheck timer) + đặt `REBUILD_HOST`/`HEALTHCHECK_PING_URL`; **copy backup ra ngoài host**; kiểm CSP bằng trình duyệt rồi nâng HSTS 1 năm
+- [ ] **@deploy** (✅ 2026-10-30: tunnel + DNS, `.env.production`, `up -d`, rebuild flow + webhook, site/CMS lên domain thật; 2FA admin **bỏ qua có chủ đích** — [08a §0](./08a-deploy-home-tunnel.md); **còn lại**: dựng lại bằng script Sprint 10 (nghiệm thu P6), restore drill, backup ra ngoài host, HSTS 1 năm). Danh mục gốc: DNS `retro.`/`cms.` trỏ host; mở 80/443; `.env.production` (domain+secrets); `docker compose -f … -f docker-compose.prod.yml up -d`; `pnpm rebuild:flow`; `pnpm theme:apply` (theme/branding Directus admin); chạy `./scripts/deploy-home.sh` (sinh `.env.production`, dựng stack gồm `ops` backup/healthcheck — không còn systemd, [ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md)/[0017](./adr/0017-ops-services-in-compose.md)); **copy backup ra ngoài host**; kiểm CSP bằng trình duyệt rồi nâng HSTS 1 năm
 - [x] DoD release ([14 §2.2](./14-quality-gates.md)) — cơ chế đạt; chốt cuối khi deploy

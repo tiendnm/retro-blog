@@ -30,7 +30,7 @@ Tạo ADR khi quyết định: khó đảo ngược, ảnh hưởng nhiều ph�
 | [0005](./adr/0005-use-docker-packaging.md) | Dùng Docker | Đóng gói/Runtime | P4,P5 | **Accepted** |
 | [0006](./adr/0006-render-strategy.md) | **SSG static-first** | Render strategy | P3,P4,P5 | **Accepted** |
 | [0007](./adr/0007-reverse-proxy-and-tls.md) | **Caddy** (reverse proxy + auto-TLS) | Edge / Ingress / TLS | P4,P5 | **Accepted** |
-| [0008](./adr/0008-rebuild-on-publish.md) | **Rebuild-on-publish** (Flow→webhook→script→atomic swap) | Content release pipeline | P3,P4,P5 | **Accepted** |
+| [0008](./adr/0008-rebuild-on-publish.md) | **Rebuild-on-publish** (Flow→webhook→script→atomic swap) | Content release pipeline | P3,P4,P5 | **Accepted** (nơi chạy receiver: thay bởi 0016) |
 | [0009](./adr/0009-quality-tooling-biome-vitest.md) | **Biome + Vitest + astro check** (cổng chất lượng) | Tooling (RÌA) | P6 | **Accepted** |
 | [0010](./adr/0010-external-postgres-instance.md) | **PostgreSQL instance có sẵn trên host** (ngoài compose) | Content Store (hạ tầng) | P6 | **Accepted** (dev; prod → ADR-0014) |
 | [0011](./adr/0011-body-stored-as-html-wysiwyg.md) | **`posts.body` lưu HTML (WYSIWYG)** — thay `[S2-P3]` | Content format (RÌA) | P6 | **Accepted** |

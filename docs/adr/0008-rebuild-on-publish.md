@@ -1,6 +1,6 @@
 # ADR-0008 — Rebuild-on-publish: Directus Flow → Webhook → Shell script → Atomic swap
 
-> **Status:** Accepted <!-- ratified 2026-07-23 (Sprint 6 Phase 0, Product chốt) -->
+> **Status:** Accepted <!-- ratified 2026-07-23 (Sprint 6 Phase 0, Product chốt) --> — **một phần được thay bởi [ADR-0016](./0016-rebuild-receiver-in-web-container.md)** (nơi chạy receiver: nay trong container `web`, không còn systemd/host; luồng Flow → webhook → build → atomic swap giữ nguyên)
 > **Ngày đề xuất:** 2026-07-23 · **Ngày Accepted:** 2026-07-23
 > **Người quyết định:** Product
 > **Người liên quan / tham vấn:** Team dự án

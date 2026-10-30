@@ -10,7 +10,7 @@
 **Production (self-host, Sprint 6 — [08-deployment §2](./08-deployment.md), [ADR-0005](./adr/0005-use-docker-packaging.md)/[0007](./adr/0007-reverse-proxy-and-tls.md)/[0008](./adr/0008-rebuild-on-publish.md)):** 1 Docker host, `docker-compose.prod.yml`.
 
 ```
-                       Internet (80/443)
+                       Internet (qua Cloudflare Tunnel hoặc 80/443)
                               │
                      ┌────────▼─────────┐  Caddy (edge) — auto-TLS ACME
                      │  caddy:2.8       │  (ADR-0007)
@@ -18,23 +18,24 @@
         retro.<domain>   │          │   cms.<domain>
         (site tĩnh)      │          │   (Directus admin+API+/assets)
               ┌──────────▼───┐   ┌──▼──────────┐
-              │ site_dist    │   │ directus     │ :8055 (bind 127.0.0.1, không public)
+              │ site_dist    │   │ directus     │ :8055 (không publish)
               │  builds/<TS> │   │ 11.3.5       │
               │  current ───►│   └──┬───────────┘
               └──────▲───────┘      │ retro-net (nội bộ)
      web build-runner│         ┌────▼─────┐
-     (astro build →  │         │ postgres │ 16 (ngoài compose)
+     (astro build →  │         │ postgres │ 16 (trong compose)
       atomic swap)   │         └──────────┘
                      │ rebuild-on-publish (ADR-0008):
-              Directus Flow → webhook (token) → rebuild.sh → build-swap.sh
+              Directus Flow → webhook (token) → web:9000 → build-swap.sh (trong web)
 ```
 
 | Service | Ảnh | Cổng | Ghi chú |
 |---|---|---|---|
 | caddy | `caddy:2.8-alpine` | 80/443 (public) | Edge: TLS + serve static `current` + proxy Directus |
-| web (build-runner) | build từ `apps/web/Dockerfile` | — | Chạy-1-lần: `astro build` → `site_dist/builds/<TS>` → swap `current` |
+| web (build-runner + receiver) | build từ `apps/web/Dockerfile` | — (nội bộ :9000) | Build lần đầu → `site_dist/builds/<TS>` → swap `current`; rồi nghe `POST /rebuild` ([ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md)) |
 | directus | `directus/directus:11.3.5` | (không publish) | Chỉ trong mạng compose; public qua Caddy `cms.` |
-| postgres | instance host (PG 16, :5433) | — | Ngoài compose, DB `retro-blog` ([ADR-0010](./adr/0010-external-postgres-instance.md)); không còn volume `pgdata` |
+| postgres | `postgres:16` | — | Trong compose, volume `pgdata` ([ADR-0014](./adr/0014-postgres-in-compose-for-production.md)) |
+| ops | build từ `services/ops/Dockerfile` | — | Backup hằng ngày + healthcheck 5 phút; mount `:ro`, không `docker.sock` ([ADR-0017](./adr/0017-ops-services-in-compose.md)) |
 
 > **Volumes:** `directus_uploads`, `site_dist` (builds + `current`), `caddy_data`/`caddy_config`.
 > **Dev** ([docker-compose.yml](../docker-compose.yml)): `astro dev` on-demand (:4321), Directus :8055 — không có Caddy/build-runner.
@@ -57,19 +58,19 @@
 |---|---|---|
 | Logging | TBD | — |
 | Metrics (CPU/mem/latency) | TBD | TODO |
-| Uptime / Health check | [`services/ops/healthcheck.sh`](../services/ops/healthcheck.sh) chạy mỗi 5 phút bằng systemd timer ([`services/ops/systemd/`](../services/ops/systemd/README.md)); kiểm site/robots/sitemap, Directus `/server/health`, hạn chứng chỉ TLS. Báo động ngoài host: đặt `HEALTHCHECK_PING_URL` (kiểu healthchecks.io — cảnh báo khi **mất ping**, bắt được cả trường hợp host chết) | Hỏng ≥ 1 lần chạy → `FAIL` trong journal + ping `/fail`; chứng chỉ < 14 ngày |
+| Uptime / Health check | [`services/ops/healthcheck.sh`](../services/ops/healthcheck.sh) chạy mỗi 5 phút trong service `ops` (xem `docker compose --env-file .env.production logs ops`); kiểm site/robots/sitemap, Directus `/server/health`, hạn chứng chỉ TLS. Báo động ngoài host: đặt `HEALTHCHECK_PING_URL` (kiểu healthchecks.io — cảnh báo khi **mất ping**, bắt được cả trường hợp host chết) | Hỏng ≥ 1 lần chạy → `FAIL` trong log `ops` + ping `/fail`; chứng chỉ < 14 ngày |
 | Error tracking | TBD | TODO |
 
 ## 4. Sao lưu & Khôi phục (Backup & Recovery)
 
-Công cụ (Sprint 6): [`services/ops/backup.sh`](../services/ops/backup.sh) (`pnpm backup`) · [`restore.sh`](../services/ops/restore.sh) (`pnpm restore <dir>`). **Production (Postgres trong compose, [ADR-0014](./adr/0014-postgres-in-compose-for-production.md))**: đặt `PG_VIA_COMPOSE=1` (+ `COMPOSE_FILES`, `PGUSER`, `PGDB`) — `pg_dump`/`pg_restore` chạy trong container `postgres`; unit systemd đã đặt sẵn. Restore drill với Postgres-trong-compose: đạt (Sprint 9, dump → DB trống → posts 4=4).
+Công cụ: [`services/ops/backup.sh`](../services/ops/backup.sh) và [`prune-backups.sh`](../services/ops/prune-backups.sh) chạy **tự động trong service `ops`** ([ADR-0017](./adr/0017-ops-services-in-compose.md)); [`restore.sh`](../services/ops/restore.sh) chạy **tay trên host** (uploads mount `:ro` trong `ops`). Backup tay: `docker compose --env-file .env.production exec ops sh services/ops/backup.sh`. Khôi phục: `ENV_FILE=.env.production PG_VIA_COMPOSE=1 sh services/ops/restore.sh backups/<YYYYMMDD-HHMMSS>` rồi `sh services/rebuild/rebuild.sh`. Restore drill với Postgres-trong-compose: đạt (Sprint 9, dump → DB trống → posts 4=4).
 
 > ⚠️ **Hiện chưa có backup ra ngoài máy** (quyết định của Product, 2026-10-07): backup nằm cùng ổ HDD, chỉ cứu lỗi phần mềm/xoá nhầm — **không** cứu hỏng ổ hoặc mất máy. Xem [08a §0](./08a-deploy-home-tunnel.md).
 
 | Hạng mục | Chính sách |
 |---|---|
 | Sao lưu gì | **database** (`pg_dump -Fc`) · **uploads** (`directus_uploads`) · **config** (schema snapshot, compose, Caddyfile) · **env** (secret — lưu tách/mã hoá). **KHÔNG** `dist/` (tái sinh bằng `astro build`) |
-| Tần suất | **Hằng ngày ~03:30** (`retro-backup.timer`, systemd — [mẫu](../services/ops/systemd/README.md)) + chạy tay trước mỗi lần deploy/nâng cấp |
+| Tần suất | **Hằng ngày ~03:30** (`BACKUP_AT`, scheduler trong `ops`; máy tắt lúc đó thì chạy bù khi bật lại; lỗi thì thử lại sau 1 giờ) + chạy tay trước mỗi lần deploy/nâng cấp |
 | Lưu giữ (retention) | `BACKUP_KEEP` bản gần nhất (mặc định 14), tự dọn bởi [`prune-backups.sh`](../services/ops/prune-backups.sh); thư mục backup `umask 077` |
 | Nơi lưu | **Tách khỏi host prod** (object storage/máy khác); thư mục backup NHẠY CẢM (có DB+secret) → mã hoá |
 | **RPO** | ≤ khoảng cách giữa 2 lần backup (hằng ngày → ≤ 24h) |

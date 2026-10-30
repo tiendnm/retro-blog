@@ -97,18 +97,19 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
 
 ### Triển khai production (Sprint 6/9 — [08-deployment](./docs/08-deployment.md))
 
-Hai cách: **(a) Server tại nhà + Cloudflare Tunnel** (không mở cổng, $0 — runbook [08a](./docs/08a-deploy-home-tunnel.md)) hoặc **(b) VPS có IP công khai + Caddy auto-TLS**. Cả hai: **rebuild-on-publish** + **backup**. Postgres chạy trong compose ([ADR-0014](./docs/adr/0014-postgres-in-compose-for-production.md)). Tóm tắt:
+Hai cách: **(a) Server tại nhà + Cloudflare Tunnel** (không mở cổng, $0 — runbook [08a](./docs/08a-deploy-home-tunnel.md)) hoặc **(b) VPS có IP công khai + Caddy auto-TLS**. Cả hai: **rebuild-on-publish** (receiver trong container `web`, [ADR-0016](./docs/adr/0016-rebuild-receiver-in-web-container.md)) + **backup/healthcheck tự động** (service `ops`, [ADR-0017](./docs/adr/0017-ops-services-in-compose.md)). Postgres chạy trong compose ([ADR-0014](./docs/adr/0014-postgres-in-compose-for-production.md)). Tóm tắt:
 
 ```bash
-cp .env.production.example .env.production   # điền <domain> thật + secrets mạnh (KHÔNG commit)
-docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production up -d                      # (b) VPS, Caddy auto-TLS
-# (a) tại nhà: thêm -f docker-compose.tunnel.yml (cần TUNNEL_TOKEN) — Caddy không publish cổng, cloudflared kết nối ra Cloudflare
-pnpm rebuild:flow    # tạo Directus Flow rebuild-on-publish (cần REBUILD_* + admin creds)
-pnpm theme:apply     # đồng bộ màu + font Directus Admin với web (Settings → Appearance)
-pnpm backup          # sao lưu db+uploads+config (restore: pnpm restore <dir>)
+# (a) Server tại nhà + Cloudflare Tunnel: tạo Tunnel trên dashboard, rồi trên server (user triển khai; Docker + Compose ≥ 2.24 có sẵn):
+git clone https://github.com/tiendnm/retro-blog.git /opt/retro-blog && cd /opt/retro-blog
+./scripts/deploy-home.sh        # hỏi domain, TUNNEL_TOKEN, email admin; sinh secret; dựng cả stack; in mật khẩu admin một lần
+./scripts/update.sh             # cập nhật code sau này
+
+# Lệnh compose hằng ngày không cần -f (COMPOSE_FILE nằm trong .env.production):
+docker compose --env-file .env.production ps
 ```
 
-> Cách (b) cần DNS `retro.<domain>` + `retro-cms.<domain>` trỏ host, mở 80/443; cách (a) chỉ cần domain ở Cloudflare + tunnel. Chi tiết topology/checklist: [08-deployment](./docs/08-deployment.md) · vận hành/backup: [13-operations](./docs/13-operations.md).
+> Cách (b) (VPS): tự `cp .env.production.example .env.production`, điền secret, bỏ `docker-compose.tunnel.yml` khỏi `COMPOSE_FILE`. Cách (b) cần DNS `retro.<domain>` + `retro-cms.<domain>` trỏ host, mở 80/443; cách (a) chỉ cần domain ở Cloudflare + tunnel. Chi tiết topology/checklist: [08-deployment](./docs/08-deployment.md) · vận hành/backup: [13-operations](./docs/13-operations.md).
 
 ---
 
