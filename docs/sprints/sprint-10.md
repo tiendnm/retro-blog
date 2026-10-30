@@ -1,6 +1,6 @@
 # 📦 Sprint 10 — Đóng gói deploy (dựng server bằng 2 lệnh)
 
-> **Trạng thái:** 🟡 **Đã dựng lại trên server thật (2026-10-30), còn vài số đo/kiểm tra phụ — chờ review cuối sprint** · **Vai trò:** DevOps · **Mục tiêu:** rút quy trình dựng server tại nhà từ ~15 bước tay xuống còn clone + chạy một script. Không đổi Content Model/API/DTO/Reader.
+> **Trạng thái:** ✅ **Hoàn thành — Product duyệt và đóng sprint (2026-10-30)** · **Vai trò:** DevOps · **Mục tiêu:** rút quy trình dựng server tại nhà từ ~15 bước tay xuống còn clone + chạy một script. Không đổi Content Model/API/DTO/Reader.
 > 🔗 [ADR-0016](../adr/0016-rebuild-receiver-in-web-container.md) · [ADR-0017](../adr/0017-ops-services-in-compose.md) · [08a runbook](../08a-deploy-home-tunnel.md) · [13-operations](../13-operations.md) · [Sprint 9 — kết quả máy thật](./sprint-9.md)
 
 ## Bối cảnh
