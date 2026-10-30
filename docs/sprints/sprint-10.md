@@ -1,6 +1,6 @@
 # 📦 Sprint 10 — Đóng gói deploy (dựng server bằng 2 lệnh)
 
-> **Trạng thái:** 📝 **Đề xuất — chờ Product duyệt** (2026-10-30) · **Vai trò:** DevOps · **Mục tiêu:** rút quy trình dựng server tại nhà từ ~15 bước tay xuống còn clone + chạy một script. Không đổi Content Model/API/DTO/Reader.
+> **Trạng thái:** 🟡 **Đã dựng lại trên server thật (2026-10-30), còn vài số đo/kiểm tra phụ — chờ review cuối sprint** · **Vai trò:** DevOps · **Mục tiêu:** rút quy trình dựng server tại nhà từ ~15 bước tay xuống còn clone + chạy một script. Không đổi Content Model/API/DTO/Reader.
 > 🔗 [ADR-0016](../adr/0016-rebuild-receiver-in-web-container.md) · [ADR-0017](../adr/0017-ops-services-in-compose.md) · [08a runbook](../08a-deploy-home-tunnel.md) · [13-operations](../13-operations.md) · [Sprint 9 — kết quả máy thật](./sprint-9.md)
 
 ## Bối cảnh
@@ -39,9 +39,26 @@ Vận hành: đăng bài → tự rebuild; cập nhật code → `./scripts/upda
   - **Kết quả P4 (2026-10-30):** `scripts/deploy-home.sh` (kiểm tra môi trường → swap tuỳ chọn → sinh `.env.production` 600 → Postgres+Directus → schema/permissions/Flow/theme trong `ops` → toàn stack → smoke test → tóm tắt + mật khẩu một lần), `scripts/update.sh`, `scripts/lib/common.sh`; `shellcheck -S warning` trong CI (đã sửa cảnh báo ở script cũ). Dry-run cục bộ project `retro-p4` từ trạng thái sạch: 5/5 smoke test đạt (site/CMS qua Caddy, webhook từ chối token sai, API công khai, `/users` bị chặn); chạy lại script bỏ qua phần đã xong, không sinh lại secret; `ops` tự backup bù khi khởi động. **Lỗi tìm ra & đã sửa:** Directus `start_period` 40s quá ngắn cho lần chạy migration đầu (>2 phút) → `--wait` báo unhealthy; nâng 300s ở prod. Directus từ chối email `.test` khi đăng nhập (chỉ ảnh hưởng dữ liệu thử). Chưa kiểm: kiểm tra tunnel thật (`cloudflared`), swap thật, J1900 — để P6b.
 - [x] **P5 — Tài liệu:** viết lại gọn `08a` (4 việc ở trên + xử lý sự cố), cập nhật `13-operations`, `12-security` (không `docker.sock`, mạng nội bộ), `08-deployment`, `10-decisions`, `adr/README`, roadmap, README.
   - **Kết quả P5 (2026-10-30):** viết lại `08a` (4 việc tay + vận hành + bảng sự cố); cập nhật `08-deployment`, `12-security` (không `docker.sock`, Directus không publish cổng), `13-operations` (topo mới, ops, restore), `10a`, README, `copilot-instructions`, ADR-0008/index (nơi chạy receiver thay bởi 0016). `restore.sh` nhận `ENV_FILE` để dùng `COMPOSE_FILE` trong env.
-- [ ] **P6 — Nghiệm thu:** (a) dry-run cục bộ project riêng (cổng/tên riêng, dọn sau) từ trạng thái sạch; (b) **dựng lại trên server thật** từ trạng thái sạch theo đúng 4 việc; đo thời gian dựng, RAM/thời gian build, publish→hiện bài.
+- [x] **P6 — Nghiệm thu:** (a) dry-run cục bộ project riêng (cổng/tên riêng, dọn sau) từ trạng thái sạch; (b) **dựng lại trên server thật** từ trạng thái sạch theo đúng 4 việc; đo thời gian dựng, RAM/thời gian build, publish→hiện bài.
 
 **Ngoài phạm vi (Backlog):** tự tạo Tunnel qua Cloudflare API · backup ra ngoài máy (rclone → R2/B2) · nâng HSTS 1 năm · 2FA admin (đã bỏ có chủ đích) · rate limiting Directus · container không chạy root cho các service còn lại · quét dependency · Reader feature / Visual Polish.
+
+### Kết quả P6 — dựng lại trên server thật (2026-10-30)
+Sau khi Product xác nhận (bỏ bước backup vì chỉ có dữ liệu test), xoá stack cũ (`down -v`, gỡ unit systemd, user `retro`, `/opt/retro-blog`) rồi dựng lại bằng `git clone ~/retro-blog` + `./scripts/deploy-home.sh` (bằng `tiendnm`, không user `retro`, không Node/systemd/ufw 9000 trên host).
+
+| Hạng mục | Kết quả |
+|---|---|
+| `deploy-home.sh` lần đầu | **3m15s** tổng; 5/5 smoke test nội bộ đạt; Flow/quyền/theme áp thành công; 6 container healthy |
+| `update.sh` (đã đổi mật khẩu admin) | ~35s khởi động lại stack; script phát hiện mật khẩu cũ, hỏi mật khẩu hiện tại, áp lại cấu hình; 6/6 kiểm tra đạt (gồm tunnel) |
+| Site/CMS qua Cloudflare từ 4G | Đạt (Product xác nhận) |
+| Rebuild-on-publish | Bài mới publish **hiện trên site** (Product xác nhận); thời gian chính xác: chưa đo |
+| Số bước tay | 4 (tạo Tunnel, clone, chạy script + 3 câu hỏi, đăng nhập) — đúng mục tiêu |
+
+**Lỗi thật tìm ra khi nghiệm thu và đã sửa trong repo:** (1) `deploy-home.sh` thiếu bit thực thi do tạo trên Windows (`git update-index --chmod=+x`); (2) smoke test tunnel chạy trước khi `cloudflared` đăng ký xong → chờ tối đa 60s; (3) `update.sh` đăng nhập admin bằng mật khẩu ban đầu nên thất bại sau khi Product đổi mật khẩu → kiểm tra trước và hỏi mật khẩu hiện tại (`ADMIN_PASSWORD_OVERRIDE`); (4) Directus `start_period` quá ngắn lần chạy đầu (P4).
+
+**Lưu ý đo đạc (trung thực):** 3m15s **không phải** số "máy trắng": image `retro-web`/`retro-ops` còn cache từ lần dựng trước (log `CACHED`) nên build site rất nhanh; lần đầu trên máy chưa có cache sẽ lâu hơn (ước tính 5–15 phút theo kế hoạch, chưa đo). RAM đỉnh khi build: chưa ghi nhận.
+
+**Còn lại (không chặn đóng sprint, nên làm sớm):** đo thời gian publish→hiện bài; reboot thử một lần (`restart: unless-stopped`, backup chạy bù); xác nhận file trong `backups/` thuộc `tiendnm` và có bản backup đầu tiên; restore drill trên stack mới; dọn `/var/backups/retro-blog.old`; copy backup ra ngoài máy (Backlog).
 
 ## Điểm dừng chờ review (theo [Working Agreement](../17-contributing.md))
 1. **Bây giờ:** duyệt bản đề xuất này + ADR-0016/0017 trước khi viết code (thay đổi hạ tầng/bảo mật/kiến trúc).
