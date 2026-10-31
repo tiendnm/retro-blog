@@ -87,9 +87,12 @@ smoke_tests() {
   # Tunnel (bỏ qua nếu không dùng tunnel hoặc SKIP_TUNNEL_CHECK=1).
   if [ "${SKIP_TUNNEL_CHECK:-0}" != "1" ] && dc config --services | grep -qx cloudflared; then
     # Container báo "running" trước khi tunnel đăng ký xong (vài giây) → chờ tối đa 60 giây.
-    local registered=0
+    # Đọc log vào biến rồi mới grep: `grep -q` thoát sớm làm `docker logs` chết vì SIGPIPE, và `pipefail`
+    # biến điều đó thành "chưa đăng ký" dù log đã có dòng cần tìm (xảy ra khi log dài).
+    local registered=0 tunnel_log
     for _ in $(seq 1 12); do
-      if dc logs --no-color cloudflared 2>&1 | grep -q "Registered tunnel connection"; then registered=1; break; fi
+      tunnel_log=$(dc logs --no-color cloudflared 2>&1 || true)
+      if grep -q "Registered tunnel connection" <<<"$tunnel_log"; then registered=1; break; fi
       sleep 5
     done
     if [ "$registered" = 1 ]; then
