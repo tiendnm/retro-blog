@@ -20,7 +20,7 @@ import type {
   PostSummary,
   SiteSettings,
 } from './types';
-import { rewriteAssetUrls } from './rewrite-assets';
+import { optimizeBodyImages, rewriteAssetUrls } from './rewrite-assets';
 import { sanitizeBody } from './sanitize-body';
 
 // URL container→Directus (server-side). Không token ⇒ Public role.
@@ -181,7 +181,7 @@ function toDetail(p: RawPost): PostDetail {
     title: p.title,
     slug: p.slug,
     excerpt: p.excerpt ?? null,
-    body: p.body ? rewriteAssetUrls(sanitizeBody(p.body), PUBLIC_URL) : null,
+    body: p.body ? optimizeBodyImages(rewriteAssetUrls(sanitizeBody(p.body), PUBLIC_URL)) : null,
     publishedAt: p.published_at ?? null,
     author: toAuthorDetail(p.author),
     category: toCategory(p.category),

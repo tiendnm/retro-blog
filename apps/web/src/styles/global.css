@@ -503,13 +503,21 @@ main {
 .post__header .meta {
   margin: 0;
 }
+/* Ảnh bìa kiểu banner (Notion): nằm trên tiêu đề, rộng hơn cột chữ, cắt dẹt bằng object-fit. */
 .post__cover {
   display: block;
-  width: 100%;
-  max-height: 420px;
+  width: min(var(--container-wide), calc(100vw - 2 * var(--container-pad-x)));
+  height: 280px;
+  margin: 0 0 var(--space-6) 50%;
+  transform: translateX(-50%);
   object-fit: cover;
+  object-position: center;
   border: var(--border-width) solid var(--color-border);
-  margin-bottom: var(--space-6);
+}
+@media (max-width: 600px) {
+  .post__cover {
+    height: 160px;
+  }
 }
 
 .prose {

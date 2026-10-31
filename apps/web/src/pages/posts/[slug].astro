@@ -57,6 +57,18 @@ const jsonLdScript = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
     {post.category && <meta property="article:section" content={post.category.name} />}
     <script type="application/ld+json" is:inline set:html={jsonLdScript} />
   </Fragment>
+  {
+    post.cover && (
+      <CoverImage
+        class="post__cover"
+        src={post.cover.url}
+        alt={post.cover.alt}
+        widths={[640, 960, 1200, 1600]}
+        sizes="(min-width: 1120px) 1080px, calc(100vw - 2.5rem)"
+        eager
+      />
+    )
+  }
   <article class="post">
     <header class="post__header">
       <h1>{post.title}</h1>
@@ -73,18 +85,6 @@ const jsonLdScript = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
         {post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
       </p>
     </header>
-    {
-      post.cover && (
-        <CoverImage
-          class="post__cover"
-          src={post.cover.url}
-          alt={post.cover.alt}
-          widths={[640, 960, 1200]}
-          sizes="(min-width: 760px) 680px, 100vw"
-          eager
-        />
-      )
-    }
     <div class="prose" set:html={bodyHtml}></div>
   </article>
 </Base>

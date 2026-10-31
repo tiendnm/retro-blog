@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { formatDate } from '../src/lib/format';
-import { rewriteAssetUrls } from '../src/lib/rewrite-assets';
+import { optimizeBodyImages, rewriteAssetUrls } from '../src/lib/rewrite-assets';
 import { sanitizeBody } from '../src/lib/sanitize-body';
 
 const ID = '123e4567-e89b-12d3-a456-426614174000';
@@ -61,5 +61,27 @@ describe('formatDate', () => {
   });
   it('ISO hợp lệ → chuỗi có năm', () => {
     expect(formatDate('2026-03-05T12:00:00Z')).toContain('2026');
+  });
+});
+
+describe('optimizeBodyImages', () => {
+  const base = `https://cms.example.com/assets/${ID}`;
+
+  it('đổi ảnh gốc 4000px sang srcset webp, giữ alt/loading, bỏ dấu / tự đóng', () => {
+    const html = `<img src="${base}.jpg?width=4000&amp;height=3000" alt="Ảnh" loading="lazy" />`;
+    const out = optimizeBodyImages(html);
+    expect(out).toContain('alt="Ảnh"');
+    expect(out).toContain('loading="lazy"');
+    expect(out).toContain(`src="${base}?width=960&amp;quality=80&amp;format=webp"`);
+    expect(out).toContain(`${base}?width=640&amp;quality=80&amp;format=webp 640w`);
+    expect(out).toContain('sizes="');
+    expect(out).not.toContain('width=4000');
+    expect(out).not.toContain('/ ');
+    expect(out.endsWith('>')).toBe(true);
+  });
+
+  it('không đụng ảnh ngoài asset Directus', () => {
+    const html = '<img src="https://x.com/a.png" alt="x">';
+    expect(optimizeBodyImages(html)).toBe(html);
   });
 });
