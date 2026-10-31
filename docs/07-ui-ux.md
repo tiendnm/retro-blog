@@ -42,8 +42,8 @@
 | Token | Giá trị |
 |---|---|
 | `--space-1 … --space-16` | `0.25 · 0.5 · 0.75 · 1 · 1.5 · 2 · 3 · 4` rem |
-| `--container-max` / `--container-pad-x` | `720px` / `1.25rem` |
-| `--reading-width` | `68ch` *(áp dụng thân bài ở Phase 3)* |
+| `--container-max` / `--container-pad-x` | `800px` / `1.25rem` |
+| `--reading-width` | `76ch` *(áp dụng thân bài ở Phase 3)* |
 | `--border-width` / `--radius-sm` | `1px` / `2px` |
 
 > **Shadow / Effect retro:** chưa định nghĩa (chờ chốt phong cách — ngoài Phase 0).
@@ -65,7 +65,7 @@
 
 ## 4. Bố cục & Responsive
 
-- **Container:** `body` giới hạn `--container-max` (720px), căn giữa, padding ngang `--container-pad-x`. Detail thu về `--reading-width` (~65ch) cho dễ đọc.
+- **Container:** `body` giới hạn `--container-max` (800px), căn giữa, padding ngang `--container-pad-x`. Detail thu về `--reading-width` (76ch) cho dễ đọc.
 - **Fluid, ít breakpoint:** bố cục dùng flex + đơn vị tương đối; PostCard giữ thumbnail nhỏ-trái ở mọi kích thước (không stack lớn — thumbnail chỉ hỗ trợ). Code/table trong `.prose` `overflow-x:auto`.
 - **Kiểm chứng:** @390px **không** cuộn ngang ở cả 3 trang (đo CDP — Sprint 3 Phase 4).
 

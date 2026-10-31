@@ -50,10 +50,10 @@
   --space-16: 4rem;
 
   /* ---- Container / width ------------------------------------------------ */
-  --container-max: 720px; /* bề rộng trang (cột đọc) */
+  --container-max: 800px; /* bề rộng trang (cột đọc) */
   --container-wide: 1080px; /* trang list: lưới ảnh (Sprint 8) */
   --container-pad-x: 1.25rem;
-  --reading-width: 68ch; /* độ rộng dòng thân bài (áp dụng ở Phase 3) */
+  --reading-width: 76ch; /* độ rộng dòng thân bài (áp dụng ở Phase 3) */
 
   /* ---- Border ----------------------------------------------------------- */
   --border-width: 1px;
@@ -522,6 +522,7 @@ main {
 }
 
 .prose {
+  font-size: 1.0625rem; /* 17px: chữ mono thân bài dễ đọc hơn */
   line-height: var(--leading-relaxed);
   /* UI-1 (Sprint 6.5, R4): từ/URL siêu dài không tràn ngang, bẻ dòng trong hộp đọc */
   overflow-wrap: break-word;
