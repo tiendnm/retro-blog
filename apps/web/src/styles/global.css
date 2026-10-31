@@ -507,6 +507,7 @@ main {
 .post__cover {
   display: block;
   width: min(var(--container-wide), calc(100vw - 2 * var(--container-pad-x)));
+  max-width: none; /* thắng `img { max-width: 100% }` — nếu không banner bị kẹt ở bề rộng cột */
   height: 280px;
   margin: 0 0 var(--space-6) 50%;
   transform: translateX(-50%);
