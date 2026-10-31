@@ -50,10 +50,10 @@
   --space-16: 4rem;
 
   /* ---- Container / width ------------------------------------------------ */
-  --container-max: 800px; /* bề rộng trang (cột đọc) */
+  --container-max: 880px; /* bề rộng trang (cột đọc) */
   --container-wide: 1080px; /* trang list: lưới ảnh (Sprint 8) */
   --container-pad-x: 1.25rem;
-  --reading-width: 76ch; /* độ rộng dòng thân bài (áp dụng ở Phase 3) */
+  --reading-width: 50rem; /* độ rộng dòng thân bài (áp dụng ở Phase 3) */
 
   /* ---- Border ----------------------------------------------------------- */
   --border-width: 1px;
