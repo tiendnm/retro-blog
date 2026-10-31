@@ -80,6 +80,17 @@ describe('optimizeBodyImages', () => {
     expect(out.endsWith('>')).toBe(true);
   });
 
+  it('đặt width/height từ query gốc để giữ chỗ (hết giật layout)', () => {
+    const html = `<img src="${base}.jpg?width=4000&amp;height=3000" alt="a" />`;
+    const out = optimizeBodyImages(html);
+    expect(out).toContain('width="4000" height="3000"');
+  });
+
+  it('không có kích thước trong URL thì không bịa width/height', () => {
+    const out = optimizeBodyImages(`<img src="${base}" alt="a">`);
+    expect(out).not.toMatch(/\swidth="/);
+  });
+
   it('không đụng ảnh ngoài asset Directus', () => {
     const html = '<img src="https://x.com/a.png" alt="x">';
     expect(optimizeBodyImages(html)).toBe(html);
