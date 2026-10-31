@@ -58,7 +58,8 @@
 | PostCard (list item) | **Option B**: thumbnail hỗ trợ (nhỏ, trái) + text chủ đạo; không cover → text-only, không placeholder — `PostCard.astro` | 🟢 Phase 2 |
 | CoverImage (ảnh) | Render ảnh nếu có `src`; không thì rỗng (không placeholder/ảnh mặc định) — `CoverImage.astro` | 🟢 Phase 2 |
 | Empty state (list) | Khối `.empty-state` khi list rỗng | 🟢 Phase 2 |
-| Post layout (detail) | `.post` = reading column (giới hạn `--reading-width`) + header + cover (`CoverImage`) + `.prose` | 🟢 Phase 3 |
+| Post layout (detail) | **Banner** ảnh bìa (`.post__cover`, rộng `--container-wide` ≤1080px, cao 280px / 160px mobile, `object-fit: cover`) **nằm trên tiêu đề** (kiểu Notion) + `.post` = cột đọc (`--reading-width`) + header + `.prose` | 🟢 |
+| Lightbox ảnh thân bài | Bấm ảnh trong `.prose` → `<dialog>` toàn màn hình (`scripts/lightbox.ts`): ảnh webp 2000px, chú thích = `alt` + (n/N), `Esc`/✕/bấm nền đóng, ←/→ chuyển ảnh (vòng lặp), Enter/Space mở bằng bàn phím, trả focus khi đóng, khoá cuộn nền. Tuân CSP `script-src 'self'` (script ngoài; `assetsInlineLimit: 0`) | 🟢 |
 | Bố cục trang list (D) | `PostListView`: **hero** (cửa sổ OS cổ) → **lưới thẻ giấy** 3 cột → **danh sách gọn** "Cũ hơn"; thanh chuyên mục (chip); container list ~1080px, chi tiết giữ cột đọc; ảnh `srcset` qua Directus transform — [proposal](./sprints/homepage-layout-proposal.md) | 🟢 |
 | Prose (HTML body) | `.prose` — style TẬP TRUNG cho toàn bộ HTML của body (heading/list/blockquote/code/table/hr/img); vertical rhythm nhất quán | 🟢 Phase 3 |
 | Tag / Category badge · Pagination | ngoài Sprint 3 | — |
@@ -67,6 +68,8 @@
 
 - **Container:** `body` giới hạn `--container-max` (880px), căn giữa, padding ngang `--container-pad-x`. Detail thu về `--reading-width` (50rem = 800px) cho dễ đọc.
 - **Fluid, ít breakpoint:** bố cục dùng flex + đơn vị tương đối; PostCard giữ thumbnail nhỏ-trái ở mọi kích thước (không stack lớn — thumbnail chỉ hỗ trợ). Code/table trong `.prose` `overflow-x:auto`.
+- **Ảnh trong thân bài** (`optimizeBodyImages`, `lib/rewrite-assets.ts`, chạy sau sanitize ở build): URL asset Directus → `srcset` webp 640/960/1200/1600 + `sizes` khớp cột đọc (800px) + `decoding="async"`; `width`/`height` lấy từ query gốc của TinyMCE (`?width=&height=`) để giữ chỗ, không giật layout. URL không phải asset Directus thì giữ nguyên.
+- **Lưu ý CSS:** `img { max-width: 100% }` toàn cục ghi đè mọi `width` → banner cần `max-width: none`. Đơn vị `ch` của font mono ở đây chỉ ≈8px nên cột đọc dùng `rem`, không dùng `ch`.
 - **Kiểm chứng:** @390px **không** cuộn ngang ở cả 3 trang (đo CDP — Sprint 3 Phase 4).
 
 ## 5. Trạng thái tương tác

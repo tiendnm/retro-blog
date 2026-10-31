@@ -45,7 +45,7 @@
 | Thao tác | Khi nào | Các bước | Rủi ro |
 |---|---|---|---|
 | Khởi động / dừng hệ thống | | TODO | |
-| Triển khai phiên bản mới | | Xem [08-deployment](./08-deployment.md) | |
+| Triển khai phiên bản mới | | Xem [08-deployment](./08-deployment.md). Server tại nhà: `./scripts/update.sh` (đầy đủ, áp lại schema/quyền/Flow/theme, hỏi mật khẩu admin nếu đã đổi) hoặc `./scripts/update.sh --web-only` khi chỉ đổi code web (bỏ qua bước CMS, không cần mật khẩu) — [08a](./08a-deploy-home-tunnel.md) | Thấp |
 | Rollback (site) | Deploy/rebuild lỗi | **Atomic swap** về build trước: đổi symlink `current` trong volume `site_dist` sang `builds/<TS-cũ>` (giữ `KEEP_BUILDS` bản). Xem [08 §6](./08-deployment.md) | Thấp (không rebuild) |
 | Rebuild site (sau publish) | Nội dung đổi | **Tự động** qua Directus Flow → webhook → `services/rebuild/rebuild.sh` (build + atomic swap; ADR-0008). **Thủ công/fallback:** chạy `sh services/rebuild/rebuild.sh` trên host | Thấp (atomic; fail → giữ bản cũ) |
 | Xuất bản bài (publish) | Editor đặt `status=published` | Directus **Flow "Auto set published_at"** (`services/directus/apply-publish-flow.mjs`, Sprint 6.5) tự đặt `published_at = thời điểm hiện tại` **CHỈ khi field còn trống** — vá "bẫy 2 bước" (publish nhưng quên `published_at` → bài ẩn). **Editor vẫn chỉnh `published_at` thủ công** được (vd xuất bản lùi/định ngày); Flow **KHÔNG ghi đè** giá trị đã có. Chạy `emitEvents=false` ⇒ không loop/rebuild thừa. Áp dụng khi deploy: `node services/directus/apply-publish-flow.mjs` | Thấp |
