@@ -682,3 +682,101 @@ main {
   font-size: var(--text-sm);
   color: var(--color-muted);
 }
+
+/* ---- Lightbox xem ảnh thân bài (scripts/lightbox.ts) ---- */
+.prose img.zoomable {
+  cursor: zoom-in;
+}
+.prose img.zoomable:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+html:has(dialog.lightbox[open]) {
+  overflow: hidden; /* khoá cuộn nền khi đang xem ảnh */
+}
+dialog.lightbox {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--color-card);
+}
+dialog.lightbox[open] {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+}
+dialog.lightbox::backdrop {
+  background: rgb(20 17 12 / 92%);
+}
+.lightbox__figure {
+  margin: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+.lightbox__img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100dvh - 7rem);
+  object-fit: contain;
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  transition: opacity 0.15s;
+}
+.lightbox__img.is-loading {
+  opacity: 0.35;
+}
+.lightbox__caption {
+  font-size: var(--text-sm);
+  text-align: center;
+  color: var(--color-card);
+}
+.lightbox__btn {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  line-height: 1;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  color: var(--color-card);
+  background: transparent;
+  border: var(--border-width) solid var(--color-card);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.lightbox__btn:hover,
+.lightbox__btn:focus-visible {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  outline: none;
+}
+.lightbox__close {
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 1;
+}
+@media (max-width: 600px) {
+  dialog.lightbox[open] {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+  }
+  .lightbox__prev,
+  .lightbox__next {
+    position: fixed;
+    bottom: var(--space-4);
+  }
+  .lightbox__prev {
+    left: var(--space-4);
+  }
+  .lightbox__next {
+    right: var(--space-4);
+  }
+}

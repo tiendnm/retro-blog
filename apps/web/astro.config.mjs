@@ -11,6 +11,8 @@ const SITE_URL = process.env.PUBLIC_SITE_URL ?? 'http://localhost:4321';
 // dùng getStaticPaths, KHÔNG cần adapter. Dev (`astro dev`) render on-demand.
 export default defineConfig({
   site: SITE_URL,
+  // CSP production là script-src 'self' (không inline): không cho Astro/Vite nhúng script nhỏ vào HTML.
+  vite: { build: { assetsInlineLimit: 0 } },
   server: {
     host: true,
     port: 4321,

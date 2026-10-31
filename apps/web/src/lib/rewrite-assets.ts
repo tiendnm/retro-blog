@@ -26,7 +26,9 @@ export function optimizeBodyImages(html: string): string {
     const variant = (w: number) => `${base}?width=${w}&amp;quality=80&amp;format=webp`;
     const srcset = BODY_IMG_WIDTHS.map((w) => `${variant(w)} ${w}w`).join(', ');
     const src = variant(BODY_IMG_WIDTHS[1]);
-    const rest = `${before}${after}`.replace(/\s*\/\s*$/, '').replace(/\s(srcset|sizes|decoding)=(["'])[^"']*\2/gi, '');
+    const rest = `${before}${after}`
+      .replace(/\s*\/\s*$/, '')
+      .replace(/\s(srcset|sizes|decoding)=(["'])[^"']*\2/gi, '');
     return `<img${rest} src=${q}${src}${q} srcset=${q}${srcset}${q} sizes=${q}${BODY_IMG_SIZES}${q} decoding=${q}async${q}>`;
   });
 }
