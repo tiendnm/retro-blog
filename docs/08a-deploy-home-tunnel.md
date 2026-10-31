@@ -64,7 +64,7 @@ docker compose --env-file .env.production logs -f ops        # backup + healthch
 | Việc | Cách |
 |---|---|
 | Đăng bài | Admin → publish → Flow gọi `http://web:9000/rebuild` → site tự cập nhật (~1–3 phút trên J1900) |
-| Cập nhật code | `./scripts/update.sh` (git pull → build lại image → `up -d` → áp lại schema/quyền/Flow → smoke test) |
+| Cập nhật code | `./scripts/update.sh` (git pull → build lại image → `up -d` → áp lại schema/quyền/Flow → smoke test). Chỉ đổi code web (giao diện, script): `./scripts/update.sh --web-only` — bỏ qua bước áp CMS nên **không hỏi mật khẩu admin** |
 | Backup | Tự động ~03:30 hằng ngày vào `backups/` (chạy bù khi bật lại máy sau khi tắt); xem [13 §4](./13-operations.md) |
 | Healthcheck | Tự động mỗi 5 phút trong `ops`; thêm `HEALTHCHECK_PING_URL` (healthchecks.io) để biết khi cả máy/mạng sập |
 | Rebuild tay | `sh services/rebuild/rebuild.sh` (POST vào receiver trong `web`) |

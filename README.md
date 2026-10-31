@@ -103,7 +103,7 @@ Hai cách: **(a) Server tại nhà + Cloudflare Tunnel** (không mở cổng, $0
 # (a) Server tại nhà + Cloudflare Tunnel: tạo Tunnel trên dashboard, rồi trên server (user triển khai; Docker + Compose ≥ 2.24 có sẵn):
 git clone https://github.com/tiendnm/retro-blog.git /opt/retro-blog && cd /opt/retro-blog
 ./scripts/deploy-home.sh        # hỏi domain, TUNNEL_TOKEN, email admin; sinh secret; dựng cả stack; in mật khẩu admin một lần
-./scripts/update.sh             # cập nhật code sau này
+./scripts/update.sh             # cập nhật code sau này (thêm --web-only nếu chỉ đổi web: bỏ qua bước CMS)
 
 # Lệnh compose hằng ngày không cần -f (COMPOSE_FILE nằm trong .env.production):
 docker compose --env-file .env.production ps
