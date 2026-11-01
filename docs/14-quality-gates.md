@@ -24,7 +24,7 @@ Một hạng mục (story/task) chỉ được kéo vào sprint khi:
 - [ ] Có test phù hợp & pass ([11-testing](./11-testing.md))
 - [ ] Đã được review & duyệt (mục 3)
 - [ ] Tài liệu liên quan được cập nhật
-- [ ] Không hạ thấp a11y/SEO/performance ([15](./15-seo-accessibility.md))
+- [ ] Không hạ thấp a11y/SEO/performance ([15](./15-seo-accessibility.md)) — thay đổi ảnh hưởng trang xuất ra: job `site-checks` (axe 0 serious/critical, Lighthouse trong ngân sách) không đỏ mới
 - [ ] Không cảnh báo bảo mật mới ([12](./12-security.md))
 
 ### 2.2. DoD cho một bản phát hành (release)
@@ -50,7 +50,7 @@ Một hạng mục (story/task) chỉ được kéo vào sprint khi:
 
 ## 4. Điều kiện merge
 
-- CI xanh là điều kiện bắt buộc: job **`quality`** (lint → format → typecheck → test) là required check ngay; job **`build`** (cần Directus + Postgres + seed) chạy `continue-on-error` cho tới khi ổn định (vài lần xanh liên tiếp), rồi nâng thành required — Product xác nhận lúc nâng.
+- CI xanh là điều kiện bắt buộc: job **`quality`** (lint → format → typecheck → test) là required check ngay; job **`build`** (cần Directus + Postgres + seed; từ Sprint 11 còn chạy test quyền Public + luồng publish → build) và job **`site-checks`** (Sprint 11: link/sitemap/canonical/RSS, Playwright + axe, Lighthouse — cần artifact `dist` của `build`) chạy `continue-on-error` cho tới khi ổn định (`site-checks` xanh 10 lần liên tiếp trên `main`), rồi nâng thành required ở Sprint 13 — Product xác nhận lúc nâng.
 - **Branch protection (đã bật, 2026-10-07)** trên `main` của repo public `tiendnm/retro-blog`: required check **`quality`**, cấm force-push và xoá nhánh. `enforce_admins=false` → chủ repo vẫn push thẳng được (repo một người); người khác chỉ merge được khi `quality` xanh. Job `build` chưa required (còn `continue-on-error`). Gói GitHub Free chỉ cho protection ở repo **public**.
 - Review ở ranh giới sprint; giữa sprint chỉ dừng cho thay đổi hạ tầng / bảo mật / schema / kiến trúc ([17 §2](./17-contributing.md)).
 

@@ -85,7 +85,9 @@
 
 ## B3. Kiểm thử a11y
 
-- Tự động (axe/Lighthouse) + thủ công (bàn phím, screen reader). Xem [11-testing §3](./11-testing.md).
+- **Tự động (Sprint 11, job `site-checks`)**: axe-core (thẻ WCAG 2.0/2.1/2.2 A+AA) trên **mỗi loại trang một mẫu** — trang chủ, bài (thường + có ảnh), chuyên mục, thẻ, tác giả, lưu trữ (+ tháng), `/categories`, tìm kiếm, 404 — ở **desktop và mobile**, cộng lightbox đang mở. Ngưỡng: **0 serious/critical**; moderate/minor được ghi log + đính kèm báo cáo, nếu chưa sửa thì ghi lý do vào Kết quả sprint. Bàn phím qua E2E: skip-link, focus nhìn thấy, tìm kiếm, mở/đóng lightbox bằng phím. Lighthouse (mobile) đo Accessibility ≥ 0,95.
+- **Giới hạn đã biết của axe:** không đánh giá được `::backdrop` (nền tối của lightbox) nên báo sai tương phản chữ sáng → test tắt rule `color-contrast` riêng cho lightbox và tự tính tỉ lệ thật (≥ 4,5:1).
+- **Thủ công (chưa tự động):** screen reader, zoom 200–400 %, `prefers-reduced-motion`, tương phản của trạng thái hover/focus. Xem [11-testing §3](./11-testing.md).
 
 ## B4. Trách nhiệm
 
