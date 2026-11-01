@@ -52,6 +52,10 @@
 | Khởi động lại Directus / DB | Treo/lỗi | TODO | |
 | Xoá cache | Dữ liệu cũ | TODO | |
 
+**Container không chạy root (2026-11-01):** `web` và `caddy` chạy uid 1000. Server dựng mới từ đầu không cần làm gì thêm. Server **đã có volume cũ thuộc root** (nâng cấp từ trước mốc này) phải chown một lần, khi hai service đã dừng, rồi mới `update.sh`:
+`for v in site_dist caddy_data caddy_config; do docker run --rm -v retro-blog_$v:/v alpine chown -R 1000:1000 /v; done`
+(đã làm trên server nhà). **Rate limit Directus:** nhật ký có dòng `WARN: Custom IP header didn't return valid IP address: undefined` cho yêu cầu nội bộ (web build, ops) — bình thường, vì chúng không đi qua Cloudflare; yêu cầu công khai khi quá 100/10 giây sẽ nhận 429 và tự hết sau vài giây.
+
 ## 3. Observability (Log / Metric / Alert)
 
 | Hạng mục | Công cụ (dự kiến) | Ngưỡng cảnh báo |
