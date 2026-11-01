@@ -26,6 +26,12 @@ export interface CategoryRef {
   slug: string;
 }
 
+/** Thẻ (03c §2.4) — nhãn tự do, nhiều-nhiều với bài. */
+export interface TagRef {
+  name: string;
+  slug: string;
+}
+
 /** PostSummary — 03d §3.1 (trang danh sách). */
 export interface PostSummary {
   id: string;
@@ -37,6 +43,8 @@ export interface PostSummary {
   author: AuthorSummary;
   /** Chuyên mục (Sprint 6.5) — bổ sung additive để card hiện chủ đề; `null` nếu bài không có. */
   category: CategoryRef | null;
+  /** Thẻ (Sprint 11) — bổ sung additive; mảng rỗng nếu bài không có thẻ. */
+  tags: TagRef[];
 }
 
 /** PostDetail — 03d §3.2 (trang chi tiết). */
@@ -50,6 +58,7 @@ export interface PostDetail {
   author: AuthorDetail;
   category: CategoryRef | null;
   cover: MediaRef | null;
+  tags: TagRef[];
 }
 
 /** SiteSettings — 03d §3.4 (cấu hình site, singleton). Luôn có giá trị (fallback khi CMS chưa cấu hình). */

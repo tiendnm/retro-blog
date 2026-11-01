@@ -38,6 +38,7 @@ function itemXml(post: PostDetail, site: FeedSite): string {
   if (post.publishedAt) parts.push(`<pubDate>${rfc822(post.publishedAt)}</pubDate>`);
   if (post.author.name) parts.push(`<dc:creator>${xmlEscape(post.author.name)}</dc:creator>`);
   if (post.category) parts.push(`<category>${xmlEscape(post.category.name)}</category>`);
+  for (const t of post.tags) parts.push(`<category>${xmlEscape(t.name)}</category>`);
   if (post.excerpt) parts.push(`<description>${xmlEscape(post.excerpt)}</description>`);
   if (post.body)
     parts.push(`<content:encoded>${cdata(absolutizeUrls(post.body, site.base))}</content:encoded>`);

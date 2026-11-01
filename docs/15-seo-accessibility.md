@@ -15,6 +15,8 @@
 | **Twitter Card** | `summary` (không ảnh) / `summary_large_image` (có cover) + title/description/image | `Base.astro` |
 | **`sitemap.xml`** | Endpoint tự viết — **chỉ canonical content URL** (home + posts + category trang-1), **loại pagination** | `src/pages/sitemap.xml.ts` |
 | **`robots.txt`** | Endpoint — `Allow: /` + trỏ `Sitemap:` tuyệt đối | `src/pages/robots.txt.ts` |
+| **Thẻ `/tag/<slug>`** | Trang-1 mỗi thẻ có bài (route tĩnh, phân trang `/tag/<slug>/page/N` như chuyên mục); chip `#tên` trên card + trang bài; `article:tag` + JSON-LD `keywords`; thẻ vào sitemap; `<category>` trong RSS | `src/pages/tag/`, `src/components/TagList.astro` |
+| **Lưu trữ `/archive`** | Trang tổng hợp theo tháng (số bài/tháng) + `/archive/YYYY/MM` (hết bài trong tháng, không phân trang); **tháng tính theo giờ VN (UTC+7)**; `/archive` và các tháng vào sitemap; link "Lưu trữ" ở header | `src/pages/archive/`, `src/lib/archive.ts` |
 | **`rss.xml`** | RSS 2.0, 20 bài mới nhất, đủ nội dung (`content:encoded`, body đã sanitize, link nội bộ đổi sang tuyệt đối); autodiscovery `<link rel="alternate">` ở mọi trang + link "RSS" ở footer | `src/pages/rss.xml.ts`, `src/lib/rss.ts` |
 
 > **Địa chỉ tuyệt đối** dẫn xuất từ `PUBLIC_SITE_URL` (→ `Astro.site`) — nguồn sự thật DUY NHẤT; Sprint 6 (deploy) đổi domain chỉ sửa 1 biến. Xem Decision `[S5-P0]` (route/sitemap policy) & `[S5-P2]` (canonical self-referencing).

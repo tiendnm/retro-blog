@@ -71,6 +71,7 @@ describe('mapping DTO', () => {
       publishedAt: '2026-01-02T00:00:00Z',
       author: { name: 'An', slug: 'an' },
       category: { name: 'CPU', slug: 'cpu' },
+      tags: [],
     });
     expect(item).not.toHaveProperty('body');
     expect(item).not.toHaveProperty('published_at');

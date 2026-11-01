@@ -17,7 +17,7 @@
 
 ## 1. Ánh xạ Content Type → Collection (Sprint 2)
 
-> Ánh xạ từ [03c §2](./03c-content-model.md). **Tag: ngoài Sprint 2.**
+> Ánh xạ từ [03c §2](./03c-content-model.md). Tag: thêm 2026-11-01 (xem `tags` bên dưới).
 
 ### `posts` ← Post ([03c §2.1](./03c-content-model.md))
 | Field (03c) | Directus type | Interface | Ghi chú |
@@ -31,12 +31,18 @@
 | author | uuid (M2O) | select-dropdown-m2o → `authors` | required; on_delete NO ACTION |
 | category | uuid (M2O) | select-dropdown-m2o → `categories` | on_delete SET NULL |
 | cover | uuid (M2O) | file-image → `directus_files` | on_delete SET NULL |
+| tags | alias (M2M) | list-m2m → `tags` qua bảng nối `posts_tags` | xoá bài/xoá thẻ ⇒ xoá dòng nối (CASCADE) |
 
 ### `authors` ← Author ([03c §2.2](./03c-content-model.md))
 | name (string, req) · slug (string, req, unique) · bio (text) · avatar (M2O → `directus_files`) |
 
 ### `categories` ← Category ([03c §2.3](./03c-content-model.md))
 | name (string, req) · slug (string, req, unique) · description (text) · parent (M2O → `categories`, phân cấp, on_delete SET NULL) |
+
+### `tags` ← Tag ([03c §2.4](./03c-content-model.md)) + bảng nối `posts_tags`
+| name (string, req) · slug (string, req, unique) · posts (alias O2M ngược, ẩn — để phân quyền/lọc theo bài) |
+
+`posts_tags` (ẩn): `id` (integer), `posts_id` → `posts`, `tags_id` → `tags`, cả hai on_delete CASCADE ([03e](./03e-data-model.md)).
 
 ### `site_settings` ← SiteSettings ([03c §2.6](./03c-content-model.md)) — **singleton** ([ADR-0012](./adr/0012-site-settings-singleton.md))
 | site_name (string, req, default "Retro Blog") · description (text) · footer_text (string, `{year}`) · default_og_image (M2O → `directus_files`, SET NULL) — khoá chính `id` integer (singleton) |
@@ -56,9 +62,11 @@
 
 | Collection | **Public** (read-only) | **Editor** (`app_access`) | **Admin** (`admin_access`) |
 |---|---|---|---|
-| `posts` | read — **lọc `status=published` AND `published_at ≤ $NOW`**; field: `id,title,slug,excerpt,body,published_at,author,category,cover` | create · read · update · delete | full |
+| `posts` | read — **lọc `status=published` AND `published_at ≤ $NOW`**; field: `id,title,slug,excerpt,body,published_at,author,category,cover,tags` | create · read · update · delete | full |
 | `authors` | read (mọi hàng); field: `id,name,slug,avatar` | create · read · update · delete | full |
 | `categories` | read (mọi hàng); field: `id,name,slug` | create · read · update · delete | full |
+| `tags` | read — **chỉ thẻ có ≥ 1 bài `status=published`**; field: `id,name,slug` | create · read · update · delete | full |
+| `posts_tags` | read — **chỉ dòng nối của bài `status=published` AND `published_at ≤ $NOW`**; field: `id,posts_id,tags_id` | create · read · update · delete | full |
 | `directus_files` | read (mọi hàng); field: `id,alt` *(đủ cho `/assets/<id>` + a11y)* | create · read · update · delete | full |
 | `directus_users`, `directus_roles`, `directus_policies` | — | — *(chỉ app-baseline: xem hồ sơ của chính mình; **không** tạo/sửa/xoá)* | full |
 
@@ -66,6 +74,7 @@
 - **Field allowlist (không `*`):** Public chỉ đọc đúng field cần cho hợp đồng [03d](./03d-api-contract.md). Field nội bộ thêm về sau (vd `internal_notes`, `status`) **không tự động lộ** — xin field ngoài allowlist → Directus trả `FORBIDDEN`. Đây là ranh giới chống-lộ (Sprint 2 Phase 3).
 - **Editor không quản trị user/role/policy** (không `admin_access`); chỉ thao tác nội dung. **Public không có** create/update/delete ở bất kỳ collection nào; không frontend auth, không public CMS users.
 - `site_settings` (singleton): Public đọc **4 field** `site_name`/`description`/`footer_text`/`default_og_image`; Editor **read + update** (không create/delete). Sửa → Flow rebuild-on-publish kích hoạt rebuild.
+- **Tags (Directus 11.3.5):** `$NOW` (và `_and`) lồng trong đường quan hệ O2M `tags → posts` làm Directus sinh SQL sai (HTTP 500 "unnamed portal parameter") nên quyền `tags` chỉ lọc `status=published`; `posts_tags` đi qua M2O nên lọc đủ cả `published_at`. Hệ quả: thẻ của bài *hẹn giờ chưa tới hạn* lộ **tên thẻ** (không lộ bài). Kiểm chứng trên Directus tạm: thẻ chỉ ở bài nháp và thẻ mồ côi không đọc được.
 - `authors`/`categories`/`directus_files` cho Public đọc **mọi hàng** (dữ liệu tham chiếu để render bài) nhưng **giới hạn field** như trên — không lộ `bio`/`description`/`parent`…
 
 ### 2.2. Tái lập (reproducible) — **không thao tác thủ công**

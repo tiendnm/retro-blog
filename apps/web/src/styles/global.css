@@ -793,3 +793,23 @@ dialog.lightbox::backdrop {
 .archive-month {
   padding: var(--space-1) 0;
 }
+
+/* Thẻ (#tag) dưới bài / trong card */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-xs);
+}
+.tag-list a {
+  color: var(--color-muted);
+  text-decoration: none;
+}
+.tag-list a:hover,
+.tag-list a:focus-visible {
+  color: var(--color-accent);
+  text-decoration: underline;
+}

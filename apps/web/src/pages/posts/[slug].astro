@@ -3,6 +3,7 @@
 // ADR-0006). Chỉ dùng thin client → DTO PostDetail; KHÔNG gọi Directus trực tiếp.
 import Base from '../../layouts/Base.astro';
 import CoverImage from '../../components/CoverImage.astro';
+import TagList from '../../components/TagList.astro';
 import { formatDate } from '../../lib/format';
 import { getAllPublishedPostSlugs, getPostBySlug, getSiteSettings } from '../../lib/directus';
 
@@ -37,6 +38,7 @@ const jsonLd = {
   ...(post.publishedAt ? { datePublished: post.publishedAt } : {}),
   author: { '@type': 'Person', name: post.author.name },
   ...(post.category ? { articleSection: post.category.name } : {}),
+  ...(post.tags.length ? { keywords: post.tags.map((t) => t.name).join(', ') } : {}),
   image: imageAbs,
   mainEntityOfPage: pageUrl,
   publisher: { '@type': 'Organization', name: siteName },
@@ -55,6 +57,7 @@ const jsonLdScript = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
     {post.publishedAt && <meta property="article:published_time" content={post.publishedAt} />}
     <meta property="article:author" content={post.author.name} />
     {post.category && <meta property="article:section" content={post.category.name} />}
+    {post.tags.map((t) => <meta property="article:tag" content={t.name} />)}
     <script type="application/ld+json" is:inline set:html={jsonLdScript} />
   </Fragment>
   {
@@ -84,6 +87,7 @@ const jsonLdScript = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
         }
         {post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
       </p>
+      <TagList tags={post.tags} />
     </header>
     <div class="prose" set:html={bodyHtml}></div>
   </article>

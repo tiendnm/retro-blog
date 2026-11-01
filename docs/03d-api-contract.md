@@ -20,8 +20,12 @@
 | Liệt kê bài đã xuất bản | Trang danh sách | phân trang, sắp xếp | `PostSummary[]` + metadata phân trang |
 | Lấy bài theo slug | Trang chi tiết | slug | `PostDetail` |
 | Liệt kê theo Category | Trang chuyên mục | category slug + phân trang | `PostSummary[]` + metadata |
+| Liệt kê theo Tag | Trang thẻ | tag slug + phân trang | `PostSummary[]` + metadata |
+| Lấy Tag theo slug | Tiêu đề trang thẻ | tag slug | `TagRef` hoặc không có |
+| Liệt kê tháng lưu trữ | Trang `/archive` | — | `{year, month, count}[]` (tháng theo giờ VN, mới nhất trước) |
+| Liệt kê theo tháng | Trang `/archive/YYYY/MM` | năm + tháng | `PostSummary[]` (hết bài của tháng, mới nhất trước) |
 
-> Chỉ *ý nghĩa logic*; ánh xạ endpoint là việc của [06](./06-api.md). (Liệt kê theo **Tag**: tương lai — Tag ngoài phạm vi hiện tại.)
+> Chỉ *ý nghĩa logic*; ánh xạ endpoint là việc của [06](./06-api.md). Tag và lưu trữ theo tháng được thêm **additive** (2026-11-01): không đổi thao tác/DTO cũ, chỉ thêm `tags` vào `PostSummary`/`PostDetail`.
 
 ## 3. Hình dạng dữ liệu (DTO — logic)
 
@@ -36,7 +40,9 @@
   "excerpt": "…",                       // 03c Post.excerpt
   "cover": { "url": "…", "alt": "…" },  // 03c Media (null nếu không có)
   "publishedAt": "…",                   // 03c Post.published_at
-  "author": { "name": "…", "slug": "…" }// 03c Author
+  "author": { "name": "…", "slug": "…" },// 03c Author
+  "category": { "name": "…", "slug": "…" }, // null nếu không gán
+  "tags": [{ "name": "…", "slug": "…" }]      // 03c Tag — [] nếu bài không có thẻ
 }
 ```
 
@@ -54,8 +60,8 @@
     "avatar": { "url": "…", "alt": "…" }// null nếu không có
   },
   "category": { "name": "…", "slug": "…" }, // 03c Category (độc quyền) — null nếu không gán
-  "cover": { "url": "…", "alt": "…" }       // 03c Media — null nếu không có
-  // "tags": — có ở 03c nhưng NGOÀI phạm vi hiện tại (Tag — Nice); bổ sung khi implement Tag
+  "cover": { "url": "…", "alt": "…" },      // 03c Media — null nếu không có
+  "tags": [{ "name": "…", "slug": "…" }]      // 03c Tag — [] nếu bài không có thẻ
 }
 ```
 

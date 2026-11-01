@@ -1,0 +1,45 @@
+---
+// Trang THẺ — TRANG 2+ (SSG). getStaticPaths dùng listPostsByTag sẵn có.
+import Base from '../../../../layouts/Base.astro';
+import PostListView from '../../../../components/PostListView.astro';
+import { getAllTagSlugs, getSiteSettings, getTagBySlug, listPostsByTag } from '../../../../lib/directus';
+
+export async function getStaticPaths() {
+  const slugs = await getAllTagSlugs();
+  const paths = [];
+  for (const slug of slugs) {
+    const { pageInfo } = await listPostsByTag(slug, { page: 1 });
+    const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
+    if (totalPages < 2) continue;
+    const tag = await getTagBySlug(slug);
+    for (let p = 2; p <= totalPages; p++) {
+      const { items } = await listPostsByTag(slug, { page: p });
+      paths.push({
+        params: { slug, page: String(p) },
+        props: { items, currentPage: p, totalPages, tagName: tag?.name ?? slug },
+      });
+    }
+  }
+  return paths;
+}
+
+const { siteName } = await getSiteSettings();
+const { slug } = Astro.params;
+const { items, currentPage, totalPages, tagName } = Astro.props;
+---
+
+<Base
+  title={`#${tagName} — Trang ${currentPage} — ${siteName}`}
+  description={`Các bài viết gắn thẻ ${tagName} trên ${siteName} — Trang ${currentPage}.`}
+  wide
+>
+  <PostListView
+    heading={`Thẻ: #${tagName}`}
+    items={items}
+    emptyText="Chưa có bài viết nào gắn thẻ này."
+    currentPage={currentPage}
+    totalPages={totalPages}
+    baseUrl={`/tag/${slug}`}
+    pagePrefix={`/tag/${slug}/page`}
+  />
+</Base>

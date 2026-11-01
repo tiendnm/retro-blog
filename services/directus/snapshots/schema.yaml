@@ -74,6 +74,30 @@ collections:
       versioning: false
     schema:
       name: posts
+  - collection: posts_tags
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: null
+      archive_value: null
+      collapse: open
+      collection: posts_tags
+      color: null
+      display_template: null
+      group: null
+      hidden: true
+      icon: import_export
+      item_duplication_fields: null
+      note: Bảng nối Post–Tag (03e)
+      preview_url: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations: null
+      unarchive_value: null
+      versioning: false
+    schema:
+      name: posts_tags
   - collection: site_settings
     meta:
       accountability: all
@@ -100,6 +124,30 @@ collections:
       versioning: false
     schema:
       name: site_settings
+  - collection: tags
+    meta:
+      accountability: all
+      archive_app_filter: true
+      archive_field: null
+      archive_value: null
+      collapse: open
+      collection: tags
+      color: null
+      display_template: null
+      group: null
+      hidden: false
+      icon: sell
+      item_duplication_fields: null
+      note: Tag (03c 2.4)
+      preview_url: null
+      singleton: false
+      sort: null
+      sort_field: null
+      translations: null
+      unarchive_value: null
+      versioning: false
+    schema:
+      name: tags
 fields:
   - collection: authors
     field: id
@@ -507,7 +555,10 @@ fields:
       group: null
       hidden: false
       interface: input
-      note: 'Văn bản thay thế (a11y, 03c §2.5): mô tả nội dung ảnh cho screen reader. Bắt buộc khi tải ảnh lên (ảnh trang trí để alt rỗng là quyết định ở tầng hiển thị).'
+      note: >-
+        Văn bản thay thế (a11y, 03c §2.5): mô tả nội dung ảnh cho screen reader.
+        Bắt buộc khi tải ảnh lên (ảnh trang trí để alt rỗng là quyết định ở tầng
+        hiển thị).
       options: null
       readonly: false
       required: true
@@ -664,7 +715,9 @@ fields:
       group: null
       hidden: false
       interface: input
-      note: 'Định danh URL: chữ thường, không dấu, dùng gạch nối thay khoảng trắng. Ổn định sau khi xuất bản (BR-2) — tránh đổi để không gãy link.'
+      note: >-
+        Định danh URL: chữ thường, không dấu, dùng gạch nối thay khoảng trắng.
+        Ổn định sau khi xuất bản (BR-2) — tránh đổi để không gãy link.
       options:
         slug: true
         trim: true
@@ -705,7 +758,9 @@ fields:
       group: null
       hidden: false
       interface: input-multiline
-      note: 'Tóm tắt ngắn: hiển thị ở danh sách bài và dùng làm thẻ mô tả SEO (meta description). Để trống nếu không cần.'
+      note: >-
+        Tóm tắt ngắn: hiển thị ở danh sách bài và dùng làm thẻ mô tả SEO (meta
+        description). Để trống nếu không cần.
       options: null
       readonly: false
       required: false
@@ -803,7 +858,9 @@ fields:
       group: null
       hidden: false
       interface: select-dropdown
-      note: 'Draft = nháp (ẩn khỏi site). Published = công khai khi published_at ≤ hiện tại.'
+      note: >-
+        Draft = nháp (ẩn khỏi site). Published = công khai khi published_at ≤
+        hiện tại.
       options:
         choices:
           - text: Draft
@@ -847,7 +904,9 @@ fields:
       group: null
       hidden: false
       interface: datetime
-      note: 'Để trống khi chuyển sang Published → hệ thống tự đặt = thời điểm hiện tại. Nhập tay để hẹn lịch/lùi ngày; giá trị đã có sẽ KHÔNG bị ghi đè.'
+      note: >-
+        Để trống khi chuyển sang Published → hệ thống tự đặt = thời điểm hiện
+        tại. Nhập tay để hẹn lịch/lùi ngày; giá trị đã có sẽ KHÔNG bị ghi đè.
       options: null
       readonly: false
       required: false
@@ -993,6 +1052,147 @@ fields:
       generation_expression: null
       has_auto_increment: false
       foreign_key_table: directus_files
+      foreign_key_column: id
+  - collection: posts
+    field: tags
+    type: alias
+    meta:
+      collection: posts
+      conditions: null
+      display: null
+      display_options: null
+      field: tags
+      group: null
+      hidden: false
+      interface: list-m2m
+      note: Thẻ (nhiều-nhiều)
+      options:
+        template: '{{tags_id.name}}'
+      readonly: false
+      required: false
+      sort: 11
+      special:
+        - m2m
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+  - collection: posts_tags
+    field: id
+    type: integer
+    meta:
+      collection: posts_tags
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 1
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: posts_tags
+      data_type: integer
+      default_value: nextval('posts_tags_id_seq'::regclass)
+      max_length: null
+      numeric_precision: 32
+      numeric_scale: 0
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: true
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: posts_tags
+    field: posts_id
+    type: uuid
+    meta:
+      collection: posts_tags
+      conditions: null
+      display: null
+      display_options: null
+      field: posts_id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: posts_id
+      table: posts_tags
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: posts
+      foreign_key_column: id
+  - collection: posts_tags
+    field: tags_id
+    type: uuid
+    meta:
+      collection: posts_tags
+      conditions: null
+      display: null
+      display_options: null
+      field: tags_id
+      group: null
+      hidden: true
+      interface: null
+      note: null
+      options: null
+      readonly: false
+      required: false
+      sort: 3
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: tags_id
+      table: posts_tags
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: true
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: tags
       foreign_key_column: id
   - collection: site_settings
     field: id
@@ -1190,6 +1390,148 @@ fields:
       has_auto_increment: false
       foreign_key_table: directus_files
       foreign_key_column: id
+  - collection: tags
+    field: id
+    type: uuid
+    meta:
+      collection: tags
+      conditions: null
+      display: null
+      display_options: null
+      field: id
+      group: null
+      hidden: true
+      interface: input
+      note: null
+      options: null
+      readonly: true
+      required: false
+      sort: 1
+      special:
+        - uuid
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
+    schema:
+      name: id
+      table: tags
+      data_type: uuid
+      default_value: null
+      max_length: null
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: true
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: tags
+    field: name
+    type: string
+    meta:
+      collection: tags
+      conditions: null
+      display: null
+      display_options: null
+      field: name
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: true
+      sort: 2
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: name
+      table: tags
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: false
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: tags
+    field: slug
+    type: string
+    meta:
+      collection: tags
+      conditions: null
+      display: null
+      display_options: null
+      field: slug
+      group: null
+      hidden: false
+      interface: input
+      note: null
+      options: null
+      readonly: false
+      required: true
+      sort: 3
+      special: null
+      translations: null
+      validation: null
+      validation_message: null
+      width: half
+    schema:
+      name: slug
+      table: tags
+      data_type: character varying
+      default_value: null
+      max_length: 255
+      numeric_precision: null
+      numeric_scale: null
+      is_nullable: false
+      is_unique: true
+      is_indexed: false
+      is_primary_key: false
+      is_generated: false
+      generation_expression: null
+      has_auto_increment: false
+      foreign_key_table: null
+      foreign_key_column: null
+  - collection: tags
+    field: posts
+    type: alias
+    meta:
+      collection: tags
+      conditions: null
+      display: null
+      display_options: null
+      field: posts
+      group: null
+      hidden: true
+      interface: list-o2m
+      note: Quan hệ ngược Tag → Post (phục vụ phân quyền/lọc)
+      options:
+        template: '{{posts_id.title}}'
+      readonly: false
+      required: false
+      sort: 4
+      special:
+        - o2m
+      translations: null
+      validation: null
+      validation_message: null
+      width: full
 relations:
   - collection: authors
     field: avatar
@@ -1296,6 +1638,48 @@ relations:
       constraint_name: posts_cover_foreign
       on_update: NO ACTION
       on_delete: SET NULL
+  - collection: posts_tags
+    field: posts_id
+    related_collection: posts
+    meta:
+      junction_field: tags_id
+      many_collection: posts_tags
+      many_field: posts_id
+      one_allowed_collections: null
+      one_collection: posts
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: tags
+      sort_field: null
+    schema:
+      table: posts_tags
+      column: posts_id
+      foreign_key_table: posts
+      foreign_key_column: id
+      constraint_name: posts_tags_posts_id_foreign
+      on_update: NO ACTION
+      on_delete: CASCADE
+  - collection: posts_tags
+    field: tags_id
+    related_collection: tags
+    meta:
+      junction_field: posts_id
+      many_collection: posts_tags
+      many_field: tags_id
+      one_allowed_collections: null
+      one_collection: tags
+      one_collection_field: null
+      one_deselect_action: nullify
+      one_field: posts
+      sort_field: null
+    schema:
+      table: posts_tags
+      column: tags_id
+      foreign_key_table: tags
+      foreign_key_column: id
+      constraint_name: posts_tags_tags_id_foreign
+      on_update: NO ACTION
+      on_delete: CASCADE
   - collection: site_settings
     field: default_og_image
     related_collection: directus_files

@@ -14,6 +14,7 @@ const post = (over: Partial<PostDetail> = {}): PostDetail => ({
   author: { name: 'Tiến', slug: 'tien', avatar: null },
   category: { name: 'Build log', slug: 'build-log' },
   cover: null,
+  tags: [{ name: 'Pentium 4', slug: 'pentium-4' }],
   ...over,
 });
 
@@ -58,6 +59,7 @@ describe('buildRss', () => {
     expect(xml).toContain('<pubDate>Fri, 30 Oct 2026 07:00:00 GMT</pubDate>');
     expect(xml).toContain('<dc:creator>Tiến</dc:creator>');
     expect(xml).toContain('<category>Build log</category>');
+    expect(xml).toContain('<category>Pentium 4</category>');
   });
 
   it('content:encoded chứa body đầy đủ với link nội bộ tuyệt đối', () => {

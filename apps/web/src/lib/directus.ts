@@ -19,6 +19,7 @@ import type {
   PostListResult,
   PostSummary,
   SiteSettings,
+  TagRef,
 } from './types';
 import { type ArchiveMonth, groupByMonth, monthRange } from './archive';
 import { optimizeBodyImages, rewriteAssetUrls } from './rewrite-assets';
@@ -35,11 +36,11 @@ const MAX_PAGE_SIZE = 50;
 // Field allowlist gửi lên Directus — TẬP CON của Public permission (05-cms §2).
 const SUMMARY_FIELDS =
   'id,title,slug,excerpt,published_at,author.name,author.slug,' +
-  'category.name,category.slug,cover.id,cover.alt';
+  'category.name,category.slug,cover.id,cover.alt,tags.tags_id.name,tags.tags_id.slug';
 const DETAIL_FIELDS =
   'id,title,slug,excerpt,body,published_at,' +
   'author.name,author.slug,author.avatar.id,author.avatar.alt,' +
-  'category.name,category.slug,cover.id,cover.alt';
+  'category.name,category.slug,cover.id,cover.alt,tags.tags_id.name,tags.tags_id.slug';
 
 // ---- Hình dạng thô từ Directus (nội bộ module — KHÔNG rò ra UI) ----
 interface RawFile {
@@ -56,6 +57,7 @@ interface RawCategory {
   slug?: string | null;
 }
 interface RawPost {
+  tags?: { tags_id?: RawCategory | null }[] | null;
   id: string;
   title: string;
   slug: string;
@@ -116,6 +118,10 @@ function toCategory(c?: RawCategory | null): CategoryRef | null {
   if (!c?.slug) return null;
   return { name: c.name ?? '', slug: c.slug };
 }
+/** M2M posts_tags → TagRef[]; bỏ dòng nối mà tag không đọc được (Public chỉ thấy tag của bài đã xuất bản). */
+function toTags(p: RawPost): TagRef[] {
+  return (p.tags ?? []).map((t) => toCategory(t.tags_id)).filter((t): t is TagRef => t !== null);
+}
 function toSummary(p: RawPost): PostSummary {
   return {
     id: p.id,
@@ -126,6 +132,7 @@ function toSummary(p: RawPost): PostSummary {
     publishedAt: p.published_at ?? null,
     author: toAuthorSummary(p.author),
     category: toCategory(p.category),
+    tags: toTags(p),
   };
 }
 // ---- Site settings (singleton) — ADR-0012 ----
@@ -187,6 +194,7 @@ function toDetail(p: RawPost): PostDetail {
     author: toAuthorDetail(p.author),
     category: toCategory(p.category),
     cover: toMedia(p.cover),
+    tags: toTags(p),
   };
 }
 
@@ -265,6 +273,38 @@ export async function getCategoryBySlug(slug: string): Promise<CategoryRef | nul
   }
 }
 
+/** Liệt kê bài đã xuất bản gắn một thẻ (mới nhất trước). */
+export async function listPostsByTag(
+  tagSlug: string,
+  params: ListParams = {},
+): Promise<PostListResult> {
+  const page = clampPage(params.page);
+  const pageSize = clampPageSize(params.pageSize);
+  const offset = (page - 1) * pageSize;
+  const { data, meta } = await directusGet<RawPost[]>(
+    `/items/posts?filter[tags][tags_id][slug][_eq]=${encodeURIComponent(tagSlug)}` +
+      `&fields=${SUMMARY_FIELDS}&sort=-published_at&limit=${pageSize}&offset=${offset}&meta=filter_count`,
+  );
+  const total = meta?.filter_count ?? data.length;
+  return {
+    items: data.map(toSummary),
+    pageInfo: { total, page, pageSize, hasMore: offset + data.length < total },
+  };
+}
+
+/** Lấy thẻ theo slug (cho tiêu đề trang). `null` nếu không có / chưa gắn bài nào đã xuất bản. */
+export async function getTagBySlug(slug: string): Promise<TagRef | null> {
+  try {
+    const { data } = await directusGet<RawCategory[]>(
+      `/items/tags?filter[slug][_eq]=${encodeURIComponent(slug)}&fields=name,slug&limit=1`,
+    );
+    return data.length ? toCategory(data[0]) : null;
+  } catch (e) {
+    if (e instanceof DirectusError && e.code === 'not_found') return null;
+    throw e;
+  }
+}
+
 /** Danh sách chuyên mục (thanh chuyên mục). Build (PROD) cache 1 lần/tiến trình. */
 let categoriesCache: Promise<CategoryRef[]> | undefined;
 export function listCategories(): Promise<CategoryRef[]> {
@@ -306,6 +346,14 @@ export async function listPostsByMonth(year: number, month: number): Promise<Pos
 export async function getAllPublishedPostSlugs(): Promise<string[]> {
   const { data } = await directusGet<{ slug: string }[]>(`/items/posts?fields=slug&limit=-1`);
   return data.map((p) => p.slug);
+}
+
+/** Slug các thẻ có bài đã xuất bản (dựng route tĩnh /tag/[slug]). Public chỉ đọc được thẻ như vậy (apply-permissions.sh). */
+export async function getAllTagSlugs(): Promise<string[]> {
+  const { data } = await directusGet<{ slug: string }[]>(
+    `/items/tags?fields=slug&sort=slug&limit=-1`,
+  );
+  return data.map((t) => t.slug);
 }
 
 /** Tất cả slug chuyên mục (dựng route tĩnh /category/[slug]). */

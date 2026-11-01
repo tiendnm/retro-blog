@@ -1,0 +1,22 @@
+---
+// TagList — dãy thẻ của một bài (#tên → /tag/<slug>). Chỉ nhận DTO TagRef; không gọi Directus.
+// Không có thẻ → không render gì (không để lại nhãn/khung rỗng).
+import type { TagRef } from '../lib/types';
+
+interface Props {
+  tags: TagRef[];
+}
+const { tags } = Astro.props;
+---
+
+{
+  tags.length > 0 && (
+    <ul class="tag-list" aria-label="Thẻ">
+      {tags.map((t) => (
+        <li>
+          <a href={`/tag/${t.slug}`}>#{t.name}</a>
+        </li>
+      ))}
+    </ul>
+  )
+}

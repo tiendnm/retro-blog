@@ -1,0 +1,36 @@
+---
+// Trang THẺ — TRANG 1 (page 2+ ở /tag/[slug]/page/[page]). Route tĩnh, cùng khuôn với chuyên mục.
+// Chỉ dùng thin client → DTO; KHÔNG gọi Directus trực tiếp.
+import Base from '../../layouts/Base.astro';
+import PostListView from '../../components/PostListView.astro';
+import { getAllTagSlugs, getSiteSettings, getTagBySlug, listPostsByTag } from '../../lib/directus';
+
+export async function getStaticPaths() {
+  const slugs = await getAllTagSlugs();
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const { siteName } = await getSiteSettings();
+const tag = await getTagBySlug(slug!);
+if (!tag) throw new Error(`Không tìm thấy thẻ: ${slug}`);
+
+const { items, pageInfo } = await listPostsByTag(slug!, { page: 1 });
+const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
+---
+
+<Base
+  title={`#${tag.name} — ${siteName}`}
+  description={`Các bài viết gắn thẻ ${tag.name} trên ${siteName}.`}
+  wide
+>
+  <PostListView
+    heading={`Thẻ: #${tag.name}`}
+    items={items}
+    emptyText="Chưa có bài viết nào gắn thẻ này."
+    currentPage={1}
+    totalPages={totalPages}
+    baseUrl={`/tag/${slug}`}
+    pagePrefix={`/tag/${slug}/page`}
+  />
+</Base>

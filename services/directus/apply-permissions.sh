@@ -43,7 +43,7 @@ if [ "${HAS_PUB:-0}" = "0" ] || [ -z "$HAS_PUB" ]; then
   # FIELD ALLOWLIST — CHỈ field cần cho hợp đồng 03d. KHÔNG dùng '*': field nội bộ
   # thêm về sau sẽ KHÔNG tự động lộ ra Public API (Sprint 2 Phase 3 — bảo mật).
   # posts: rule status=published AND published_at<=$NOW + allowlist (không có 'status').
-  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"posts\",\"action\":\"read\",\"fields\":[\"id\",\"title\",\"slug\",\"excerpt\",\"body\",\"published_at\",\"author\",\"category\",\"cover\"],\"permissions\":{\"_and\":[{\"status\":{\"_eq\":\"published\"}},{\"published_at\":{\"_lte\":\"\$NOW\"}}]}}" >/dev/null
+  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"posts\",\"action\":\"read\",\"fields\":[\"id\",\"title\",\"slug\",\"excerpt\",\"body\",\"published_at\",\"author\",\"category\",\"cover\",\"tags\"],\"permissions\":{\"_and\":[{\"status\":{\"_eq\":\"published\"}},{\"published_at\":{\"_lte\":\"\$NOW\"}}]}}" >/dev/null
   # authors/categories: dữ liệu tham chiếu để render (không lộ bio/description/parent).
   api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"authors\",\"action\":\"read\",\"fields\":[\"id\",\"name\",\"slug\",\"avatar\"],\"permissions\":{}}" >/dev/null
   api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"categories\",\"action\":\"read\",\"fields\":[\"id\",\"name\",\"slug\"],\"permissions\":{}}" >/dev/null
@@ -59,6 +59,24 @@ HAS_SS=$(api GET "/permissions?filter[policy][_eq]=$PUB&filter[collection][_eq]=
 if [ "${HAS_SS:-0}" = "0" ] || [ -z "$HAS_SS" ]; then
   echo "-> tạo Public read site_settings"
   api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"site_settings\",\"action\":\"read\",\"fields\":[\"site_name\",\"description\",\"footer_text\",\"default_og_image\"],\"permissions\":{}}" >/dev/null
+fi
+
+# ---- PUBLIC: Tags (Sprint 11 — 03c §2.4; idempotent riêng) ----
+# Chỉ lộ tag CÓ ÍT NHẤT MỘT bài đã xuất bản và dòng nối của bài đã xuất bản → tên tag/quan hệ của bài nháp không lộ.
+# LƯU Ý (Directus 11.3.5): `$NOW` lồng trong đường o2m `tags → posts` sinh SQL sai (lỗi 500 "unnamed portal parameter"),
+# và `_and` lồng trong đường quan hệ cũng vậy → tags chỉ lọc `status = published` (đủ để ẩn tag của bài nháp; bài hẹn giờ
+# chưa tới hạn chỉ lộ tên tag, không lộ bài). posts_tags đi qua M2O nên lọc đủ cả status lẫn published_at.
+HAS_TAGS=$(api GET "/permissions?filter[policy][_eq]=$PUB&filter[collection][_eq]=tags&aggregate[count]=id" | val count id)
+if [ "${HAS_TAGS:-0}" = "0" ] || [ -z "$HAS_TAGS" ]; then
+  echo "-> tạo Public read tags + posts_tags"
+  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"tags\",\"action\":\"read\",\"fields\":[\"id\",\"name\",\"slug\"],\"permissions\":{\"posts\":{\"posts_id\":{\"status\":{\"_eq\":\"published\"}}}}}" >/dev/null
+  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"posts_tags\",\"action\":\"read\",\"fields\":[\"id\",\"posts_id\",\"tags_id\"],\"permissions\":{\"posts_id\":{\"status\":{\"_eq\":\"published\"},\"published_at\":{\"_lte\":\"\$NOW\"}}}}" >/dev/null
+fi
+# posts: thêm field `tags` vào allowlist Public (permission posts đã có từ trước → cập nhật tại chỗ).
+PUB_POSTS=$(api GET "/permissions?filter[policy][_eq]=$PUB&filter[collection][_eq]=posts&fields=id,fields" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const r=JSON.parse(d).data[0];if(r&&!r.fields.includes('tags'))process.stdout.write(r.id+' '+JSON.stringify([...r.fields,'tags']))}catch(e){}})")
+if [ -n "$PUB_POSTS" ]; then
+  echo "-> thêm 'tags' vào allowlist Public của posts"
+  api PATCH "/permissions/${PUB_POSTS%% *}" "{\"fields\":${PUB_POSTS#* }}" >/dev/null
 fi
 
 # ---- EDITOR policy + role + access + permissions (idempotent) ----
@@ -85,6 +103,16 @@ if [ -n "$ED_POL" ] && { [ "${HAS_ESS:-0}" = "0" ] || [ -z "$HAS_ESS" ]; }; then
   echo "-> tạo Editor permissions site_settings"
   for a in read update; do
     api POST /permissions "{\"policy\":\"$ED_POL\",\"collection\":\"site_settings\",\"action\":\"$a\",\"fields\":[\"*\"]}" >/dev/null
+  done
+fi
+# ---- EDITOR: tags + posts_tags (Sprint 11; CRUD đầy đủ như posts/categories) ----
+HAS_ETAG=$(api GET "/permissions?filter[policy][_eq]=$ED_POL&filter[collection][_eq]=tags&aggregate[count]=id" | val count id)
+if [ -n "$ED_POL" ] && { [ "${HAS_ETAG:-0}" = "0" ] || [ -z "$HAS_ETAG" ]; }; then
+  echo "-> tạo Editor permissions tags + posts_tags"
+  for c in tags posts_tags; do
+    for a in create read update delete; do
+      api POST /permissions "{\"policy\":\"$ED_POL\",\"collection\":\"$c\",\"action\":\"$a\",\"fields\":[\"*\"]}" >/dev/null
+    done
   done
 fi
 echo "DONE"

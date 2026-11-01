@@ -40,7 +40,7 @@
 
 | Hạng mục | Nguồn | Ghi chú |
 |---|---|---|
-| Duyệt theo **Tag** | FR-R3 (phần Tag) | Kèm content type **Tag** ([03c §2.4](./03c-content-model.md)); Category đã là Must (§3) |
+| Duyệt theo **Tag** | FR-R3 (phần Tag) | ✅ Đã làm 2026-11-01 — content type **Tag** ([03c §2.4](./03c-content-model.md)); Category đã là Must (§3) |
 | RSS / Atom feed | FR-R5 (Should) | |
 | Lên lịch xuất bản (Scheduled) | FR-E3 (phần "schedule"); [03b §4](./03b-domain-model.md) nhánh *Scheduled* | "Publish" là Must; "schedule" là Nice |
 | Trạng thái *Chờ duyệt* (In Review) | [03b §4](./03b-domain-model.md) | Chỉ cần khi nhiều biên tập viên |

@@ -41,10 +41,10 @@
 
 - **Deploy (@deploy):** xác nhận ACME/DNS + CSP trên domain thật, (2FA admin: bỏ qua có chủ đích), (HSTS 1 năm và backup ra ngoài host: xong 2026-11-01); rate limiting Directus, container không chạy root, quét dependency.
 - **Kiểm thử mở rộng:** test độ bền thin client, axe a11y, link-check, Lighthouse budget, E2E.
-- **Reader feature:** Category discoverability, Search, Tags, Archive, Author pages.
+- **Reader feature:** Category discoverability, Search, Author pages.
 - **Refactor docs-architecture:** F1–F15 ([architecture review](./reviews/architecture-review-2026-07-21.md)).
 
-> RSS (`/rss.xml`) đã làm xong 2026-11-01 — [15 §A4](./15-seo-accessibility.md).
+> Đã làm xong 2026-11-01 — RSS (`/rss.xml`), Tags (`/tag/<slug>`), Archive (`/archive`): [15 §A4](./15-seo-accessibility.md).
 
 ## 5. Phát hành
 

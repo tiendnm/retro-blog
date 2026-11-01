@@ -25,13 +25,18 @@ git pull --ff-only
 say "Build lại image (web, ops)"
 dc build web ops
 
-say "Khởi động lại stack"
-dc up -d --remove-orphans --wait --wait-timeout 1200
-
 if [ "$WEB_ONLY" = 1 ]; then
+  say "Khởi động lại stack"
+  dc up -d --remove-orphans --wait --wait-timeout 1200
   say "Bỏ qua áp cấu hình CMS (--web-only)"
 else
+  # Áp cấu hình CMS TRƯỚC khi web khởi động lại: web build site ngay lúc khởi động và code mới có thể hỏi field/quyền
+  # mới (vd tags) — nếu schema chưa áp thì build lỗi và update dừng giữa chừng. Directus chỉ cần Postgres.
+  say "Khởi động Postgres + Directus"
+  dc up -d --remove-orphans --wait --wait-timeout 600 postgres directus
   setup_cms
+  say "Khởi động lại stack"
+  dc up -d --remove-orphans --wait --wait-timeout 1200
 fi
 
 say "Kiểm tra"

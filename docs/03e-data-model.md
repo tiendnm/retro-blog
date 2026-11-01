@@ -21,7 +21,7 @@
 | Category | id | slug (unique) | phân cấp? (parent ref) |
 | Tag | id | slug (unique) | |
 | Media | id | — | tham chiếu tệp |
-| Post–Tag | (post_id, tag_id) | — | bảng nối nhiều-nhiều |
+| Post–Tag | (post_id, tag_id) | — | bảng nối nhiều-nhiều (`posts_tags`: `id` integer, `posts_id`, `tags_id`; CASCADE) |
 
 ## 3. Quan hệ & Toàn vẹn tham chiếu (Referential Integrity)
 
