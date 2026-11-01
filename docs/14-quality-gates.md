@@ -50,7 +50,7 @@ Một hạng mục (story/task) chỉ được kéo vào sprint khi:
 
 ## 4. Điều kiện merge
 
-- CI xanh là điều kiện bắt buộc: job **`quality`** (lint → format → typecheck → test) là required check ngay; job **`build`** (cần Directus + Postgres + seed; từ Sprint 11 còn chạy test quyền Public + luồng publish → build) và job **`site-checks`** (Sprint 11: link/sitemap/canonical/RSS, Playwright + axe, Lighthouse — cần artifact `dist` của `build`) chạy `continue-on-error` cho tới khi ổn định (`site-checks` xanh 10 lần liên tiếp trên `main`), rồi nâng thành required ở Sprint 13 — Product xác nhận lúc nâng.
+- CI xanh là điều kiện bắt buộc: job **`quality`** (lint → format → typecheck → test → shellcheck → hồi quy header bảo mật của Caddy, [12 §6](./12-security.md)) là required check ngay; job **`build`** (cần Directus + Postgres + seed; từ Sprint 11 còn chạy test quyền Public + luồng publish → build) và job **`site-checks`** (Sprint 11: link/sitemap/canonical/RSS, Playwright + axe, Lighthouse — cần artifact `dist` của `build`) chạy `continue-on-error` cho tới khi ổn định (`site-checks` xanh 10 lần liên tiếp trên `main`), rồi nâng thành required ở Sprint 13 — Product xác nhận lúc nâng.
 - **Branch protection (đã bật, 2026-10-07)** trên `main` của repo public `tiendnm/retro-blog`: required check **`quality`**, cấm force-push và xoá nhánh. `enforce_admins=false` → chủ repo vẫn push thẳng được (repo một người); người khác chỉ merge được khi `quality` xanh. Job `build` chưa required (còn `continue-on-error`). Gói GitHub Free chỉ cho protection ở repo **public**.
 - Review ở ranh giới sprint; giữa sprint chỉ dừng cho thay đổi hạ tầng / bảo mật / schema / kiến trúc ([17 §2](./17-contributing.md)).
 
