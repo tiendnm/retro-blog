@@ -679,6 +679,22 @@ main {
 .prose th {
   background: var(--color-surface);
 }
+/* Màn hẹp: thu gọn để bảng nhỏ vừa khung, không phải cuộn ngang */
+@media (max-width: 560px) {
+  .prose table {
+    font-size: var(--text-xs);
+  }
+  .prose th,
+  .prose td {
+    padding: var(--space-1) var(--space-2);
+    min-width: 5ch;
+    line-height: 1.4;
+  }
+  .prose th:first-child,
+  .prose td:first-child {
+    white-space: normal;
+  }
+}
 
 /* Image trong nội dung */
 .prose img {
