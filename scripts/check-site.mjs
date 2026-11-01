@@ -42,7 +42,7 @@ function attrValues(html) {
   const re = /\b(href|src|srcset)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;
   for (const m of html.matchAll(re)) {
     const name = m[1].toLowerCase();
-    const val = (m[2] ?? m[3] ?? m[4] ?? '').trim();
+    const val = (m[2] ?? m[3] ?? m[4] ?? '').trim().replaceAll('&amp;', '&');
     if (name === 'srcset') {
       for (const part of val.split(',')) {
         const u = part.trim().split(/\s+/)[0];

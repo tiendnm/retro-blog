@@ -422,6 +422,15 @@ for (const a of NEW_AUTHORS) {
   authorId[a.slug] = r.data.id;
 }
 
+// 3b) Thẻ (tạo nếu chưa có) — để trang /tag/<slug> có dữ liệu (E2E/axe, Sprint 11)
+const TAGS = [
+  { name: '8-bit', slug: '8-bit' },
+  { name: 'Lưu trữ', slug: 'luu-tru' },
+  { name: 'Màn hình', slug: 'man-hinh' },
+];
+const tagId = {};
+for (const t of TAGS) tagId[t.slug] = (await findOne('tags', t.slug)) ?? (await api('POST', '/items/tags', t)).data.id;
+
 // 4) Ảnh bìa cho bài seed-dev
 let patched = 0;
 for (const [slug, key] of Object.entries(EXISTING_COVERS)) {
@@ -432,7 +441,9 @@ for (const [slug, key] of Object.entries(EXISTING_COVERS)) {
 // 5) Bài mới
 const now = Date.now();
 const DAY = 86400000;
-for (const p of POSTS) {
+for (const [i, p] of POSTS.entries()) {
+  // Mỗi bài 1–2 thẻ, xoay vòng: thẻ nào cũng có bài; nhiều bài chung thẻ.
+  const postTags = [TAGS[i % TAGS.length], ...(i % 2 ? [TAGS[(i + 1) % TAGS.length]] : [])];
   const md = p.body.replace(/\{\{([a-z0-9-]+)\}\}/g, (_, k) => `![${PHOTOS[k]}](${assetUrl(k)})`);
   await api('POST', '/items/posts', {
     title: p.title, slug: p.slug, excerpt: p.excerpt, body: mdToHtml(md),
@@ -440,6 +451,7 @@ for (const p of POSTS) {
     published_at: new Date(now - p.daysAgo * DAY - (p.daysAgo % 5) * 3600000).toISOString(),
     author: authorId[p.author], category: catId[p.cat],
     cover: p.cover ? fileId[p.cover] : null,
+    tags: postTags.map((t) => ({ tags_id: tagId[t.slug] })),
   });
 }
 
