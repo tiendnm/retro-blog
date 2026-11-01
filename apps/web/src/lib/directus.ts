@@ -33,6 +33,9 @@ const INTERNAL_URL = process.env.DIRECTUS_INTERNAL_URL ?? 'http://directus:8055'
 // URL công khai để BROWSER tải asset (ảnh) — nhúng vào HTML lúc render.
 const PUBLIC_URL = process.env.PUBLIC_DIRECTUS_URL ?? 'http://localhost:8055';
 
+// Giới hạn thời gian mỗi request: Directus treo thì build lỗi rõ ràng thay vì treo vô hạn.
+const REQUEST_TIMEOUT_MS = 15_000;
+
 const DEFAULT_PAGE_SIZE = 10; // 03d §4
 const MAX_PAGE_SIZE = 50;
 
@@ -94,6 +97,7 @@ async function directusGet<T>(path: string): Promise<DirectusList<T>> {
   try {
     res = await fetch(`${INTERNAL_URL}${path}`, {
       headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
   } catch (e) {
     throw new DirectusError('system', `Directus không truy cập được: ${(e as Error).message}`);
