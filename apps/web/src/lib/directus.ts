@@ -20,6 +20,7 @@ import type {
   PostSummary,
   SiteSettings,
 } from './types';
+import { type ArchiveMonth, groupByMonth, monthRange } from './archive';
 import { optimizeBodyImages, rewriteAssetUrls } from './rewrite-assets';
 import { sanitizeBody } from './sanitize-body';
 
@@ -273,6 +274,30 @@ export function listCategories(): Promise<CategoryRef[]> {
   ).then((r) => r.data.map(toCategory).filter((c): c is CategoryRef => c !== null));
   if (import.meta.env.PROD) categoriesCache = p;
   return p;
+}
+
+/** Các tháng có bài (mới nhất trước) kèm số bài — trang /archive. Tháng theo giờ VN (archive.ts). */
+export async function getArchiveMonths(): Promise<ArchiveMonth[]> {
+  const { data } = await directusGet<{ published_at?: string | null }[]>(
+    '/items/posts?fields=published_at&limit=-1',
+  );
+  return groupByMonth(data.map((p) => p.published_at ?? null));
+}
+
+/** Tất cả bài đã xuất bản trong một tháng (giờ VN), mới nhất trước. Một tháng hiếm khi quá 50 bài → gom hết các trang. */
+export async function listPostsByMonth(year: number, month: number): Promise<PostSummary[]> {
+  const { from, to } = monthRange(year, month);
+  const items: PostSummary[] = [];
+  for (let page = 1; ; page++) {
+    const offset = (page - 1) * MAX_PAGE_SIZE;
+    const { data } = await directusGet<RawPost[]>(
+      `/items/posts?filter[published_at][_gte]=${encodeURIComponent(from)}` +
+        `&filter[published_at][_lt]=${encodeURIComponent(to)}` +
+        `&fields=${SUMMARY_FIELDS}&sort=-published_at&limit=${MAX_PAGE_SIZE}&offset=${offset}`,
+    );
+    items.push(...data.map(toSummary));
+    if (data.length < MAX_PAGE_SIZE) return items;
+  }
 }
 
 // ---- Hỗ trợ getStaticPaths (SSG — ADR-0006) ----

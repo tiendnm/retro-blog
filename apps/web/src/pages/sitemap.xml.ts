@@ -1,13 +1,14 @@
 // Endpoint sitemap.xml (Sprint 5 Phase 2) — TỰ VIẾT, không thêm dependency.
 // Chính sách (Decision Log [S5-P0]): CHỈ canonical *content* URL —
-//   home + mọi bài published + trang-1 mỗi chuyên mục.
+//   home + mọi bài published + trang-1 mỗi chuyên mục + /archive và mỗi tháng có bài.
 // LOẠI pagination (/page/N, /category/<slug>/page/N): là điều hướng, không
 //   canonical → tránh loãng crawl budget. Pagination vẫn index được nhờ
 //   self-canonical + rel=prev/next (Base.astro / Pagination.astro).
 // Nguồn URL: getAllPublishedPostSlugs / getAllCategorySlugs (thin client sẵn có,
 //   KHÔNG đổi hợp đồng). Địa chỉ tuyệt đối lấy từ `site` (= PUBLIC_SITE_URL).
 import type { APIRoute } from 'astro';
-import { getAllPublishedPostSlugs, getAllCategorySlugs } from '../lib/directus';
+import { getAllPublishedPostSlugs, getAllCategorySlugs, getArchiveMonths } from '../lib/directus';
+import { monthPath } from '../lib/archive';
 
 // Escape ký tự đặc biệt XML trong <loc>. Slug hiện là [a-z0-9-] nên hiếm khi
 // cần, nhưng giữ an toàn nếu quy ước slug đổi.
@@ -18,15 +19,18 @@ const xmlEscape = (s: string): string =>
 
 export const GET: APIRoute = async ({ site }) => {
   const base = (site?.href ?? 'http://localhost:4321/').replace(/\/$/, '');
-  const [postSlugs, categorySlugs] = await Promise.all([
+  const [postSlugs, categorySlugs, months] = await Promise.all([
     getAllPublishedPostSlugs(),
     getAllCategorySlugs(),
+    getArchiveMonths(),
   ]);
 
   const paths = [
     '/',
     ...postSlugs.map((s) => `/posts/${s}`),
     ...categorySlugs.map((s) => `/category/${s}`),
+    '/archive',
+    ...months.map((m) => monthPath(m.year, m.month)),
   ];
 
   const body = `<?xml version="1.0" encoding="UTF-8"?>

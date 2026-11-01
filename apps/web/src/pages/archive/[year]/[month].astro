@@ -1,0 +1,38 @@
+---
+// Trang LƯU TRỮ THEO THÁNG (/archive/YYYY/MM). Route tĩnh dựng từ các tháng có bài.
+// Một trang liệt kê hết bài của tháng (không phân trang — một tháng hiếm khi quá vài chục bài).
+import Base from '../../../layouts/Base.astro';
+import PostListView from '../../../components/PostListView.astro';
+import { getArchiveMonths, getSiteSettings, listPostsByMonth } from '../../../lib/directus';
+import { monthLabel, monthPath } from '../../../lib/archive';
+
+export async function getStaticPaths() {
+  const months = await getArchiveMonths();
+  return months.map((m) => ({
+    params: { year: String(m.year), month: String(m.month).padStart(2, '0') },
+    props: { year: m.year, month: m.month },
+  }));
+}
+
+const { year, month } = Astro.props;
+const { siteName } = await getSiteSettings();
+const items = await listPostsByMonth(year, month);
+const label = monthLabel(year, month);
+---
+
+<Base
+  title={`${label} — Lưu trữ — ${siteName}`}
+  description={`Các bài viết đăng trong ${label.toLowerCase()} trên ${siteName}.`}
+  wide
+>
+  <p class="meta"><a href="/archive">← Lưu trữ</a></p>
+  <PostListView
+    heading={label}
+    items={items}
+    emptyText="Không có bài viết nào trong tháng này."
+    currentPage={1}
+    totalPages={1}
+    baseUrl={monthPath(year, month)}
+    pagePrefix={`${monthPath(year, month)}/page`}
+  />
+</Base>

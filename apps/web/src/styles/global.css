@@ -780,3 +780,16 @@ dialog.lightbox::backdrop {
     right: var(--space-4);
   }
 }
+
+/* Lưu trữ (/archive): danh sách tháng nhóm theo năm */
+.archive-year {
+  margin: 0 0 var(--space-6);
+}
+.archive-months {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.archive-month {
+  padding: var(--space-1) 0;
+}

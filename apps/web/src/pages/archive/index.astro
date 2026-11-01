@@ -1,0 +1,38 @@
+---
+// Trang LƯU TRỮ — liệt kê các tháng có bài, nhóm theo năm. Route tĩnh; chỉ dùng thin client → DTO.
+import Base from '../../layouts/Base.astro';
+import { getArchiveMonths, getSiteSettings } from '../../lib/directus';
+import { monthLabel, monthPath } from '../../lib/archive';
+
+const { siteName } = await getSiteSettings();
+const months = await getArchiveMonths();
+const years = [...new Set(months.map((m) => m.year))];
+---
+
+<Base
+  title={`Lưu trữ — ${siteName}`}
+  description={`Toàn bộ bài viết trên ${siteName}, sắp theo tháng.`}
+>
+  <h1>Lưu trữ</h1>
+  {
+    months.length === 0 ? (
+      <p class="empty-state">Chưa có bài viết nào được xuất bản.</p>
+    ) : (
+      years.map((year) => (
+        <section class="archive-year" aria-labelledby={`y${year}`}>
+          <h2 class="dir-heading" id={`y${year}`}>{year}</h2>
+          <ul class="archive-months">
+            {months
+              .filter((m) => m.year === year)
+              .map((m) => (
+                <li class="archive-month">
+                  <a href={monthPath(m.year, m.month)}>{monthLabel(m.year, m.month)}</a>
+                  <span class="meta"> — {m.count} bài</span>
+                </li>
+              ))}
+          </ul>
+        </section>
+      ))
+    )
+  }
+</Base>
