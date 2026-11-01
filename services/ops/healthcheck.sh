@@ -1,7 +1,8 @@
 #!/bin/sh
 # ── Health check / uptime (Sprint 8) ───────────────────────────────────────
 # Kiểm: site trả 200 · /robots.txt & /sitemap.xml · Directus /server/health = ok ·
-# chứng chỉ TLS còn hạn. Exit 0 nếu tất cả đạt, 1 nếu có mục hỏng. Production: service `ops`
+# chứng chỉ TLS còn hạn · (Sprint 12) đĩa, RAM/swap, tuổi backup local + R2 (hostcheck.sh).
+# Exit 0 nếu tất cả đạt, 1 nếu có mục hỏng. Production: service `ops`
 # (scheduler.sh, ADR-0017) chạy định kỳ; cũng chạy tay được trên host hoặc máy khác.
 #
 #   Env bắt buộc: SITE_URL (vd https://retro.example.com), CMS_URL (vd https://cms.example.com)
@@ -58,6 +59,13 @@ if command -v openssl >/dev/null 2>&1; then
   done
 else
   echo "SKIP  kiểm TLS (không có openssl)"
+fi
+
+# Tài nguyên máy + độ tươi backup (đĩa, RAM/swap, tuổi backup local & R2) — xem hostcheck.sh.
+HOSTCHECK_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)"
+if [ -f "$HOSTCHECK_DIR/hostcheck.sh" ]; then
+  hc_out=$(sh "$HOSTCHECK_DIR/hostcheck.sh" 2>&1) || FAILED=1
+  echo "$hc_out"
 fi
 
 if [ -n "${HEALTHCHECK_PING_URL:-}" ]; then

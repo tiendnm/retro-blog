@@ -9,6 +9,7 @@
 # - web = build-runner + receiver webhook (ADR-0008, ADR-0016): build lần đầu → volume site_dist (Caddy phục vụ),
 #   rồi lắng nghe POST /rebuild từ Directus (chỉ trong mạng compose, KHÔNG publish cổng).
 # - ops = backup hằng ngày + healthcheck (ADR-0017): không docker.sock, mount chỉ-đọc, chạy bằng uid của user triển khai.
+# - Mọi service: log json-file xoay vòng 10 MB × 3 bản (Sprint 12) — trước đó không giới hạn.
 # - directus: KHÔNG publish cổng ra host; chỉ tới được trong mạng compose (Caddy, ops). Public qua Caddy.
 name: retro-blog
 
@@ -36,6 +37,9 @@ services:
       timeout: 5s
       retries: 12
       start_period: 20s
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
 
   directus:
     # Không publish cổng ra host (public đi qua Caddy; script vận hành chạy trong `ops` gọi http://directus:8055).
@@ -76,6 +80,9 @@ services:
     cap_drop: [ALL]
     security_opt:
       - no-new-privileges:true
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
 
   # Web = build-runner + receiver (ADR-0008/0016): web-entrypoint.sh build lần đầu (astro build →
   # staging builds/<TS> → ATOMIC SWAP symlink `current`, build-swap.sh), rồi chạy webhook.mjs;
@@ -120,6 +127,9 @@ services:
     depends_on:
       directus:
         condition: service_healthy
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
 
   # Vận hành định kỳ (ADR-0017): scheduler.sh → backup.sh (03:30) + healthcheck.sh (5 phút). Cũng dùng cho tác vụ
   # chạy một lần khi dựng server:  docker compose run --rm ops <lệnh>  (node, bash, curl, pg_dump có sẵn).
@@ -182,6 +192,9 @@ services:
       timeout: 5s
       retries: 3
       start_period: 120s
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
 
   # Caddy edge: TLS tự động (hoặc HTTP sau Cloudflare Tunnel), phục vụ static, proxy Directus.
   caddy:
@@ -216,6 +229,9 @@ services:
       - caddy_config:/config
     networks:
       - retro-net
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
 
 volumes:
   pgdata:
