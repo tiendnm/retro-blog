@@ -62,7 +62,9 @@
 
 **Audit sạch high+ (2026-11-01):** `pnpm.overrides` `fast-uri >=3.1.9 <4` trong `apps/web/package.json` vá chuỗi dev `@astrojs/check`→`ajv`; `security.yml` quét mọi deps ở mức high+ và **không còn `continue-on-error`** (đỏ khi có lỗ hổng high/critical mới). Còn 1 lỗ hổng low (`esbuild` qua vite, bản vá 0.28.1 chưa vào chuỗi astro/vite) — không chặn.
 
-**Còn lại (Backlog):** cân nhắc Directus 12.x (đã nâng 11.3.5 → 11.17.4, 2026-11-01) · chưa có rate limit riêng cho đăng nhập admin.
+**Đánh giá Directus 12.6.0 (2026-11-01, PR #17 — KHÔNG nâng):** thử thật trên bản sao backup prod (Postgres 16.15). Migration chạy được (có `Add Licensing`), `schema apply` và permissions qua. **Chặn:** (1) bản tự host không giấy phép là tầng *Core* — tạo Flow thứ 6 trả `403 LIMIT_EXCEEDED "flows limit exceeded"`; dự án cần **9 Flow** (Auto slug ×4, Guard slug ×4, Rebuild on publish) → `apply-rebuild-flow.mjs`/`apply-slug-flow.mjs` lỗi (script còn xoá flow cũ rồi mới tạo nên để lại trạng thái dở). (2) Theo release notes (chưa tự kiểm): sau 30 ngày ân hạn, *custom rules* của access policy bị bỏ qua nếu không có license — Public đang dựa vào filter `status=published AND published_at<=$NOW`, rủi ro lộ bài nháp hoặc ẩn hết; SSO cũng cần license; relicense BUSL-1.1 → MSCL-1.0-GPL. **Cũng đổi (đã thấy):** `/server/health` ẩn danh trả 403 (dùng `/server/ping`; sửa healthcheck compose, `ops/healthcheck.sh`, `update.sh`, CI), image không còn `npx` (dùng `node cli.js …`), Node 26 tối thiểu từ 12.6.0, `IP_TRUST_PROXY` mặc định `false`, Flow Update/Delete Items đổi hành vi khi key/query rỗng. Kết luận: ở lại 11.17.4 (còn nhận bản vá 11.x) cho tới khi có quyết định về license/giới hạn Flow.
+
+**Còn lại (Backlog):** Directus 12.x: đã đánh giá, chưa nâng (xem trên; đã nâng 11.3.5 → 11.17.4, 2026-11-01) · chưa có rate limit riêng cho đăng nhập admin.
 
 ## 7. Bảo mật chuỗi cung ứng (Supply chain)
 

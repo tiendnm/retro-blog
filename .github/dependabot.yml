@@ -23,6 +23,9 @@ updates:
     ignore:
       - dependency-name: postgres
         update-types: ["version-update:semver-major"]
+      # Directus 12 bị chặn bởi giới hạn Flow của tầng Core (12 §6) → chỉ nhận bản 11.x cho tới khi có quyết định.
+      - dependency-name: directus/directus
+        update-types: ["version-update:semver-major"]
     groups:
       compose-minor-and-patch:
         update-types: [minor, patch]
