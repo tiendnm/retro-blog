@@ -73,8 +73,8 @@ const jsonLdScript = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
         class="post__cover"
         src={post.cover.url}
         alt={post.cover.alt}
-        widths={[640, 960, 1200, 1600]}
-        sizes="(min-width: 1120px) 1080px, calc(100vw - 2.5rem)"
+        widths={[640, 960, 1200]}
+        sizes="(min-width: 860px) 800px, calc(100vw - 2.5rem)"
         eager
       />
     )

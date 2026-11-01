@@ -58,7 +58,7 @@
 | PostCard (list item) | **Option B**: thumbnail hỗ trợ (nhỏ, trái) + text chủ đạo; không cover → text-only, không placeholder — `PostCard.astro` | 🟢 Phase 2 |
 | CoverImage (ảnh) | Render ảnh nếu có `src`; không thì rỗng (không placeholder/ảnh mặc định) — `CoverImage.astro` | 🟢 Phase 2 |
 | Empty state (list) | Khối `.empty-state` khi list rỗng | 🟢 Phase 2 |
-| Post layout (detail) | **Banner** ảnh bìa (`.post__cover`, rộng `--container-wide` ≤1080px, cao 280px / 160px mobile, `object-fit: cover`) **nằm trên tiêu đề** (kiểu Notion) + `.post` = cột đọc (`--reading-width`) + header + `.prose` | 🟢 |
+| Post layout (detail) | **Banner** ảnh bìa (`.post__cover`, rộng bằng cột đọc `--reading-width`, tỉ lệ 2:1, `object-fit: cover`) **nằm trên tiêu đề** + `.post` = cột đọc (`--reading-width`) + header + `.prose` | 🟢 |
 | Lightbox ảnh thân bài | Bấm ảnh trong `.prose` → `<dialog>` toàn màn hình (`scripts/lightbox.ts`): ảnh webp 2000px, chú thích = `alt` + (n/N), `Esc`/✕/bấm nền đóng, ←/→ chuyển ảnh (vòng lặp), Enter/Space mở bằng bàn phím, trả focus khi đóng, khoá cuộn nền. Tuân CSP `script-src 'self'` (script ngoài; `assetsInlineLimit: 0`) | 🟢 |
 | Bố cục trang list (D) | `PostListView`: **hero** (cửa sổ OS cổ) → **lưới thẻ giấy** 3 cột → **danh sách gọn** "Cũ hơn"; thanh chuyên mục (chip); container list ~1080px, chi tiết giữ cột đọc; ảnh `srcset` qua Directus transform — [proposal](./sprints/homepage-layout-proposal.md) | 🟢 |
 | Prose (HTML body) | `.prose` — style TẬP TRUNG cho toàn bộ HTML của body (heading/list/blockquote/code/table/hr/img); vertical rhythm nhất quán | 🟢 Phase 3 |

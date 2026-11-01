@@ -503,22 +503,17 @@ main {
 .post__header .meta {
   margin: 0;
 }
-/* Ảnh bìa kiểu banner (Notion): nằm trên tiêu đề, rộng hơn cột chữ, cắt dẹt bằng object-fit. */
+/* Ảnh bìa: vừa đúng bề rộng cột bài viết (cùng khung với tiêu đề và thân bài), cắt dẹt 2:1 bằng object-fit. */
 .post__cover {
   display: block;
-  width: min(var(--container-wide), calc(100vw - 2 * var(--container-pad-x)));
-  max-width: none; /* thắng `img { max-width: 100% }` — nếu không banner bị kẹt ở bề rộng cột */
-  height: 280px;
-  margin: 0 0 var(--space-6) 50%;
-  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--reading-width);
+  aspect-ratio: 2 / 1;
+  height: auto;
+  margin: 0 0 var(--space-6);
   object-fit: cover;
   object-position: center;
   border: var(--border-width) solid var(--color-border);
-}
-@media (max-width: 600px) {
-  .post__cover {
-    height: 160px;
-  }
 }
 
 .prose {
