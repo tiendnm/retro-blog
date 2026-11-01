@@ -65,14 +65,14 @@
 
 Công cụ: [`services/ops/backup.sh`](../services/ops/backup.sh) và [`prune-backups.sh`](../services/ops/prune-backups.sh) chạy **tự động trong service `ops`** ([ADR-0017](./adr/0017-ops-services-in-compose.md)); [`restore.sh`](../services/ops/restore.sh) chạy **tay trên host** (uploads mount `:ro` trong `ops`). Backup tay: `docker compose --env-file .env.production exec ops sh services/ops/backup.sh`. Khôi phục: `ENV_FILE=.env.production PG_VIA_COMPOSE=1 sh services/ops/restore.sh backups/<YYYYMMDD-HHMMSS>` rồi `sh services/rebuild/rebuild.sh`. Restore drill với Postgres-trong-compose: đạt (Sprint 9, dump → DB trống → posts 4=4).
 
-> ⚠️ **Hiện chưa có backup ra ngoài máy** (quyết định của Product, 2026-10-07): backup nằm cùng ổ HDD, chỉ cứu lỗi phần mềm/xoá nhầm — **không** cứu hỏng ổ hoặc mất máy. Xem [08a §0](./08a-deploy-home-tunnel.md).
+> ✅ **Backup ra ngoài máy (2026-11-01):** sau mỗi lần backup, [`offsite.sh`](../services/ops/offsite.sh) (rclone) đẩy `db.dump` + `uploads.tgz` + config lên **Cloudflare R2** (bucket private, token giới hạn theo bucket), giữ `R2_KEEP` bản mới nhất (mặc định 30). **`env.bak` (secret) KHÔNG lên R2** → khi dựng lại server phải tạo lại secret/token (tunnel lấy ở Cloudflare). Dùng `copy` (không `sync`) nên thư mục local trống sau khi thay ổ không xoá backup trên R2. Kiểm tra kết nối: `docker compose --env-file .env.production exec ops sh services/ops/offsite.sh --check`. Lỗi đẩy chỉ cảnh báo trong log `ops`, lần backup sau tự đẩy bù. Còn thiếu: **restore drill từ R2** (tải về → `restore.sh`).
 
 | Hạng mục | Chính sách |
 |---|---|
 | Sao lưu gì | **database** (`pg_dump -Fc`) · **uploads** (`directus_uploads`) · **config** (schema snapshot, compose, Caddyfile) · **env** (secret — lưu tách/mã hoá). **KHÔNG** `dist/` (tái sinh bằng `astro build`) |
 | Tần suất | **Hằng ngày ~03:30** (`BACKUP_AT`, scheduler trong `ops`; máy tắt lúc đó thì chạy bù khi bật lại; lỗi thì thử lại sau 1 giờ) + chạy tay trước mỗi lần deploy/nâng cấp |
 | Lưu giữ (retention) | `BACKUP_KEEP` bản gần nhất (mặc định 14), tự dọn bởi [`prune-backups.sh`](../services/ops/prune-backups.sh); thư mục backup `umask 077` |
-| Nơi lưu | **Tách khỏi host prod** (object storage/máy khác); thư mục backup NHẠY CẢM (có DB+secret) → mã hoá |
+| Nơi lưu | Host (`backups/`) **và** Cloudflare R2 (bucket `R2_BUCKET`, không kèm `env.bak`); thư mục backup trên host NHẠY CẢM (có DB+secret) |
 | **RPO** | ≤ khoảng cách giữa 2 lần backup (hằng ngày → ≤ 24h) |
 | **RTO** | ≈ thời gian `restore.sh` (DB+uploads) + `rebuild.sh` (dựng lại static) |
 | Diễn tập khôi phục (restore drill) | ✅ **Đã diễn tập (Sprint 6 Phase 4):** restore `db.dump` vào Postgres sạch → **posts count khớp nguồn (117=117)**, uploads khớp (4=4 file). Lặp lại định kỳ |

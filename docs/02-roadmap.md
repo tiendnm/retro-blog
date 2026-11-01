@@ -18,7 +18,7 @@
 | M0 — Tài liệu nền tảng | Bộ `docs/` + ADR stack | ✅ Sprint 0 |
 | M1 — Khung hệ thống | Astro + Directus + PostgreSQL chạy local | ✅ Sprint 1 |
 | M2 — MVP nội dung | Editor publish → Reader xem (list/detail/category) | ✅ Sprint 2 |
-| M3 — Ra mắt (Launch) | Public HTTPS + SEO + a11y + checklist | 🟡 Site + CMS + rebuild-on-publish đã chạy trên domain thật (2026-10-30); backup/healthcheck nay chạy trong compose (Sprint 10); còn restore drill trên stack mới, backup ngoài máy, HSTS 1 năm ([08 §8](./08-deployment.md)) |
+| M3 — Ra mắt (Launch) | Public HTTPS + SEO + a11y + checklist | 🟡 Site + CMS + rebuild-on-publish đã chạy trên domain thật (2026-10-30); backup/healthcheck nay chạy trong compose (Sprint 10); backup ngoài máy lên Cloudflare R2 đã chạy (2026-11-01); còn restore drill từ R2 trên stack mới, HSTS 1 năm ([08 §8](./08-deployment.md)) |
 
 ## 3. Sprint
 

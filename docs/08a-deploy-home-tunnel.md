@@ -9,7 +9,7 @@ Giả định: domain (vd `tiendnm.com`) ở Cloudflare; site `retro.<domain>`, 
 
 - **Không UPS:** mất điện = site tắt; HDD có thể hỏng dữ liệu nếu tắt đột ngột (Postgres chịu được crash, nhưng vẫn là rủi ro).
 - **Không bật 2FA cho admin (2026-10-30):** `/admin` công khai qua tunnel, chỉ bảo vệ bằng mật khẩu → mật khẩu admin do script sinh ngẫu nhiên, dùng tài khoản Editor cho việc viết bài hằng ngày. Bật lại khi cần (Profile → Two-Factor Authentication).
-- **Chưa backup ra ngoài máy:** một ổ HDD hỏng = mất toàn bộ nội dung. Backup tự động (§4) chỉ cứu lỗi phần mềm. Khi sẵn sàng, thêm rclone → Cloudflare R2/Backblaze B2 (thư mục `backups/` là bind mount, dễ lấy ra).
+- **Backup ra ngoài máy (đã làm 2026-11-01):** điền `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` vào `.env.production` (token R2 giới hạn theo bucket, quyền Object Read & Write) → `ops` tự đẩy lên Cloudflare R2 sau mỗi backup ([13 §4](./13-operations.md)). Bỏ trống `R2_BUCKET` = chỉ backup trên máy (HDD hỏng = mất hết).
 
 ## 1. Việc tay #1 — Tạo Tunnel (Cloudflare dashboard)
 
