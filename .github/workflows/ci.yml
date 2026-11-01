@@ -58,6 +58,11 @@ jobs:
       - name: Test script kiểm site (check-site)
         working-directory: .
         run: node --test scripts/check-site.test.mjs
+      # Sprint 13 §C: Caddy thật + Caddyfile thật (non-root, cap_drop ALL) → khẳng định header bảo mật trên 200/404/502.
+      # Image lấy từ docker-compose.prod.yml nên PR Dependabot nâng Caddy được kiểm tự động.
+      - name: Hồi quy header bảo mật (Caddy)
+        working-directory: .
+        run: bash scripts/test-caddy-headers.sh
 
   build:
     runs-on: ubuntu-latest
