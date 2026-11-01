@@ -7,8 +7,8 @@
 #          ./scripts/restore-drill.sh --r2            tải bản mới nhất từ R2 (qua service ops) rồi diễn tập — nên dùng định kỳ
 #   Env:   ENV_FILE (mặc định .env.production) · DRILL_MEM (RAM tối đa cho Directus tạm, mặc định 700m)
 #          DRILL_WAIT (giây chờ Directus lên, mặc định 400)
-#   Đạt khi: pg_restore OK · Directus tạm (cùng image prod) lên health=ok trên DB đã khôi phục · số file trong
-#   uploads.tgz = số dòng directus_files · số migration = prod · /assets trả 200. API công khai /items/posts trả
+#   Đạt khi: pg_restore OK · Directus tạm (cùng image prod) lên health=ok trên DB đã khôi phục · mọi file trong
+#   directus_files có trong uploads.tgz · số migration = prod · /assets trả 200. API công khai /items/posts trả
 #   cùng số bài với prod (lệch số bài chỉ là CẢNH BÁO: có thể bài đổi sau thời điểm backup).  Exit 0 = đạt.
 set -eu
 cd "$(dirname "$0")/.."
@@ -120,7 +120,13 @@ echo "[drill] DB khôi phục: migrations=$D_MIG, posts(mọi trạng thái)=$D_
 mkdir -p "$WORK/uploads"
 tar xzf "$SRC/uploads.tgz" -C "$WORK/uploads"
 T_FILES=$(find "$WORK/uploads" -type f | wc -l)
-if [ "$T_FILES" -eq "$D_FILES" ]; then ok "uploads.tgz có $T_FILES file = directus_files"; else fail "uploads.tgz có $T_FILES file ≠ directus_files $D_FILES"; fi
+# Directus lưu thêm bản thumbnail đã biến đổi cùng thư mục → số file trong tarball >= số dòng DB. Tiêu chí đúng:
+# mọi filename_disk trong DB đều phải có mặt trong tarball.
+MISSING=0
+for f in $(dsql 'select filename_disk from directus_files'); do
+  [ -f "$WORK/uploads/$f" ] || MISSING=$((MISSING + 1))
+done
+if [ "$MISSING" -eq 0 ]; then ok "đủ $D_FILES file gốc trong uploads.tgz (tổng $T_FILES file kể cả thumbnail)"; else fail "thiếu $MISSING/$D_FILES file gốc trong uploads.tgz"; fi
 if [ "$D_MIG" = "$PROD_MIG" ]; then ok "migrations = $D_MIG (khớp prod)"; else fail "migrations $D_MIG ≠ prod $PROD_MIG (backup từ phiên bản Directus khác?)"; fi
 
 # ── Directus tạm (cùng image prod) ──
