@@ -14,7 +14,7 @@ services:
     ports: !reset []
 
   cloudflared:
-    image: cloudflare/cloudflared:2026.10.0
+    image: cloudflare/cloudflared:2026.10.5
     restart: unless-stopped
     command: ["tunnel", "--no-autoupdate", "run"]
     # DNS công cộng: cloudflared tra bản ghi SRV (region1.v2.argotunnel.com); DNS nhúng của Docker
