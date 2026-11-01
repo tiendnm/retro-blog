@@ -43,7 +43,7 @@ services:
       retries: 6
       start_period: 40s
 
-  # ─── Presentation / Site (ADR-0002) — Astro dev trong container Node 22 ───
+  # ─── Presentation / Site (ADR-0002) — Astro dev trong container Node 26 ───
   # apps/web đã scaffold (Phase 3). node_modules cài trong container (linux) qua
   # volume riêng (không dùng chung với host win32). DIRECTUS_INTERNAL_URL trỏ
   # service 'directus' trong network nội bộ (fetch server-side).
