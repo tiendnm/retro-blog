@@ -5,7 +5,7 @@
   "description": "Retro Blog — nền tảng blog headless (Astro + Directus + PostgreSQL). Tài liệu: ./docs.",
   "packageManager": "pnpm@10.33.2",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.23.4"
   },
   "scripts": {
     "start": "docker compose up -d",
