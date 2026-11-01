@@ -60,9 +60,7 @@ describe('lỗi mạng', () => {
   });
 });
 
-// TẠM TẮT: thin client hiện ném SyntaxError thô (lộ đầu thân phản hồi). Bọc thành
-// DirectusError(system) là đổi hành vi ngoài timeout → chờ Product duyệt (sprint-11 §F), rồi bỏ .skip.
-describe.skip('JSON hỏng', () => {
+describe('JSON hỏng', () => {
   function mockRawBody(text: string, status = 200) {
     const fn = vi.fn(async (..._args: unknown[]) => new Response(text, { status }));
     vi.stubGlobal('fetch', fn);

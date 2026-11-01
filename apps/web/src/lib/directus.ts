@@ -109,7 +109,12 @@ async function directusGet<T>(path: string): Promise<DirectusList<T>> {
     }
     throw new DirectusError('system', `HTTP ${res.status} @ ${path}`);
   }
-  return (await res.json()) as DirectusList<T>;
+  try {
+    return (await res.json()) as DirectusList<T>;
+  } catch {
+    // Không đính kèm thông điệp gốc: nó chứa đầu thân phản hồi.
+    throw new DirectusError('system', `Phản hồi không phải JSON hợp lệ @ ${path}`);
+  }
 }
 
 // ---- Mapping Directus item → DTO ----
