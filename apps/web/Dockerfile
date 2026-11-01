@@ -10,7 +10,7 @@
 #   source/deps. Tách sạch "image tái lập" khỏi "nội dung động".
 # Serve: do Caddy (service riêng, ADR-0007) — nên KHÔNG cần runtime-server stage.
 
-FROM node:22.23.4-alpine
+FROM node:26.13.0-alpine
 
 WORKDIR /app
 ENV CI=1
