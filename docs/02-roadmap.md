@@ -39,7 +39,7 @@
 
 ## 4. Backlog cấp cao
 
-- **Deploy (@deploy):** xác nhận ACME/DNS + CSP trên domain thật, (2FA admin: bỏ qua có chủ đích), (HSTS 1 năm và backup ra ngoài host: xong 2026-11-01); rate limiting Directus, container không chạy root, quét dependency: xong 2026-11-01 ([12 §6](./12-security.md)); Directus 11.3.5 → 11.17.4 xong 2026-11-01; còn: cân nhắc Directus 12.x, rate limit riêng cho đăng nhập admin, vá nốt 3 lỗ hổng audit mức thấp/vừa.
+- **Deploy (@deploy):** xác nhận ACME/DNS + CSP trên domain thật, (2FA admin: bỏ qua có chủ đích), (HSTS 1 năm và backup ra ngoài host: xong 2026-11-01); rate limiting Directus, container không chạy root, quét dependency: xong 2026-11-01, đợt Dependabot đầu xử lý + deploy cùng ngày ([12 §6](./12-security.md), [13 §2](./13-operations.md)); Directus 11.3.5 → 11.17.4 xong 2026-11-01; còn: cân nhắc Directus 12.x, rate limit riêng cho đăng nhập admin, vá nốt 3 lỗ hổng audit mức thấp/vừa.
 - **Kiểm thử mở rộng:** test độ bền thin client, axe a11y, link-check, Lighthouse budget, E2E.
 - **Reader feature:** (không còn mục nào chờ.) (Search: khi blog lớn tới mức chỉ mục tĩnh quá nặng thì cân nhắc Pagefind/server-side — [15](./15-seo-accessibility.md).)
 - **Refactor docs-architecture:** F1–F15 ([architecture review](./reviews/architecture-review-2026-07-21.md)).

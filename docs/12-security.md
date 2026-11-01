@@ -58,6 +58,7 @@
 - **Rate limiting Directus:** `RATE_LIMITER_*` theo IP, mặc định 100 yêu cầu/10 giây (`RATE_LIMITER_POINTS/DURATION`), quá mức → 429. IP thật = header `CF-Connecting-IP` (`IP_CUSTOM_HEADER`): Cloudflare luôn ghi đè header này và Caddy không publish cổng nên chỉ tunnel tới được. Yêu cầu nội bộ (web build, ops) không có header → khoá theo IP container. Giới hạn: kho bộ nhớ trong 1 instance; chưa có hạn mức riêng cho `/auth/login`.
 - **Astro 5 → 7 (2026-11-01):** audit giảm từ 31 (1 critical, 11 high) xuống 3 (2 low, 1 moderate). Kéo theo base image `node:22.23.4-alpine` (Astro 7 cần Node ≥22.23.4); sau đó nâng tiếp lên `node:26.13.0-alpine` (2026-11-01, Dependabot #4/#6/#8). Đã so build trước/sau trên nội dung thật: cùng 19 trang/39 file, không script/style inline (CSP giữ nguyên), khác biệt chỉ là tên gói CSS, khoảng trắng và `&amp;` trong URL ảnh; tìm kiếm và lightbox chạy đúng.
 - **Quét dependency:** `.github/dependabot.yml` (npm, docker, compose, actions — hằng tuần) và workflow `security.yml` (`pnpm audit --prod --audit-level high`, hằng tuần, hiện chỉ báo cáo).
+- **Đợt Dependabot đầu (2026-11-01, 13 PR):** merge 12, đóng 1. Image: `node:26.13.0-alpine` (web, ops, compose dev; thử trọn pipeline gồm seed + `astro build`), `caddy:2.10-alpine` (header/CSP/404 giống hệt 2.8), `cloudflared:2026.10.5`. Actions: `checkout@v7`, `setup-node@v7`, `pnpm/action-setup@v6`. npm: `marked` 12→18 (HTML seed giống hệt), `vitest` 3→5, `@types/node` 22→26, nhóm minor-patch. **Postgres 16 → 18 (#1) đóng có chủ đích:** nâng major cần dump/restore, làm riêng, không qua Dependabot. CI ghim Node 26 (ghim `22` từng lấy 22.23.3 < 22.23.4 mà Astro 7 yêu cầu). Quy trình xử lý PR Dependabot: [13 §2](./13-operations.md).
 
 **Còn lại (Backlog):** bỏ `continue-on-error` của `security.yml` khi 3 lỗ hổng còn lại được vá · cân nhắc Directus 12.x (đã nâng 11.3.5 → 11.17.4, 2026-11-01) · chưa có rate limit riêng cho đăng nhập admin.
 
@@ -89,5 +90,5 @@
 - [x] **Security headers cấu hình** — Caddyfile, đã kiểm trên 200/404/502 _(S8)_; đã xác nhận bằng trình duyệt trên domain thật (2026-11-01: trang chủ + bài viết + lightbox, 0 vi phạm CSP) và nâng HSTS lên 1 năm
 - [x] **Webhook rebuild siết** — header-only token, hằng-thời-gian, khoá thử sai, bind loopback _(S8)_
 - [x] **Sanitize HTML body (XSS)** — allowlist lúc build, [ADR-0013](./adr/0013-sanitize-body-html.md) _(S7)_
-- [ ] **Dependencies quét lỗ hổng** — Backlog (vd `pnpm audit` trong CI / Dependabot)
+- [x] **Dependencies quét lỗ hổng** — Dependabot + `security.yml` (2026-11-01, §6); còn 3 lỗ hổng mức thấp/vừa chưa vá
 - [ ] 2FA admin — bật khi cấu hình server thật (khuyến nghị §3)
