@@ -40,7 +40,7 @@
 **Đã có (Sprint 6):**
 - **TLS bắt buộc:** Caddy auto-HTTPS (Let's Encrypt/ACME), HTTP→HTTPS redirect ([ADR-0007](./adr/0007-reverse-proxy-and-tls.md)).
 - **Network segmentation:** Postgres **không expose** (chỉ nội bộ `retro-net`); Directus **bind `127.0.0.1`** trên host (public **chỉ** qua Caddy). Edge duy nhất = Caddy (80/443).
-- **Image pin cứng** (không `latest`): `postgres:16.8-alpine` · `directus:11.17.4` · `caddy:2.10-alpine` · web + ops build từ `node:26.13.0-alpine`.
+- **Image pin cứng** (không `latest`): `postgres:16.8-alpine` · `directus:11.17.4` · `caddy:2.10-alpine` · `cloudflare/cloudflared:2026.10.5` · web + ops build từ `node:26.13.0-alpine`.
 - **Build tái lập:** `--frozen-lockfile` (chống drift → giảm rủi ro chuỗi cung ứng, [S6-P1](./10-decisions.md)).
 - **Secrets ngoài repo:** `.env.production` gitignored; chỉ commit `.env.production.example` (placeholder).
 
@@ -58,9 +58,11 @@
 - **Rate limiting Directus:** `RATE_LIMITER_*` theo IP, mặc định 100 yêu cầu/10 giây (`RATE_LIMITER_POINTS/DURATION`), quá mức → 429. IP thật = header `CF-Connecting-IP` (`IP_CUSTOM_HEADER`): Cloudflare luôn ghi đè header này và Caddy không publish cổng nên chỉ tunnel tới được. Yêu cầu nội bộ (web build, ops) không có header → khoá theo IP container. Giới hạn: kho bộ nhớ trong 1 instance; chưa có hạn mức riêng cho `/auth/login`.
 - **Astro 5 → 7 (2026-11-01):** audit giảm từ 31 (1 critical, 11 high) xuống 3 (2 low, 1 moderate). Kéo theo base image `node:22.23.4-alpine` (Astro 7 cần Node ≥22.23.4); sau đó nâng tiếp lên `node:26.13.0-alpine` (2026-11-01, Dependabot #4/#6/#8). Đã so build trước/sau trên nội dung thật: cùng 19 trang/39 file, không script/style inline (CSP giữ nguyên), khác biệt chỉ là tên gói CSS, khoảng trắng và `&amp;` trong URL ảnh; tìm kiếm và lightbox chạy đúng.
 - **Quét dependency:** `.github/dependabot.yml` (npm, docker, compose, actions — hằng tuần) và workflow `security.yml` (`pnpm audit --prod --audit-level high`, hằng tuần, hiện chỉ báo cáo).
-- **Đợt Dependabot đầu (2026-11-01, 13 PR):** merge 12, đóng 1. Image: `node:26.13.0-alpine` (web, ops, compose dev; thử trọn pipeline gồm seed + `astro build`), `caddy:2.10-alpine` (header/CSP/404 giống hệt 2.8), `cloudflared:2026.10.5`. Actions: `checkout@v7`, `setup-node@v7`, `pnpm/action-setup@v6`. npm: `marked` 12→18 (HTML seed giống hệt), `vitest` 3→5, `@types/node` 22→26, nhóm minor-patch. **Postgres 16 → 18 (#1) đóng có chủ đích:** nâng major cần dump/restore, làm riêng, không qua Dependabot. CI ghim Node 26 (ghim `22` từng lấy 22.23.3 < 22.23.4 mà Astro 7 yêu cầu). Quy trình xử lý PR Dependabot: [13 §2](./13-operations.md).
+- **Đợt Dependabot đầu (2026-11-01, 13 PR):** merge 12, đóng 1. Image: `node:26.13.0-alpine` (web, ops, compose dev; thử trọn pipeline gồm seed + `astro build`), `caddy:2.10-alpine` (header/CSP/404 giống hệt 2.8), `cloudflared:2026.10.5`. Actions: `checkout@v7`, `setup-node@v7`, `pnpm/action-setup@v6`. npm: `marked` 12→18 (HTML seed giống hệt), `vitest` 3→5, `@types/node` 22→26, nhóm minor-patch. **Postgres 16 → 18 (#1) đóng có chủ đích:** nâng major cần dump/restore, làm riêng, không qua Dependabot. CI ghim Node 26 (ghim `22` từng lấy 22.23.3 < 22.23.4 mà Astro 7 yêu cầu). Quy trình xử lý PR Dependabot: [13 §2](./13-operations.md). Sau đó bỏ `pnpm-workspace.yaml` (nguyên nhân PR npm thiếu lockfile), thêm `ignore` major Postgres và gom nhóm docker/compose/actions trong `dependabot.yml`.
 
-**Còn lại (Backlog):** bỏ `continue-on-error` của `security.yml` khi 3 lỗ hổng còn lại được vá · cân nhắc Directus 12.x (đã nâng 11.3.5 → 11.17.4, 2026-11-01) · chưa có rate limit riêng cho đăng nhập admin.
+**Audit sạch high+ (2026-11-01):** `pnpm.overrides` `fast-uri >=3.1.9 <4` trong `apps/web/package.json` vá chuỗi dev `@astrojs/check`→`ajv`; `security.yml` quét mọi deps ở mức high+ và **không còn `continue-on-error`** (đỏ khi có lỗ hổng high/critical mới). Còn 1 lỗ hổng low (`esbuild` qua vite, bản vá 0.28.1 chưa vào chuỗi astro/vite) — không chặn.
+
+**Còn lại (Backlog):** cân nhắc Directus 12.x (đã nâng 11.3.5 → 11.17.4, 2026-11-01) · chưa có rate limit riêng cho đăng nhập admin.
 
 ## 7. Bảo mật chuỗi cung ứng (Supply chain)
 

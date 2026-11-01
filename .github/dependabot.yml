@@ -1,4 +1,6 @@
 # Cập nhật phụ thuộc định kỳ (gom vào PR hằng tuần). Image Docker pin cứng nên Dependabot là cách duy nhất biết có bản vá.
+# KHÔNG có pnpm-workspace.yaml ở gốc: có file đó thì Dependabot coi apps/web là thành viên workspace, tìm lockfile ở gốc
+# (không có) và bỏ qua apps/web/pnpm-lock.yaml → PR npm chỉ sửa package.json, CI fail --frozen-lockfile (xem 13 §2).
 version: 2
 updates:
   - package-ecosystem: npm
@@ -11,9 +13,22 @@ updates:
   - package-ecosystem: docker
     directories: [/apps/web, /services/ops]
     schedule: { interval: weekly }
+    groups:
+      docker-minor-and-patch:
+        update-types: [minor, patch]
   - package-ecosystem: docker-compose
     directory: /
     schedule: { interval: weekly }
+    # Postgres nâng major cần dump/restore (không phải đổi tag) → làm tay có ADR, không qua Dependabot (12 §6).
+    ignore:
+      - dependency-name: postgres
+        update-types: ["version-update:semver-major"]
+    groups:
+      compose-minor-and-patch:
+        update-types: [minor, patch]
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: weekly }
+    groups:
+      actions-minor-and-patch:
+        update-types: [minor, patch]

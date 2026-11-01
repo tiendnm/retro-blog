@@ -1,6 +1,6 @@
 # Quét lỗ hổng dependency định kỳ (hardening). Chạy hằng tuần + khi chạy tay + khi đổi lockfile.
-# Hiện CHỈ BÁO CÁO (continue-on-error). Sau khi nâng Astro 7 chỉ còn lỗi low/moderate; khi sạch hẳn thì bỏ
-# continue-on-error để job đỏ khi có lỗ hổng high/critical mới.
+# Quét TOÀN BỘ deps (cả dev: chạy trong CI) ở mức high+; job đỏ khi có lỗ hổng high/critical mới.
+# (2026-11-01: đã sạch high+ nhờ pnpm.overrides fast-uri trong apps/web/package.json; còn 1 low esbuild, không chặn.)
 name: Security
 
 on:
@@ -17,7 +17,6 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: true
     defaults:
       run:
         working-directory: apps/web
@@ -29,5 +28,5 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: "26"
-      - name: pnpm audit (production deps, high+)
-        run: pnpm audit --prod --audit-level high
+      - name: pnpm audit (mọi deps, high+)
+        run: pnpm audit --audit-level high

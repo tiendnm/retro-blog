@@ -28,5 +28,10 @@
     "marked": "^18.1.2",
     "typescript": "^5.9.3",
     "vitest": "^5.0.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "fast-uri": ">=3.1.9 <4"
+    }
   }
 }

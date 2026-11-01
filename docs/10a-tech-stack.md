@@ -31,8 +31,8 @@
 
 | Thành phần | Phiên bản | Ghi chú |
 |---|---|---|
-| Node.js | **22 LTS (host) · 26 (container & CI)** (`engines >=22.23.4`, `.nvmrc` 22) | web (Astro) & Directus chạy trong container (Node 26 image) → `docker compose up` không cần Node trên host; chạy Astro trực tiếp trên host thì cài Node ≥22.23.4 (Astro 7 yêu cầu; máy dev hiện 26.13.0 LTS) |
-| Package manager | **pnpm 10.x** (workspace) | pin qua `packageManager` trong `package.json` |
+| Node.js | **26 (container, CI, `.nvmrc`)** · tối thiểu 22.23.4 (`engines >=22.23.4`, `.nvmrc` 26) | web (Astro) & Directus chạy trong container (Node 26 image) → `docker compose up` không cần Node trên host; chạy Astro trực tiếp trên host thì cài Node ≥22.23.4 (Astro 7 yêu cầu; máy dev hiện 26.13.0 LTS) |
+| Package manager | **pnpm 10.x** (lockfile riêng ở `apps/web`, không dùng workspace) | pin qua `packageManager` trong `package.json` |
 | Astro | **7.x** | apps/web (container `node:26.13.0-alpine`) |
 | Directus | **11.17.4** (pin) | image `directus/directus:11.17.4` |
 | PostgreSQL | **16.8-alpine** (pin) | image `postgres:16.8-alpine` |
