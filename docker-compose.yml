@@ -10,7 +10,7 @@ services:
 
   # ─── Headless Content Service (ADR-0003) ───
   directus:
-    image: directus/directus:11.17.4
+    image: directus/directus:12.6.0
     restart: unless-stopped
     # host.docker.internal: tự có trên Docker Desktop; dòng dưới bổ sung cho Linux.
     extra_hosts:
