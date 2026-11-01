@@ -2,7 +2,7 @@
 
 > Một blog headless mang phong cách retro — **Astro** (site) + **Directus** (headless CMS) + **PostgreSQL**, đóng gói bằng **Docker**.
 
-> **Trạng thái:** 🟢 Đang chạy production trên server tại nhà qua Cloudflare Tunnel; CI (`quality` + `build`) bắt buộc trên `main`. Sprint 0–13 xong, Sprint 14 (nợ tài liệu) chờ review. Chi tiết: [docs/sprints](./docs/sprints/) · [roadmap](./docs/02-roadmap.md).
+> **Trạng thái:** 🟢 Đang chạy production trên server tại nhà qua Cloudflare Tunnel; CI (`quality` + `build`) bắt buộc trên `main`. Sprint 0–14 xong. Chi tiết: [docs/sprints](./docs/sprints/) · [roadmap](./docs/02-roadmap.md).
 
 ---
 
@@ -154,7 +154,7 @@ Bắt đầu từ [docs/README.md](./docs/README.md).
 | Sprint 11 | Kiểm thử mở rộng (E2E, axe, Lighthouse, quyền Public) | 🟢 Hoàn thành ([sprint-11](./docs/sprints/sprint-11.md)) |
 | Sprint 12 | Vận hành & quan sát (runbook, restore drill) | 🟢 Hoàn thành ([sprint-12](./docs/sprints/sprint-12.md)) |
 | Sprint 13 | Bảo mật bổ sung & cổng CI | 🟢 Hoàn thành ([sprint-13](./docs/sprints/sprint-13.md)) |
-| Sprint 14 | Nợ tài liệu (dọn placeholder, script `check-docs`) | 🟡 Làm xong, chờ Product review ([sprint-14](./docs/sprints/sprint-14.md)) |
+| Sprint 14 | Nợ tài liệu (dọn placeholder, script `check-docs`) | 🟢 Hoàn thành ([sprint-14](./docs/sprints/sprint-14.md)) |
 | Sprint 15–16 | Refactor docs Đợt 3 · Visual Polish | 📋 Kế hoạch ([roadmap](./docs/02-roadmap.md)) |
 
 ## License

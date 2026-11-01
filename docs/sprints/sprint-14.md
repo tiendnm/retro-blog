@@ -90,6 +90,6 @@ Chỉ **cuối sprint** (docs/CI nhẹ, không phải hạ tầng/bảo mật/sc
   1. **Preview bản nháp chưa có** dù `01` ghi FR-E2 "xem trước" là Must → **Product đồng ý hạ (2026-11-02)**: FR-E2 chỉ còn "Lưu nháp" (Must), "xem trước" thành FR-E2b (Nice); ghi `10 §5`, sửa `01`, `01a`, `05 §4`.
   2. **Directus ghi activity + revision** cho mọi collection (`accountability: all`), không tự xoá (`04 §7`) → **Product đồng ý giữ nguyên hành vi** (chi phí không đáng kể); `03e §6` đã ghi đúng là không có yêu cầu nghiệp vụ.
   3. **Site chưa có trang liên hệ/About** (`12 §10`) → **để Backlog** (việc nhỏ `feat(web)` ngoài sprint, khi Product cần).
-  4. `00-project` do tôi soạn nháp từ `01a`, hướng nội dung và số đo có thật (Q1): **còn chờ Product đọc lại câu chữ §1–§5.**
+  4. `00-project` do tôi soạn nháp từ `01a`, hướng nội dung và số đo có thật (Q1): **Product duyệt nguyên văn §1–§5 (2026-11-02).**
 - **Rà bổ sung (sau review):** `08-deployment` sửa lại theo hiện trạng (domain `retro.`/`retro-cms.tiendnm.com`, Postgres trong compose, tunnel/TLS, CI `quality`/`build`/`site-checks`, bỏ khuyến nghị 2FA). Đối chiếu README/runbook với repo: mọi đường dẫn `scripts/`·`services/`, lệnh `pnpm` và cờ (`--web-only`, `--r2`, `--profile`/`--set`…) đều tồn tại.
 - **Không đổi (không có ô trống):** `11-testing`, `16-glossary`, `13-operations`. Chưa thử đẩy commit hỏng link lên GitHub (đã chứng minh cục bộ, CI chạy đúng).
