@@ -42,7 +42,7 @@ function init(): void {
     <button type="button" class="lightbox__btn lightbox__close" aria-label="Đóng">✕</button>
     <div class="lightbox__tools" role="group" aria-label="Phóng to / thu nhỏ">
       <button type="button" class="lightbox__btn lightbox__zoom-out" aria-label="Thu nhỏ">−</button>
-      <button type="button" class="lightbox__btn lightbox__zoom-reset" aria-label="Về kích thước vừa khung">100%</button>
+      <button type="button" class="lightbox__btn lightbox__zoom-reset" aria-label="100% — về kích thước vừa khung">100%</button>
       <button type="button" class="lightbox__btn lightbox__zoom-in" aria-label="Phóng to">+</button>
     </div>
     <button type="button" class="lightbox__btn lightbox__prev" aria-label="Ảnh trước">‹</button>
@@ -71,7 +71,10 @@ function init(): void {
     big.classList.toggle('is-animating', animate);
     big.style.transform = st.s === 1 ? '' : `translate(${st.x}px, ${st.y}px) scale(${st.s})`;
     stage.classList.toggle('is-zoomed', st.s > 1);
-    zoomReset.textContent = `${Math.round(st.s * 100)}%`;
+    const pct = `${Math.round(st.s * 100)}%`;
+    zoomReset.textContent = pct;
+    // WCAG 2.5.3 (Label in Name): tên truy cập phải chứa đúng chữ đang hiển thị.
+    zoomReset.setAttribute('aria-label', `${pct} — về kích thước vừa khung`);
     zoomOut.disabled = st.s <= 1;
   }
 
