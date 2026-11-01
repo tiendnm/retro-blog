@@ -33,7 +33,7 @@
 |---|---|---|
 | Node.js | **22 LTS** (`engines >=22`, `.nvmrc` 22) | web (Astro) & Directus chạy trong container (Node 22 image) → `docker compose up` không cần Node 22 trên host; chạy Astro trực tiếp trên host thì cài Node 22 (host hiện 20.19.4) |
 | Package manager | **pnpm 10.x** (workspace) | pin qua `packageManager` trong `package.json` |
-| Astro | **5.x** | apps/web (container `node:22.12.0-alpine`) |
+| Astro | **7.x** | apps/web (container `node:22.23.4-alpine`) |
 | Directus | **11.3.5** (pin) | image `directus/directus:11.3.5` |
 | PostgreSQL | **16.8-alpine** (pin) | image `postgres:16.8-alpine` |
 | Docker Engine / Compose | **29.x / Compose v2** | đóng gói & runtime |

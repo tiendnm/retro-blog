@@ -40,7 +40,7 @@
 **Đã có (Sprint 6):**
 - **TLS bắt buộc:** Caddy auto-HTTPS (Let's Encrypt/ACME), HTTP→HTTPS redirect ([ADR-0007](./adr/0007-reverse-proxy-and-tls.md)).
 - **Network segmentation:** Postgres **không expose** (chỉ nội bộ `retro-net`); Directus **bind `127.0.0.1`** trên host (public **chỉ** qua Caddy). Edge duy nhất = Caddy (80/443).
-- **Image pin cứng** (không `latest`): `postgres:16.8-alpine` · `directus:11.3.5` · `caddy:2.8-alpine` · web build từ `node:22.12.0-alpine`.
+- **Image pin cứng** (không `latest`): `postgres:16.8-alpine` · `directus:11.3.5` · `caddy:2.8-alpine` · web + ops build từ `node:22.23.4-alpine`.
 - **Build tái lập:** `--frozen-lockfile` (chống drift → giảm rủi ro chuỗi cung ứng, [S6-P1](./10-decisions.md)).
 - **Secrets ngoài repo:** `.env.production` gitignored; chỉ commit `.env.production.example` (placeholder).
 
