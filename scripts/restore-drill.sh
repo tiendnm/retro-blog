@@ -92,8 +92,9 @@ docker network create "$NET" >/dev/null
 docker run -d --name "$ID-pg" --network "$NET" --network-alias drill-pg --memory 256m \
   -e POSTGRES_USER=drill -e POSTGRES_PASSWORD="$PW" -e POSTGRES_DB=drill \
   "$PGIMAGE" >/dev/null
-for _ in $(seq 1 60); do
-  docker exec "$ID-pg" pg_isready -U drill -d drill >/dev/null 2>&1 && break
+# Image postgres khởi động 2 lần (server init tạm rồi server thật) → đợi log "ready" lần thứ 2, không chỉ pg_isready.
+for _ in $(seq 1 120); do
+  [ "$(docker logs "$ID-pg" 2>&1 | grep -c 'ready to accept connections')" -ge 2 ] && break
   sleep 1
 done
 docker exec "$ID-pg" pg_isready -U drill -d drill >/dev/null || {
