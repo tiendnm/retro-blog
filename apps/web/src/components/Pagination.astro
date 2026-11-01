@@ -4,6 +4,8 @@
 // - Số trang: link tới trang đích; trang hiện tại là span aria-current, không link.
 // - Cửa sổ rút gọn với "…" (ellipsis) → quy mô lớn (50+ trang) vẫn nhảy được đầu/cuối.
 // - <nav aria-label> + rel=prev/next. Chỉ render khi có >1 trang.
+import { pageCells } from '../lib/pagination';
+
 interface Props {
   currentPage: number;
   totalPages: number;
@@ -15,18 +17,7 @@ const pageUrl = (n: number) => (n <= 1 ? baseUrl : `${pagePrefix}/${n}`);
 const hasPrev = currentPage > 1;
 const hasNext = currentPage < totalPages;
 
-// Cửa sổ số trang: luôn hiện trang 1 & trang cuối + lân cận trang hiện tại;
-// chèn 'gap' khi có khoảng đứt để render "…".
-const window = [...new Set([1, currentPage - 1, currentPage, currentPage + 1, totalPages])]
-  .filter((n) => n >= 1 && n <= totalPages)
-  .sort((a, b) => a - b);
-const cells: (number | 'gap')[] = [];
-let prev = 0;
-for (const n of window) {
-  if (prev && n - prev > 1) cells.push('gap');
-  cells.push(n);
-  prev = n;
-}
+const cells = pageCells(currentPage, totalPages);
 ---
 
 {

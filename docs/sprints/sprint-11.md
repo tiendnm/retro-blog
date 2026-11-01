@@ -41,20 +41,20 @@
 ### F. Độ bền thin client (Vitest)
 - [x] Test: Directus trả 5xx / lỗi mạng / JSON hỏng / phản hồi chậm → `DirectusError` kiểu `system`, không rò chi tiết; danh sách rỗng; trang không tồn tại → `null`.
 - [x] Thêm **timeout cho `fetch`** (`AbortSignal.timeout`) nếu test chứng minh build treo — sửa tối thiểu, chỉ trong `directus.ts`, kèm test; không thêm retry khi chưa có bằng chứng cần.
-- [ ] _(không làm — ghi Backlog, chờ Product duyệt)_ Phần `.astro` chứa logic (cửa sổ phân trang `Pagination.astro`, JSON-LD ở `posts/[slug].astro`): tách thành module `.ts` rồi test là **refactor** → ghi Backlog, **chỉ làm nếu Product duyệt**. Trong sprint này chỉ phủ bằng E2E/JSON-LD của mục A.
+- [x] _(Product duyệt sau review, 01/11/2026)_ Phần `.astro` chứa logic (cửa sổ phân trang `Pagination.astro`, JSON-LD ở `posts/[slug].astro`): tách thành module `.ts` rồi test là **refactor** → ghi Backlog, **chỉ làm nếu Product duyệt**. Trong sprint này chỉ phủ bằng E2E/JSON-LD của mục A.
 
 ### G. CI & tài liệu
 - [x] Job `site-checks` (cần artifact `dist` từ `build`): chạy A + B + C + D; thời gian thêm ≤ ~5 phút; cache trình duyệt Playwright.
 - [x] Cập nhật [11-testing §2–3](../11-testing.md) (kim tự tháp, bảng trạng thái), [15 §B3](../15-seo-accessibility.md), [14 §4](../14-quality-gates.md) (DoD nhắc job mới).
 
 ## Ngoài phạm vi / Backlog
-- **Favicon:** site không có `<link rel="icon">` nên mọi trình duyệt gọi `/favicon.ico` → 404 (cả ở production). Lighthouse Best Practices bị trừ vì `errors-in-console`. Thêm favicon là thay đổi giao diện → chờ Product.
-- `apps/web/biome.json` khai `$schema` 2.5.5 trong khi CLI là 2.6.4 (Dependabot đã nâng) + cảnh báo `recommended` deprecated → chạy `biome migrate` (chỉ là `info`, lint vẫn xanh).
+- **Favicon (chưa có ý tưởng — Product cần thêm thời gian, giữ Backlog):** site không có `<link rel="icon">` nên mọi trình duyệt gọi `/favicon.ico` → 404 (cả ở production). Lighthouse Best Practices bị trừ vì `errors-in-console`. Thêm favicon là thay đổi giao diện → chờ Product.
+- ~~`apps/web/biome.json` khai `$schema` 2.5.5~~ → đã `biome migrate` sau review (`$schema` 2.6.4, `rules.preset`). Ghi chú cũ: khai `$schema` 2.5.5 trong khi CLI là 2.6.4 (Dependabot đã nâng) + cảnh báo `recommended` deprecated → chạy `biome migrate` (chỉ là `info`, lint vẫn xanh).
 - Tổng byte mỗi trang **không** đặt ngân sách: khi chạy offline ảnh là ảnh giả 26 KB, không đại diện cho ảnh thật (webp từ Directus). Đo byte thật cần chạy trên bản deploy.
 - Rule Public của `tags` chỉ lọc `status=published` (không lọc `published_at`) → tên/slug thẻ của bài hẹn giờ lộ ra trước giờ đăng. Đã được ghi nhận và chấp nhận trong `apply-permissions.sh` (Directus 11.3.5 lỗi `$NOW` ở đường o2m); test không khẳng định điều này. Cân nhắc xem lại khi nâng Directus.
-- Biến các job mới thành check bắt buộc, branch protection → **Sprint 13**.
+- Biến các job mới thành check bắt buộc, branch protection → **Sprint 13** (Product đã đồng ý).
 - Kiểm link ngoài định kỳ; visual regression bằng ảnh chụp (chờ sau [Sprint 16](./sprint-16.md)); test tải.
-- Tách logic khỏi `.astro` (mục F) nếu chưa được duyệt.
+- ~~Tách logic khỏi `.astro` (mục F)~~ → đã làm sau review: `lib/pagination.ts` (`pageCells`) + `lib/json-ld.ts`, thêm 12 unit test (tổng 132); hành vi giữ nguyên, E2E/JSON-LD của CI là lưới an toàn.
 
 ## Tiêu chí xong
 - `quality` và `build` vẫn xanh; `site-checks` chạy xanh trên `main` **10 lần liên tiếp**, không flaky.

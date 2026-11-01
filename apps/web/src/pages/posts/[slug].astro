@@ -6,6 +6,7 @@ import CoverImage from '../../components/CoverImage.astro';
 import TagList from '../../components/TagList.astro';
 import AuthorName from '../../components/AuthorName.astro';
 import { formatDate } from '../../lib/format';
+import { buildPostJsonLd, serializeJsonLd } from '../../lib/json-ld';
 import { getAllPublishedPostSlugs, getPostBySlug, getSiteSettings } from '../../lib/directus';
 
 export async function getStaticPaths() {
@@ -30,28 +31,10 @@ const imageAbs = post.cover?.url
   ? (site ? new URL(post.cover.url, site).href : post.cover.url)
   : (site ? new URL(defaultOgImage?.url ?? '/og-default.png', site).href : (defaultOgImage?.url ?? '/og-default.png'));
 
-// JSON-LD BlogPosting — chỉ dùng field DTO sẵn có, không đổi kiến trúc (R3).
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
-  headline: post.title,
-  ...(post.excerpt ? { description: post.excerpt } : {}),
-  ...(post.publishedAt ? { datePublished: post.publishedAt } : {}),
-  author: {
-    '@type': 'Person',
-    name: post.author.name,
-    ...(site && post.author.slug
-      ? { url: new URL(`/author/${post.author.slug}`, site).href }
-      : {}),
-  },
-  ...(post.category ? { articleSection: post.category.name } : {}),
-  ...(post.tags.length ? { keywords: post.tags.map((t) => t.name).join(', ') } : {}),
-  image: imageAbs,
-  mainEntityOfPage: pageUrl,
-  publisher: { '@type': 'Organization', name: siteName },
-};
-// Escape '<' để chuỗi JSON không thể phá vỡ ngữ cảnh <script> (nội dung tin cậy, vẫn hardening).
-const jsonLdScript = JSON.stringify(jsonLd).replace(/</g, '\\u003c');
+// JSON-LD BlogPosting (logic ở lib/json-ld.ts, có unit test).
+const jsonLdScript = serializeJsonLd(
+  buildPostJsonLd(post, { site, siteName, imageAbs, pageUrl }),
+);
 ---
 
 <Base
