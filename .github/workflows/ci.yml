@@ -71,7 +71,7 @@ jobs:
       PUBLIC_SITE_URL: http://localhost:4321
     services:
       postgres:
-        image: postgres:16.8-alpine
+        image: postgres:16.15-alpine
         env:
           POSTGRES_PASSWORD: ci-only-postgres
           POSTGRES_DB: retro-blog

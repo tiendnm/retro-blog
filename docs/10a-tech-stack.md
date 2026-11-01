@@ -35,7 +35,7 @@
 | Package manager | **pnpm 10.x** (lockfile riêng ở `apps/web`, không dùng workspace) | pin qua `packageManager` trong `package.json` |
 | Astro | **7.x** | apps/web (container `node:26.13.0-alpine`) |
 | Directus | **11.17.4** (pin) | image `directus/directus:11.17.4` |
-| PostgreSQL | **16.8-alpine** (pin) | image `postgres:16.8-alpine` |
+| PostgreSQL | **16.15-alpine** (pin) | image `postgres:16.15-alpine` |
 | Docker Engine / Compose | **29.x / Compose v2** | đóng gói & runtime |
 
 > Nâng cấp lớn (major) của bất kỳ mục nào → ghi **Decision Log** (hoặc ADR nếu ảnh hưởng kiến trúc).
