@@ -33,13 +33,13 @@
 | [6](./sprints/sprint-6.md) | Deployment & Public MVP | ✅ (mục @deploy chờ domain thật) |
 | [6.5](./sprints/sprint-6.5.md) | Product Polish (Content & UX) | ✅ |
 | [7](./sprints/sprint-7.md) | System Hardening & Quality (Biome, test, CI) | ✅ Phase 1–3 xong (Biome + astro check, 38 test Vitest, CI phương án lai: job `quality` bắt buộc, job `build` continue-on-error) |
-| [8](./sprints/sprint-8.md) | Production Hardening (header, webhook, backup lịch, healthcheck) | ✅ (webhook rebuild đã kiểm chứng trên máy thật; backup/healthcheck timers chưa) |
+| [8](./sprints/sprint-8.md) | Production Hardening (header, webhook, backup lịch, healthcheck) | ✅ (webhook rebuild đã kiểm chứng trên máy thật; backup/healthcheck timers chưa — *đã xử lý ở [Sprint 10](./sprints/sprint-10.md): thay timer systemd bằng service `ops` trong compose, [ADR-0017](./adr/0017-ops-services-in-compose.md)*) |
 | [9](./sprints/sprint-9.md) | Deploy tại nhà: Cloudflare Tunnel + Postgres trong compose | ✅ đã chạy trên máy thật (2026-10-30): site + CMS + rebuild-on-publish qua tunnel |
 | [10](./sprints/sprint-10.md) | Đóng gói deploy (webhook + backup vào compose, script dựng server) | ✅ Product duyệt 2026-10-30: server dựng bằng 4 việc tay (`deploy-home.sh`), webhook + backup + healthcheck trong compose |
-| [11](./sprints/sprint-11.md) | Kiểm thử mở rộng (link-check, axe, Lighthouse, E2E, quyền Public, độ bền thin client) | 📋 Kế hoạch — **sprint kế tiếp** |
-| [12](./sprints/sprint-12.md) | Vận hành & quan sát (runbook, log, metric nhẹ, sự cố, restore drill định kỳ) | 📋 Kế hoạch |
+| [11](./sprints/sprint-11.md) | Kiểm thử mở rộng (link-check, axe, Lighthouse, E2E, quyền Public, độ bền thin client) | ✅ Xong |
+| [12](./sprints/sprint-12.md) | Vận hành & quan sát (runbook, log, metric nhẹ, sự cố, restore drill định kỳ) | ✅ Xong |
 | [13](./sprints/sprint-13.md) | Bảo mật bổ sung & cổng CI (rate limit đăng nhập admin, check bắt buộc, header test, xoay secret, đánh giá Postgres 18/Directus) | ✅ Xong (2026-11-02) |
-| [14](./sprints/sprint-14.md) | Nợ tài liệu (dọn ~70 TODO/TBD, sửa chỗ lệch thực tế, script kiểm docs) | 📋 Kế hoạch |
+| [14](./sprints/sprint-14.md) | Nợ tài liệu (dọn ô placeholder còn trống, sửa chỗ lệch thực tế, script kiểm docs) | 🟡 Làm xong, chờ Product review |
 | [15](./sprints/sprint-15.md) | Refactor docs Đợt 3 (IA của site, Design System, topology một nguồn, F9–F15) | 📋 Kế hoạch |
 | [16](./sprints/sprint-16.md) | Visual Polish (grain/crease procedural kiểu manual cũ) | 📋 Kế hoạch |
 

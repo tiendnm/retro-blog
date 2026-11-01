@@ -29,11 +29,12 @@ Giả định: domain (vd `tiendnm.com`) ở Cloudflare; site `retro.<domain>`, 
 ## 2. Việc tay #2–#3 — Clone và chạy script (trên server, bằng `tiendnm`)
 
 ```bash
-sudo install -d -o "$USER" -g "$USER" /opt/retro-blog     # một lần, nếu /opt/retro-blog chưa có
-git clone https://github.com/tiendnm/retro-blog.git /opt/retro-blog
-cd /opt/retro-blog
+git clone https://github.com/tiendnm/retro-blog.git ~/retro-blog     # trong thư mục home của user triển khai — không cần sudo
+cd ~/retro-blog
 ./scripts/deploy-home.sh
 ```
+
+> Server thật dùng `~/retro-blog` (không phải `/opt/retro-blog` như bản hướng dẫn cũ). Chọn thư mục khác cũng được miễn user triển khai sở hữu nó; mọi script chạy theo thư mục hiện hành, không gắn cứng đường dẫn.
 
 Script hỏi **3 thứ**: domain gốc, `TUNNEL_TOKEN`, email admin. Rồi tự làm:
 
@@ -53,7 +54,7 @@ Mở `https://retro-cms.<domain>/admin` bằng email + mật khẩu in ra → **
 
 ## 4. Vận hành hằng ngày
 
-Mọi lệnh compose chạy ở `/opt/retro-blog` và **không cần `-f`** (danh sách file nằm trong `COMPOSE_FILE` của `.env.production`):
+Mọi lệnh compose chạy ở `~/retro-blog` và **không cần `-f`** (danh sách file nằm trong `COMPOSE_FILE` của `.env.production`):
 
 ```bash
 docker compose --env-file .env.production ps

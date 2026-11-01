@@ -2,7 +2,7 @@
 
 > Một blog headless mang phong cách retro — **Astro** (site) + **Directus** (headless CMS) + **PostgreSQL**, đóng gói bằng **Docker**.
 
-> **Trạng thái:** 🟡 Public MVP: cơ chế deploy + CI đã có; còn checklist @deploy trên domain thật và hardening hạ tầng (security header, webhook). Chi tiết: [docs/sprints](./docs/sprints/).
+> **Trạng thái:** 🟢 Đang chạy production trên server tại nhà qua Cloudflare Tunnel; CI (`quality` + `build`) bắt buộc trên `main`. Sprint 0–13 xong, Sprint 14 (nợ tài liệu) chờ review. Chi tiết: [docs/sprints](./docs/sprints/) · [roadmap](./docs/02-roadmap.md).
 
 ---
 
@@ -17,9 +17,11 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
 | Vai trò | Công nghệ | Phiên bản | ADR |
 |---|---|---|---|
 | Presentation / Site | Astro | 7.x | [ADR-0002](./docs/adr/0002-use-astro-site-generator.md) |
-| Headless CMS | Directus | `11.3.5` | [ADR-0003](./docs/adr/0003-use-directus-headless-cms.md) |
-| Content Store | PostgreSQL | 16 (instance host :5433) | [ADR-0004](./docs/adr/0004-use-postgresql-content-store.md), [ADR-0010](./docs/adr/0010-external-postgres-instance.md) |
+| Headless CMS | Directus | `11.17.4` | [ADR-0003](./docs/adr/0003-use-directus-headless-cms.md) |
+| Content Store | PostgreSQL | `16.15` (production: trong compose; dev: instance host :5433) | [ADR-0004](./docs/adr/0004-use-postgresql-content-store.md), [ADR-0010](./docs/adr/0010-external-postgres-instance.md), [ADR-0014](./docs/adr/0014-postgres-in-compose-for-production.md) |
 | Đóng gói & runtime | Docker + Compose v2 | 29.x | [ADR-0005](./docs/adr/0005-use-docker-packaging.md) |
+| Edge / ingress | Caddy `2.10` + Cloudflare Tunnel | — | [ADR-0007](./docs/adr/0007-reverse-proxy-and-tls.md), [ADR-0015](./docs/adr/0015-cloudflare-tunnel-ingress.md) |
+| Chất lượng | Biome · Vitest · Playwright + axe · Lighthouse CI | — | [ADR-0009](./docs/adr/0009-quality-tooling-biome-vitest.md) |
 
 > Sổ đăng ký công nghệ: [docs/10a-tech-stack.md](./docs/10a-tech-stack.md).
 
@@ -30,7 +32,7 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
 ### Yêu cầu môi trường
 
 - **Bắt buộc (để chạy stack):** Docker Engine + Docker Compose v2 (đã kiểm với Docker 29 / Compose v2). Stack chạy **hoàn toàn trong Docker** — *không* cần Node trên host để chạy.
-- **Tuỳ chọn (dev tooling trên host):** Node 22 LTS + pnpm 10 (để dùng các script `pnpm ...` và IDE). Xem `.nvmrc`.
+- **Tuỳ chọn (dev tooling trên host):** Node ≥ 22.23.4 (`.nvmrc` = 26, khớp container và CI) + pnpm 10 (để dùng các script `pnpm ...`, chạy test và IDE).
 
 ### Các bước
 
@@ -95,13 +97,23 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
 
 > **Dữ liệu bền:** named volumes `pgdata`, `directus_uploads` tồn tại qua `stop`/`down` (chỉ mất khi `docker compose down -v`).
 
+### Kiểm tra chất lượng (giống CI job `quality`)
+
+```bash
+cd apps/web && pnpm install --frozen-lockfile --ignore-workspace
+pnpm exec biome lint . && pnpm format:check && pnpm typecheck && pnpm test   # lint → format → typecheck → Vitest
+cd ../.. && pnpm docs:check      # link/neo tài liệu còn đúng, không còn ô placeholder (scripts/check-docs.mjs)
+```
+
+> E2E (Playwright + axe), Lighthouse và kiểm site chạy ở job `site-checks` trên `dist/` đã build — xem [11-testing](./docs/11-testing.md). Quy ước merge: [14 §4](./docs/14-quality-gates.md).
+
 ### Triển khai production (Sprint 6/9 — [08-deployment](./docs/08-deployment.md))
 
 Hai cách: **(a) Server tại nhà + Cloudflare Tunnel** (không mở cổng, $0 — runbook [08a](./docs/08a-deploy-home-tunnel.md)) hoặc **(b) VPS có IP công khai + Caddy auto-TLS**. Cả hai: **rebuild-on-publish** (receiver trong container `web`, [ADR-0016](./docs/adr/0016-rebuild-receiver-in-web-container.md)) + **backup/healthcheck tự động** (service `ops`, [ADR-0017](./docs/adr/0017-ops-services-in-compose.md)). Postgres chạy trong compose ([ADR-0014](./docs/adr/0014-postgres-in-compose-for-production.md)). Tóm tắt:
 
 ```bash
 # (a) Server tại nhà + Cloudflare Tunnel: tạo Tunnel trên dashboard, rồi trên server (user triển khai; Docker + Compose ≥ 2.24 có sẵn):
-git clone https://github.com/tiendnm/retro-blog.git /opt/retro-blog && cd /opt/retro-blog
+git clone https://github.com/tiendnm/retro-blog.git ~/retro-blog && cd ~/retro-blog
 ./scripts/deploy-home.sh        # hỏi domain, TUNNEL_TOKEN, email admin; sinh secret; dựng cả stack; in mật khẩu admin một lần
 ./scripts/update.sh             # cập nhật code sau này (thêm --web-only nếu chỉ đổi web: bỏ qua bước CMS)
 
@@ -135,9 +147,15 @@ Bắt đầu từ [docs/README.md](./docs/README.md).
 | Sprint 5 | Reader Completeness (Pagination + SEO baseline) | 🟢 Hoàn thành |
 | Sprint 6 | Deployment & Public MVP (TLS + rebuild-on-publish + backup) | 🟢 Hoàn thành ([sprint-6](./docs/sprints/sprint-6.md)); mục @deploy chờ domain thật |
 | Sprint 6.5 | Product Polish (Content & UX) | 🟢 Hoàn thành ([sprint-6.5](./docs/sprints/sprint-6.5.md)) |
-| Sprint 7 | System Hardening & Quality (Biome, test, CI) | 🟢 Phase 1–3 xong; chờ remote GitHub để xác nhận CI xanh ([sprint-7](./docs/sprints/sprint-7.md)) |
-| Sprint 8 | Production Hardening (header bảo mật, webhook, backup lịch, healthcheck) | 🟢 Hoàn thành ([sprint-8](./docs/sprints/sprint-8.md)); chờ xác nhận trên server thật |
-| Sprint 9 | Deploy tại nhà (Cloudflare Tunnel, Postgres trong compose) | 🟢 Cấu hình + dry-run xong ([sprint-9](./docs/sprints/sprint-9.md)); chờ dựng trên máy thật |
+| Sprint 7 | System Hardening & Quality (Biome, test, CI) | 🟢 Hoàn thành ([sprint-7](./docs/sprints/sprint-7.md)) |
+| Sprint 8 | Production Hardening (header bảo mật, webhook, backup lịch, healthcheck) | 🟢 Hoàn thành ([sprint-8](./docs/sprints/sprint-8.md)) |
+| Sprint 9 | Deploy tại nhà (Cloudflare Tunnel, Postgres trong compose) | 🟢 Đã chạy trên máy thật ([sprint-9](./docs/sprints/sprint-9.md)) |
+| Sprint 10 | Đóng gói deploy (webhook + backup + healthcheck vào compose, `deploy-home.sh`) | 🟢 Hoàn thành ([sprint-10](./docs/sprints/sprint-10.md)) |
+| Sprint 11 | Kiểm thử mở rộng (E2E, axe, Lighthouse, quyền Public) | 🟢 Hoàn thành ([sprint-11](./docs/sprints/sprint-11.md)) |
+| Sprint 12 | Vận hành & quan sát (runbook, restore drill) | 🟢 Hoàn thành ([sprint-12](./docs/sprints/sprint-12.md)) |
+| Sprint 13 | Bảo mật bổ sung & cổng CI | 🟢 Hoàn thành ([sprint-13](./docs/sprints/sprint-13.md)) |
+| Sprint 14 | Nợ tài liệu (dọn placeholder, script `check-docs`) | 🟡 Làm xong, chờ Product review ([sprint-14](./docs/sprints/sprint-14.md)) |
+| Sprint 15–16 | Refactor docs Đợt 3 · Visual Polish | 📋 Kế hoạch ([roadmap](./docs/02-roadmap.md)) |
 
 ## License
 

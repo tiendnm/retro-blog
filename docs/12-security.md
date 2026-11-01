@@ -14,7 +14,7 @@
 | Tài sản (Asset) | Tác nhân đe doạ | Mối đe doạ | Biện pháp kiểm soát |
 |---|---|---|---|
 | Nội dung/DB | Kẻ tấn công ngoài | Rò rỉ/sửa dữ liệu | Phân quyền, backup, TLS |
-| Tài khoản admin Directus | Brute force/phishing | Chiếm quyền | Mật khẩu mạnh, 2FA, giới hạn |
+| Tài khoản admin Directus | Brute force/phishing | Chiếm quyền | Mật khẩu mạnh, giới hạn tốc độ (2FA không bật — §3) |
 | Secrets/API token | Lộ qua repo/log | Lạm dụng API | Quản lý secret, không log |
 | Người dùng cuối | XSS qua nội dung | Chèn script | Sanitize/escape khi render |
 
@@ -25,7 +25,7 @@
 - **Vai trò Directus** (chi tiết & ma trận: [05-cms §2](./05-cms.md)): **Admin** (`admin_access`, full) · **Editor** (`app_access`, chỉ CRUD nội dung — *không* quản trị user/role/policy) · **Public** (read-only).
 - **Public API tối thiểu (least privilege):** Public chỉ `read`; `posts` bị chặn bằng rule **`status=published` AND `published_at ≤ $NOW`** → bản nháp và bài hẹn giờ tương lai **không** lộ qua API. Đã kiểm thử Phase 2: draft/future → `403`, published → `200`.
 - **Reproducible, không thủ công:** phân quyền nằm ở [`services/directus/apply-permissions.sh`](../services/directus/apply-permissions.sh) (`pnpm permissions:apply`) — không dựa vào thao tác UI. Đây là ranh giới bảo mật cần review khi thay đổi.
-- **Không frontend auth, không public CMS users** (MVP). 2FA cho tài khoản admin: khuyến nghị khi lên production (TODO trước phát hành).
+- **Không frontend auth, không public CMS users** (MVP). **2FA cho tài khoản admin: không bật** — Product chốt 2026-11-02, chấp nhận rủi ro (một admin, không bề mặt đăng nhập công khai ngoài Cloudflare). Giảm thiểu: mật khẩu ≥ 24 ký tự ngẫu nhiên (§4), rate limit Directus theo IP (§6); giới hạn riêng cho `/auth/login` ở Cloudflare do Product tự cấu hình, chưa kiểm chứng (Sprint 13). Bật lại nếu có thêm tài khoản Editor/Admin hoặc mô hình đe doạ đổi.
 
 ## 4. Quản lý Secrets
 
@@ -50,14 +50,15 @@
 
 ## 5. Bảo mật dữ liệu & Quyền riêng tư
 
-- TODO _(PII? bình luận? cookie/analytics; tuân thủ GDPR nếu có người dùng EU; cookie consent)_.
+- **Site công khai không thu thập dữ liệu cá nhân:** không form, bình luận, đăng nhập, cookie của site, analytics hay script bên thứ ba (mã nguồn `apps/web` không có; CSP cấm script ngoài — §6). Do đó **không cần banner cookie/consent**. Font tự host (gói npm, không gọi nhà cung cấp font).
+- **Dữ liệu cá nhân duy nhất:** tên/email/mật khẩu băm của Admin/Editor trong CMS, và hồ sơ tác giả hiển thị công khai (tên, tiểu sử, avatar — nội dung do Editor nhập). Cloudflare (tunnel) thấy IP độc giả theo chính sách của họ; Caddy không ghi access log (§9). Nếu về sau thêm analytics/bình luận → đổi mô hình đe doạ, cập nhật mục này và [01a §7](./01a-mvp-scope.md) trước.
 
 ## 6. Bảo mật hạ tầng
 
 **Đã có (Sprint 6):**
 - **TLS bắt buộc:** Caddy auto-HTTPS (Let's Encrypt/ACME), HTTP→HTTPS redirect ([ADR-0007](./adr/0007-reverse-proxy-and-tls.md)).
 - **Network segmentation:** Postgres **không expose** (chỉ nội bộ `retro-net`); Directus **bind `127.0.0.1`** trên host (public **chỉ** qua Caddy). Edge duy nhất = Caddy (80/443).
-- **Image pin cứng** (không `latest`): `postgres:16.15-alpine` · `directus:11.17.4` · `caddy:2.10-alpine` · `cloudflare/cloudflared:2026.10.5` · web + ops build từ `node:26.13.0-alpine`.
+- **Image pin cứng** (không `latest`): `postgres:16.15-alpine` · `directus:11.17.4` · `caddy:2.10-alpine` · `cloudflare/cloudflared:2026.10.6` · web + ops build từ `node:26.13.0-alpine`.
 - **Build tái lập:** `--frozen-lockfile` (chống drift → giảm rủi ro chuỗi cung ứng, [S6-P1](./10-decisions.md)).
 - **Secrets ngoài repo:** `.env.production` gitignored; chỉ commit `.env.production.example` (placeholder).
 
@@ -102,11 +103,16 @@
 
 ## 9. Logging & Audit
 
-- TODO _(ghi log truy cập/thay đổi; **không** log secret/PII)_. Xem [13-operations](./13-operations.md).
+- **Log tiến trình:** mọi container ghi stdout/stderr, Docker lưu `json-file` xoay vòng 10 MB × 3 file mỗi service (`docker-compose.prod.yml`). Xem và truy vết sự cố: [13 §3, §5](./13-operations.md).
+- **Log truy cập:** Caddy **không bật access log** (không có chỉ thị `log` trong `Caddyfile`) ⇒ không lưu IP/URL độc giả; đổi lại không truy vết được ai gọi gì — chấp nhận ở quy mô này. Rate limit Directus đếm IP trong bộ nhớ, không lưu.
+- **Log thay đổi nội dung:** Directus ghi activity + revision cho mọi sửa của Admin/Editor ([04 §7](./04-database.md)); là dấu vết "ai sửa gì, khi nào", nằm trong sao lưu.
+- **Không log secret/PII:** script và `ops` chỉ in trạng thái và đường dẫn; lỗi từ CMS không kèm nội dung phản hồi ([09 §10](./09-coding-standards.md), test `directus-resilience`).
 
 ## 10. Quy trình khi phát hiện lỗ hổng
 
-- TODO _(cách báo cáo, mức độ, thời gian vá, disclosure)_.
+- **Báo cáo:** không có kênh riêng (Product chốt 2026-11-02) — blog cá nhân, không tài khoản độc giả. Site chưa có trang/thông tin liên hệ; điểm liên hệ công khai duy nhất hiện có là repo GitHub (`tiendnm/retro-blog`). Muốn có đường báo kín đáo hơn (email, Security Advisories) phải bổ sung — Product chưa yêu cầu.
+- **Mức độ và thời gian vá (mục tiêu, không cam kết):** critical/high — xử lý trong tuần phát hiện (vá, hoặc gỡ/chặn tạm bằng Cloudflare); medium/low — gom vào đợt Dependabot hằng tuần hoặc sprint kế. Lỗ hổng phụ thuộc: `security.yml` hằng tuần đỏ khi có high/critical (§6).
+- **Khi nghi bị xâm nhập:** xoay secret theo runbook §4 và xử lý theo [13 §5](./13-operations.md); công bố (nếu cần) bằng một bài trên chính blog.
 
 ## 11. Checklist bảo mật trước phát hành
 
@@ -118,4 +124,4 @@
 - [x] **Webhook rebuild siết** — header-only token, hằng-thời-gian, khoá thử sai, bind loopback _(S8)_
 - [x] **Sanitize HTML body (XSS)** — allowlist lúc build, [ADR-0013](./adr/0013-sanitize-body-html.md) _(S7)_
 - [x] **Dependencies quét lỗ hổng** — Dependabot + `security.yml` (2026-11-01, §6); còn 3 lỗ hổng mức thấp/vừa chưa vá
-- [ ] 2FA admin — bật khi cấu hình server thật (khuyến nghị §3)
+- [x] 2FA admin — **quyết định không bật**, rủi ro chấp nhận (Product, 2026-11-02; §3)

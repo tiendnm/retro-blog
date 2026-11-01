@@ -98,7 +98,7 @@ Theo máy trạng thái [03b §4](./03b-domain-model.md); field `status` (enum `
 
 ## 4. Preview bản nháp
 
-- Ngoài Sprint 2 (Nice). TODO khi cần.
+- **Chưa hiện thực.** Bài nháp không ra site (Public chỉ đọc `published`, §2 trên) và site tĩnh không dựng bản nháp; Editor chỉ xem bài trong trình soạn WYSIWYG của CMS, muốn thấy trên site thật phải xuất bản (có thể đặt `published_at` tương lai để chưa hiện). Khoảng trống so với FR-E2 ([01](./01-requirements.md) ghi "xem trước" là Must) — **Product chưa chốt** có làm preview không; xem Kết quả Sprint 14.
 
 ## 5. Media & Assets
 

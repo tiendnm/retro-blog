@@ -21,8 +21,8 @@
 | Headless Content Service (CMS) | Directus | `11.17.4` (image, pin) | **Accepted** | [0003](./adr/0003-use-directus-headless-cms.md) | P1, P2, P4 |
 | Content Store (Persistence) | PostgreSQL | 16 (dev: instance host :5433; production: trong compose — ADR-0014) | **Accepted** | [0004](./adr/0004-use-postgresql-content-store.md), [0010](./adr/0010-external-postgres-instance.md) | P4, P6 |
 | Đóng gói & Runtime | Docker Engine + Compose v2 | 29.x | **Accepted** | [0005](./adr/0005-use-docker-packaging.md) | P4, P5 |
-| Edge / Reverse Proxy | _TBD_ | — | ⏳ | _TBD_ | — |
-| Build / Deploy Orchestrator (CI/CD) | _TBD_ | — | ⏳ | _TBD_ | — |
+| Edge / Reverse Proxy | Caddy | `2.10-alpine` (pin) | **Accepted** | [0007](./adr/0007-reverse-proxy-and-tls.md) (ingress: [0015](./adr/0015-cloudflare-tunnel-ingress.md), Cloudflare Tunnel) | P4, P6 |
+| Build / Deploy Orchestrator (CI/CD) | GitHub Actions (kiểm tra) · rebuild-on-publish + `scripts/deploy-home.sh` (phát hành) | — | **Accepted** | [0008](./adr/0008-rebuild-on-publish.md), [0016](./adr/0016-rebuild-receiver-in-web-container.md), [0017](./adr/0017-ops-services-in-compose.md) | P4, P6 |
 | Chiến lược render | **SSG (static)** | — | **Accepted** | [0006](./adr/0006-render-strategy.md) | P3, P4, P5 |
 
 > ✅ **Accepted** = đã ratify (Sprint 0 close-out). Phiên bản chốt ở **Sprint 1** (Decision Log [10 §5](./10-decisions.md)); patch cụ thể pin qua lockfile / image digest khi cài.

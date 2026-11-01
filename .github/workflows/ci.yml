@@ -1,5 +1,5 @@
 # CI — Sprint 7 Phase 3, mở rộng Sprint 11. Ba job (phương án lai):
-#   quality     : cổng tĩnh + test + header Caddy (nhanh, BẮT BUỘC)
+#   quality     : cổng tĩnh + test + header Caddy + kiểm tài liệu (nhanh, BẮT BUỘC)
 #   build       : (BẮT BUỘC từ Sprint 13) dựng Directus + Postgres + seed (minimal + showcase) rồi `astro build`; kiểm quyền Public và
 #                 luồng publish → build trên Directus thật; đẩy dist/ làm artifact (tích hợp end-to-end).
 #   site-checks : (cần artifact dist) link/sitemap/canonical/RSS, E2E Playwright + axe, Lighthouse — không cần Directus.
@@ -57,6 +57,10 @@ jobs:
       - name: Test script kiểm site (check-site)
         working-directory: .
         run: node --test scripts/check-site.test.mjs
+      # Sprint 14: link/neo tương đối trong docs/ + README trỏ tới đích có thật; không TODO/TBD ngoài docs/.todo-allowlist.
+      - name: Kiểm tài liệu (link, neo, TODO/TBD)
+        working-directory: .
+        run: node scripts/check-docs.mjs
       # Sprint 13 §C: Caddy thật + Caddyfile thật (non-root, cap_drop ALL) → khẳng định header bảo mật trên 200/404/502.
       # Image lấy từ docker-compose.prod.yml nên PR Dependabot nâng Caddy được kiểm tự động.
       - name: Hồi quy header bảo mật (Caddy)

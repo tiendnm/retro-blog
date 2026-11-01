@@ -24,7 +24,9 @@
 
 > Kiến trúc là đánh đổi. Xếp hạng để biết khi xung đột thì ưu tiên gì.
 
-1. TODO (vd: Hiệu năng đọc — Core Web Vitals) · 2. TODO (Bảo trì/agnostic) · 3. TODO (Bảo mật) · 4. TODO (Chi phí)...
+1. **Bảo trì dài hạn / không lock-in** (đổi được từng adapter mà không chạm LÕI — [03a](./03a-architecture-principles.md)) · 2. **Hiệu năng đọc** (Core Web Vitals — [01 §2](./01-requirements.md)) · 3. **Bảo mật** ([12](./12-security.md)) · 4. **Chi phí** (hạ tầng tối thiểu, một người vận hành).
+
+Khi xung đột, ưu tiên theo thứ tự trên: ví dụ chọn site tĩnh (hiệu năng, bảo mật) nhưng giữ Content Service thay được qua port, dù tích hợp trực tiếp sẽ ít code hơn.
 
 ## 2. Sơ đồ ngữ cảnh (C4 L1 — System Context)
 
@@ -35,9 +37,10 @@
       ┌──────────────────  RETRO BLOG  ──────────────────┐
       │  (hệ thống blog headless, content-driven)         │
       └───────────────────────────────────────────────────┘
-             │ (tuỳ chọn) dịch vụ ngoài: analytics, search...
+             │ dịch vụ ngoài: nhà cung cấp tunnel/DNS (ingress), dịch vụ CI,
+             │ kho sao lưu ngoài host, dịch vụ giám sát (nhận ping định kỳ)
 ```
-> Tech-neutral. TODO: bổ sung actor/dịch vụ ngoài thực tế.
+> Tech-neutral. Không có dịch vụ analytics hay search ngoài (tìm kiếm chạy phía client trên chỉ mục tĩnh). Sản phẩm cụ thể: [Tech Stack](./10a-tech-stack.md) và [08](./08-deployment.md).
 
 ## 3. Vai trò thành phần (Component Roles) — C4 L2
 
@@ -67,7 +70,7 @@
 
 - **Build-time (SSG):** nội dung *Published* → sự kiện → Orchestrator build site tĩnh → phát hành.
 - **Runtime:** độc giả yêu cầu → Edge → Presentation (tĩnh hoặc render) → (nếu cần) Content API.
-- TODO: chốt build-time vs runtime cho từng loại trang (chiến lược render — cần ADR).
+- **Chiến lược render:** mọi trang dựng ở build-time (SSG), không render theo yêu cầu; nội dung đổi → sự kiện → dựng lại và hoán đổi nguyên tử ([ADR-0006](./adr/0006-render-strategy.md), [ADR-0008](./adr/0008-rebuild-on-publish.md)). Tương tác động (tìm kiếm, lightbox) chạy phía client trên dữ liệu tĩnh đã dựng sẵn.
 
 ## 6. Mối quan tâm xuyên suốt (Cross-cutting)
 
@@ -107,7 +110,9 @@
 | Adapter cho Headless Content Service | [ADR-0003](./adr/0003-use-directus-headless-cms.md) |
 | Adapter cho Content Store | [ADR-0004](./adr/0004-use-postgresql-content-store.md) |
 | Đóng gói & runtime | [ADR-0005](./adr/0005-use-docker-packaging.md) |
-| Chiến lược render (SSG/SSR/ISR) | _TBD (ADR-0006)_ |
+| Chiến lược render (SSG/SSR/ISR) | [ADR-0006](./adr/0006-render-strategy.md) — SSG |
+| Edge / Reverse Proxy và TLS | [ADR-0007](./adr/0007-reverse-proxy-and-tls.md) · ingress: [ADR-0015](./adr/0015-cloudflare-tunnel-ingress.md) |
+| Build lại khi xuất bản | [ADR-0008](./adr/0008-rebuild-on-publish.md) · [ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md) |
 
 ## 10. Rủi ro & Đánh đổi
 
@@ -117,4 +122,6 @@
 
 ## 11. Câu hỏi mở
 
-- [ ] Chiến lược render mặc định? · [ ] Search tự host hay dịch vụ? · [ ] Media CDN?
+- [x] Chiến lược render mặc định? → SSG ([ADR-0006](./adr/0006-render-strategy.md)).
+- [x] Search tự host hay dịch vụ? → chỉ mục tĩnh, tìm phía client, không dịch vụ ngoài ([01a §5](./01a-mvp-scope.md)).
+- [x] Media CDN? → không ở v1 (Anti-scope, [01a §5](./01a-mvp-scope.md)).

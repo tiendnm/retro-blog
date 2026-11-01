@@ -92,9 +92,9 @@
 
 ## 8. Chuyển động & Hiệu ứng (Motion)
 
-- TODO _(tôn trọng `prefers-reduced-motion`)_.
+- Chuyển động tối thiểu, chỉ chuyển trạng thái (hover/focus, mở–đóng lightbox); không hiệu ứng tự chạy. Khi người dùng đặt `prefers-reduced-motion: reduce`, mọi animation/transition rút về ~0 ms (khối `@media` trong `apps/web/src/styles/global.css`; cũng là lý do rule `noImportantStyles` của Biome bị tắt — [09 §4](./09-coding-standards.md)). Kiểm thủ công, chưa tự động ([15 §B3](./15-seo-accessibility.md)).
 
 ## 9. Bàn giao thiết kế (Design Handoff)
 
-- Nguồn thiết kế (Figma/khác): _TBD (link)_.
-- Quy ước đặt tên layer/component khớp code: TODO.
+- **Không có nguồn thiết kế ngoài (không Figma):** thiết kế sống trong code — token và style ở `apps/web/src/styles/global.css`; ý đồ thiết kế mô tả ở §1–§8 tài liệu này.
+- **Quy ước đặt tên:** component `.astro` PascalCase trùng tên file (`PostCard.astro`); xem [09 §3](./09-coding-standards.md).

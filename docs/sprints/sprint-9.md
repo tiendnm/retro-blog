@@ -45,3 +45,4 @@
 
 **Quyết định (2026-10-30):** không bật 2FA admin (rủi ro chấp nhận, ghi ở 08a §0).
 **Chưa xác nhận:** backup/healthcheck timers trên máy thật, restore drill, backup ra ngoài máy, HSTS 1 năm.
+> *Cập nhật (Sprint 14): đã xử lý sau đó — timer systemd được thay bằng service `ops` trong compose ([Sprint 10](./sprint-10.md), [ADR-0017](../adr/0017-ops-services-in-compose.md)); backup ra ngoài máy (R2) và HSTS 1 năm xong 2026-11-01 ([12 §6](../12-security.md)); restore drill ở [Sprint 12](./sprint-12.md) ([13 §4](../13-operations.md)).*

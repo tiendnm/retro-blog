@@ -52,11 +52,13 @@
 
 ## 3. Ràng buộc kỹ thuật (Technical Constraints)
 
-- TODO _(trình duyệt hỗ trợ, thiết bị, hosting, ngân sách hạ tầng...)_.
+- **Trình duyệt:** bản *evergreen* mới nhất của Chrome, Firefox, Safari, Edge; không hỗ trợ IE/trình duyệt cũ. Site đọc được không cần JavaScript (tìm kiếm và lightbox là cải tiến tăng dần).
+- **Thiết bị:** responsive từ điện thoại tới desktop; E2E và axe chạy ở cả hai khung (desktop và mobile).
+- **Hosting:** tự host trên máy tại nhà, truy cập từ internet duy nhất qua Cloudflare Tunnel ([ADR-0015](./adr/0015-cloudflare-tunnel-ingress.md)); ngân sách hạ tầng tối thiểu (không dịch vụ trả phí bắt buộc).
 
 ## 4. Ngoài phạm vi (Explicitly Out of Scope)
 
-- TODO.
+Xem [01a §5–§6](./01a-mvp-scope.md) (Future và Anti-scope) — SSOT, không lặp lại ở đây: tài khoản độc giả, bình luận, newsletter, analytics dashboard, related posts, CDN/tối ưu ảnh nâng cao, i18n.
 
 ## 5. Truy vết (Traceability)
 

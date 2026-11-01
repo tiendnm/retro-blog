@@ -24,6 +24,7 @@
     "rebuild:flow": "node services/directus/apply-rebuild-flow.mjs",
     "theme:apply": "node services/directus/apply-theme.mjs",
     "rebuild:run": "sh services/rebuild/rebuild.sh",
+    "docs:check": "node scripts/check-docs.mjs",
     "backup": "sh services/ops/backup.sh",
     "restore": "sh services/ops/restore.sh"
   }

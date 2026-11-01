@@ -102,7 +102,7 @@
 
 ## 6. Đa ngôn ngữ (i18n) — khái niệm
 
-- Loại nội dung nào cần dịch, mô hình bản dịch (khái niệm, không phải cơ chế CMS). Ngoài MVP — TODO khi có nhu cầu.
+- Loại nội dung nào cần dịch, mô hình bản dịch (khái niệm, không phải cơ chế CMS). Ngoài MVP ([01a §5](./01a-mvp-scope.md), Future) — chưa có nhu cầu; bổ sung khi Product yêu cầu đa ngôn ngữ.
 
 ## 7. Con trỏ hiện thực (non-normative)
 

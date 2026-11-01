@@ -5,6 +5,8 @@
 
 ---
 
+> 📋 **Cách đọc tài liệu này:** §1, §2.1 và §3 là **mẫu checklist** — sao chép vào PR/brief sprint rồi tích; ô `[ ]` để trống ở đây là **chủ ý, không phải việc tồn đọng**. Chỉ §2.2 (bản phát hành) ghi **trạng thái đã đạt** (`[x]`); §5 là cổng Sprint 0 đã qua, giữ làm lịch sử. Trạng thái từng sprint nằm ở `Kết quả` của `docs/sprints/sprint-N.md`; điều kiện merge: §4.
+
 ## 1. Definition of Ready (DoR) — sẵn sàng để làm
 
 Một hạng mục (story/task) chỉ được kéo vào sprint khi:
@@ -14,7 +16,7 @@ Một hạng mục (story/task) chỉ được kéo vào sprint khi:
 - [ ] Phụ thuộc đã xác định & không bị chặn
 - [ ] Đủ nhỏ để hoàn thành trong một sprint
 - [ ] Ảnh hưởng thiết kế/UX đã làm rõ (nếu có)
-- [ ] TODO: bổ sung theo team
+- [ ] Nếu đụng hạ tầng/bảo mật/schema/kiến trúc: đã xác định điểm dừng chờ Product ([17 §2](./17-contributing.md))
 
 ## 2. Definition of Done (DoD) — hoàn thành
 
@@ -50,7 +52,7 @@ Một hạng mục (story/task) chỉ được kéo vào sprint khi:
 
 ## 4. Điều kiện merge
 
-- CI xanh là điều kiện bắt buộc: job **`quality`** (lint → format → typecheck → test → shellcheck → hồi quy header bảo mật của Caddy, [12 §6](./12-security.md)) là required check ngay; job **`build`** (cần Directus + Postgres + seed; từ Sprint 11 còn chạy test quyền Public + luồng publish → build; **required từ Sprint 13**) và job **`site-checks`** (Sprint 11: link/sitemap/canonical/RSS, Playwright + axe, Lighthouse — cần artifact `dist` của `build`) `site-checks` còn `continue-on-error` cho tới khi xanh 10 lần liên tiếp trên `main` (8/8 tới 2026-11-02), rồi nâng thành required — Product xác nhận lúc nâng.
+- CI xanh là điều kiện bắt buộc: job **`quality`** (lint → format → typecheck → test → shellcheck → hồi quy header bảo mật của Caddy, [12 §6](./12-security.md) → kiểm tài liệu `scripts/check-docs.mjs`: link/neo tương đối đúng, không còn ô placeholder ngoài `docs/.todo-allowlist`) là required check ngay; job **`build`** (cần Directus + Postgres + seed; từ Sprint 11 còn chạy test quyền Public + luồng publish → build; **required từ Sprint 13**) và job **`site-checks`** (Sprint 11: link/sitemap/canonical/RSS, Playwright + axe, Lighthouse — cần artifact `dist` của `build`) `site-checks` còn `continue-on-error` cho tới khi xanh 10 lần liên tiếp trên `main` (8/8 tới 2026-11-02), rồi nâng thành required — Product xác nhận lúc nâng.
 - **Branch protection (đã bật, 2026-10-07)** trên `main` của repo public `tiendnm/retro-blog`: required check **`quality`** + **`build`** (thêm `build` 2026-11-02), cấm force-push và xoá nhánh. `enforce_admins=false` → chủ repo vẫn push thẳng được (repo một người); người khác chỉ merge được khi `quality` xanh. Gói GitHub Free chỉ cho protection ở repo **public**.
 - Review ở ranh giới sprint; giữa sprint chỉ dừng cho thay đổi hạ tầng / bảo mật / schema / kiến trúc ([17 §2](./17-contributing.md)).
 
@@ -63,3 +65,5 @@ Một hạng mục (story/task) chỉ được kéo vào sprint khi:
 - [ ] `09-coding-standards` đạt 🟢
 - [ ] ADR cho stack chính (Astro/Directus/DB/Docker) ở trạng thái Accepted
 - [ ] Mục 2 (DoD) đã được thống nhất
+
+_Cổng này đã được review và thoát ở close-out Sprint 0 (2026-07-21; các ô giữ nguyên làm mẫu lịch sử, không áp dụng cho sprint hiện tại)._

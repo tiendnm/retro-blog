@@ -24,7 +24,7 @@
 
 > **Địa chỉ tuyệt đối** dẫn xuất từ `PUBLIC_SITE_URL` (→ `Astro.site`) — nguồn sự thật DUY NHẤT; Sprint 6 (deploy) đổi domain chỉ sửa 1 biến. Xem Decision `[S5-P0]` (route/sitemap policy) & `[S5-P2]` (canonical self-referencing).
 >
-> **Chưa làm (đúng scope):** JSON-LD (`BlogPosting`) = *stretch*, không vào Acceptance Criteria S5 — A3 bên dưới. RSS: xem `rss.xml` ở trên (2026-11-01).
+> **Đã bổ sung sau S5:** JSON-LD `BlogPosting` (A3) và RSS (`rss.xml` ở trên) — cả hai làm 2026-11-01.
 
 ---
 
@@ -32,7 +32,8 @@
 
 ## A1. Mục tiêu SEO
 
-- TODO _(được index, thứ hạng cho chủ đề mục tiêu, rich results)_.
+- Được công cụ tìm kiếm **index đầy đủ và đúng canonical** (sitemap hợp lệ, không trang trùng — phân trang/tìm kiếm không vào sitemap); ngưỡng kỹ thuật **Lighthouse SEO ≥ 0,95** (baseline 1,00) ở job `site-checks`.
+- Chủ đề mục tiêu: máy tính cổ ([00 §1](./00-project.md)). **Không đặt chỉ tiêu thứ hạng hay lưu lượng** — phụ thuộc nội dung và thời gian, không do hệ thống quyết định; rich result dừng ở `BlogPosting` (A3).
 
 ## A2. On-page & Semantic HTML
 
@@ -43,8 +44,8 @@
 
 ## A3. Structured Data (JSON-LD)
 
-- [ ] `Article`/`BlogPosting` cho trang bài viết _(stretch — chưa vào AC S5)_
-- [ ] `BreadcrumbList`, `Person` (author) nếu phù hợp
+- [x] `BlogPosting` cho trang bài viết, kèm `author` (`Person`, có `url` tới trang tác giả), `publisher`, `keywords` từ thẻ — `src/lib/json-ld.ts`, có test; `check-site.mjs` kiểm JSON-LD parse được
+- [ ] `BreadcrumbList` — **không làm có chủ đích**: cấu trúc phẳng (bài → chuyên mục), lợi ích rich result nhỏ; xem lại nếu chuyên mục phân cấp sâu hơn
 
 ## A4. Sitemap, Robots, Feed
 
@@ -58,11 +59,11 @@
 
 ## A6. Hiệu năng (là yếu tố SEO)
 
-- [ ] Ngân sách Core Web Vitals (xem [01 §2](./01-requirements.md), [11-testing](./11-testing.md))
+- [x] Ngân sách hiệu năng: Lighthouse mobile Performance ≥ 0,9 (baseline thấp nhất 0,96) trong `e2e/lighthouserc.cjs`; mục tiêu CWV: [01 §2](./01-requirements.md); cách đo: [11-testing](./11-testing.md)
 
 ## A7. i18n / hreflang (nếu đa ngôn ngữ)
 
-- TODO.
+- **Không áp dụng ở v1:** site một ngôn ngữ (`lang="vi"`, `og:locale=vi_VN`); đa ngôn ngữ là Future ([01a §5](./01a-mvp-scope.md)). Khi làm i18n mới cần `hreflang` và URL theo ngôn ngữ.
 
 ---
 
@@ -91,4 +92,7 @@
 
 ## B4. Trách nhiệm
 
-- TODO _(a11y là trách nhiệm chung: thiết kế, code, nội dung — vd alt text do biên tập viên nhập trong Directus)_.
+a11y là trách nhiệm chung:
+- **Thiết kế/UI:** token màu giữ tỉ lệ tương phản AA ([07](./07-ui-ux.md)), focus nhìn thấy, skip-link, `prefers-reduced-motion`.
+- **Code:** HTML ngữ nghĩa; thay đổi ảnh hưởng trang xuất ra phải qua job `site-checks` (axe 0 serious/critical — [14 §2.1](./14-quality-gates.md)).
+- **Nội dung (Editor):** nhập **alt text** cho mọi ảnh trong Directus (trường `alt` là bắt buộc ở form soạn — [05-cms](./05-cms.md)); đặt heading đúng cấp trong bài; ảnh trang trí để alt rỗng.

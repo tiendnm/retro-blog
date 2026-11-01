@@ -40,7 +40,7 @@ sprint brief → commit nhỏ → CI xanh → review ở ranh giới sprint → 
 
 ## 4. Cách viết tài liệu (Docs-as-code)
 
-- **Một file = một mối quan tâm.** Không giữ file chỉ toàn TODO — chưa cần thì chưa tạo.
+- **Một file = một mối quan tâm.** Không giữ file chỉ toàn ô trống chờ điền — chưa cần thì chưa tạo.
 - **Không dùng header "Trạng thái / Owner / Cập nhật lần cuối / Người duyệt"** — git đã ghi lịch sử; các trường này luôn lỗi thời. Chỉ giữ dòng 🎯 Mục đích + 🔗 Liên quan nếu hữu ích.
 - Liên kết chéo bằng đường dẫn tương đối; thêm doc mới → cập nhật bảng ở [docs/README](./README.md).
 - Ngôn ngữ: tiếng Việt diễn giải, giữ nguyên thuật ngữ kỹ thuật tiếng Anh.

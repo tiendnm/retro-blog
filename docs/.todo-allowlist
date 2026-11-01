@@ -1,0 +1,4 @@
+# Danh sách TODO/TBD được giữ có chủ đích trong tài liệu "sống" (scripts/check-docs.mjs đọc file này).
+# Mỗi dòng:  đường-dẫn :: đoạn trích nằm trong dòng có TODO/TBD :: lý do giữ :: sprint đích
+# Mục nào không còn khớp dòng nào bị báo lỗi (xoá đi). docs/sprints, docs/adr, docs/reviews là lịch sử nên không quét.
+# Sprint 14: không còn mục nào — mọi ô trống đã điền, xoá, hoặc đổi thành quyết định/"chưa hiện thực" có ghi lý do.
