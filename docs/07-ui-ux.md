@@ -60,7 +60,7 @@
 | Empty state (list) | Khối `.empty-state` khi list rỗng | 🟢 Phase 2 |
 | Post layout (detail) | **Banner** ảnh bìa (`.post__cover`, rộng bằng cột đọc `--reading-width`, tỉ lệ 2:1, `object-fit: cover`) **nằm trên tiêu đề** + `.post` = cột đọc (`--reading-width`) + header + `.prose` | 🟢 |
 | Lightbox ảnh thân bài | Bấm ảnh trong `.prose` → `<dialog>` toàn màn hình (`scripts/lightbox.ts`): ảnh webp 2000px, chú thích = `alt` + (n/N), `Esc`/✕/bấm nền đóng, ←/→ chuyển ảnh (vòng lặp), Enter/Space mở bằng bàn phím, trả focus khi đóng, khoá cuộn nền. **Zoom (2026-11-01):** nút −/100%/+, phím `+` `-` `0`, lăn chuột (quanh con trỏ), nhấp/chạm đúp (2,5×), chụm 2 ngón; kéo để di chuyển khi đã phóng (tối đa 5×); `Esc` khi đang phóng về vừa khung trước; toán ở `src/lib/zoom.ts` (có test). Tuân CSP `script-src 'self'` (script ngoài; `assetsInlineLimit: 0`) | 🟢 |
-| Bố cục trang list (D) | `PostListView`: **hero** (cửa sổ OS cổ) → **lưới thẻ giấy** 3 cột → **danh sách gọn** "Cũ hơn"; thanh chuyên mục (chip); container list ~1080px, chi tiết giữ cột đọc; ảnh `srcset` qua Directus transform — [proposal](./sprints/homepage-layout-proposal.md) | 🟢 |
+| Bố cục trang list (D) | `PostListView`: **hero** (cửa sổ OS cổ; ảnh giãn theo chiều cao khối chữ, tóm tắt cắt ở 4 dòng) → **lưới thẻ giấy** 3 cột → **danh sách gọn** "Cũ hơn"; thanh chuyên mục (chip); container list ~1080px, chi tiết giữ cột đọc; ảnh `srcset` qua Directus transform — [proposal](./sprints/homepage-layout-proposal.md) | 🟢 |
 | Prose (HTML body) | `.prose` — style TẬP TRUNG cho toàn bộ HTML của body (heading/list/blockquote/code/table/hr/img); vertical rhythm nhất quán | 🟢 Phase 3 |
 | Tag / Category badge · Pagination | ngoài Sprint 3 | — |
 
