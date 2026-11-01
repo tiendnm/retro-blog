@@ -43,11 +43,13 @@ if [ "${1:-}" = "--check" ]; then
 fi
 
 echo "[offsite] đẩy $DIR → $REMOTE (bỏ env.bak, *.tmp)"
-# Filter xét theo thứ tự: loại env.bak TRƯỚC khi include; include có mặt ⇒ rclone ngầm loại mọi thứ còn lại (thư mục *.tmp, file lạ).
+# Luật --filter xét theo thứ tự, khớp đầu tiên thắng: (1) loại env.bak (secret), (2) nhận thư mục backup hoàn chỉnh, (3) loại hết còn lại
+# (*.tmp, file lạ). Đã kiểm chứng bằng `rclone lsf` — dùng cặp --exclude/--include riêng lẻ từng để lọt env.bak lên R2.
 # Không pipe qua lệnh khác: `set -e` phải thấy mã thoát của rclone, nếu không bước dọn bên dưới có thể chạy khi đẩy lỗi.
 rc copy "$DIR" "$REMOTE" \
-  --exclude 'env.bak' \
-  --include '/[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9]/**' \
+  --filter '- env.bak' \
+  --filter '+ /[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9]/**' \
+  --filter '- **' \
   --retries 3 --stats-one-line --stats 30s -v
 
 # Dọn bản cũ trên R2 — tới đây tức là đẩy đã thành công.
