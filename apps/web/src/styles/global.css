@@ -53,7 +53,7 @@
   --container-max: 880px; /* bề rộng trang (cột đọc) */
   --container-wide: 1080px; /* trang list: lưới ảnh (Sprint 8) */
   --container-pad-x: 1.25rem;
-  --reading-width: 50rem; /* độ rộng dòng thân bài (áp dụng ở Phase 3) */
+  --reading-width: 100%; /* cột đọc = đúng bề rộng <main> (840px), thẳng hàng header/footer; trước đây 50rem lệch 40px */
 
   /* ---- Border ----------------------------------------------------------- */
   --border-width: 1px;
@@ -732,14 +732,38 @@ dialog.lightbox::backdrop {
   align-items: center;
   gap: var(--space-3);
 }
+/* Khung xem: chiếm toàn vùng ảnh, cắt phần phóng tràn; touch-action:none để tự xử lý kéo/chụm */
+.lightbox__stage {
+  width: 100%;
+  height: calc(100dvh - 7rem);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  touch-action: none;
+  cursor: zoom-in;
+}
+.lightbox__stage.is-zoomed {
+  cursor: grab;
+}
+.lightbox__stage.is-dragging {
+  cursor: grabbing;
+}
 .lightbox__img {
   display: block;
   max-width: 100%;
-  max-height: calc(100dvh - 7rem);
+  max-height: 100%;
   object-fit: contain;
   border: var(--border-width) solid var(--color-border);
   background: var(--color-surface);
+  transform-origin: center;
+  user-select: none;
+  -webkit-user-select: none;
   transition: opacity 0.15s;
+}
+.lightbox__img.is-animating {
+  transition:
+    opacity 0.15s,
+    transform 0.18s ease-out;
 }
 .lightbox__img.is-loading {
   opacity: 0.35;
@@ -766,6 +790,28 @@ dialog.lightbox::backdrop {
   background: var(--color-accent);
   border-color: var(--color-accent);
   outline: none;
+}
+.lightbox__tools {
+  position: fixed;
+  top: var(--space-4);
+  left: var(--space-4);
+  z-index: 1;
+  display: flex;
+  gap: var(--space-2);
+}
+.lightbox__tools .lightbox__btn {
+  font-size: var(--text-lg);
+}
+.lightbox__tools .lightbox__zoom-reset {
+  min-width: 4.5rem;
+}
+.lightbox__btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.lightbox__btn:disabled:hover {
+  background: transparent;
+  border-color: var(--color-card);
 }
 .lightbox__close {
   position: fixed;
