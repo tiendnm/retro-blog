@@ -312,10 +312,14 @@ main {
 .hero__img {
   display: block;
   line-height: 0;
+  min-height: 0;
 }
+/* Ảnh giãn theo chiều cao của khối chữ (không để trống dưới ảnh khi chữ dài hơn); tối thiểu 3:2 */
 .hero__img img {
   display: block;
   width: 100%;
+  height: 100%;
+  min-height: 240px;
   aspect-ratio: 3 / 2;
   object-fit: cover;
 }
@@ -332,6 +336,14 @@ main {
 }
 .hero__txt p {
   margin: 0;
+}
+/* Tóm tắt dài không kéo cao cả khung hero */
+.hero__txt p:not(.kicker):not(.meta):not(:last-child) {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .hero__more {
   font-weight: var(--weight-bold);
@@ -412,6 +424,9 @@ main {
 @media (max-width: 860px) {
   .hero__inner {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .hero__img img {
+    height: auto;
   }
   .paper-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
