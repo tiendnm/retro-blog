@@ -823,6 +823,11 @@ dialog.lightbox::backdrop {
   dialog.lightbox[open] {
     grid-template-columns: minmax(0, 1fr);
     align-content: center;
+    /* chừa dải đỉnh (zoom/đóng) và dải đáy (‹ ›) — các nút này cố định nên không được đè ảnh/chú thích */
+    padding-block: calc(2.75rem + var(--space-4) * 2);
+  }
+  .lightbox__stage {
+    height: calc(100dvh - 15rem);
   }
   .lightbox__prev,
   .lightbox__next {
