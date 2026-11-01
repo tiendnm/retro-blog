@@ -65,7 +65,13 @@ if [ "$SRC" = "--r2" ]; then
   SRC="$WORK/src"
   echo "[drill] nguồn: R2 / $STAMP"
 else
-  [ -n "$SRC" ] || SRC="backups/$(ls -1 backups | grep -E '^[0-9]{8}-[0-9]{6}$' | sort | tail -1)"
+  if [ -z "$SRC" ]; then
+    # Glob theo thứ tự chữ cái = thứ tự thời gian (YYYYMMDD-HHMMSS) → vòng lặp lấy bản cuối cùng.
+    for d in backups/[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9][0-9][0-9]; do
+      [ -d "$d" ] && SRC="$d"
+    done
+    [ -n "$SRC" ] || { echo "không có bản backup local trong backups/" >&2; exit 2; }
+  fi
   echo "[drill] nguồn: $SRC (local)"
 fi
 for f in db.dump uploads.tgz; do
