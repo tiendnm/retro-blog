@@ -60,4 +60,26 @@
 - Cuối sprint: review một lần. Phần docs/script không đụng server: commit liên tục.
 
 ## Kết quả
-_(điền khi xong sprint: kết quả từng lần chạy thử, ngưỡng đã chốt, quyết định error tracking và kênh liên lạc)_
+_(cập nhật 2026-11-02; sprint **chưa đóng** — còn chờ quyết định Product ở cuối)_
+
+**Đã deploy (2026-11-01, `update.sh --web-only`, smoke test xanh):** log xoay vòng 10 MB × 3 cho cả 6 service; `hostcheck.sh` chạy cùng healthcheck 5 phút.
+**Đã chạy thật trên server:**
+| Hạng mục | Kết quả |
+|---|---|
+| Hostcheck bình thường | đĩa 47%, RAM khả dụng 1,7 GB, swap 7%, db 10 MB / uploads 36 MB / backups 398 MB, backup local & R2 0 giờ tuổi |
+| Gây lỗi đĩa (ngưỡng 1%) | `FAIL`, exit 1 |
+| Gây lỗi tuổi backup (ngưỡng −1 giờ) | `FAIL` cả local lẫn R2 |
+| Restore drill `--r2` | **ĐẠT, 70 giây** (migrations 101=101; 12/12 file gốc; Directus tạm health=ok; `/assets` 200; bài công khai 1=1; dọn sạch). Sửa 3 lỗi script trong lúc chạy thật |
+| Khởi động lại Directus / Postgres | Directus healthy sau 55 giây, Postgres 6 giây; site công khai OK sau đó |
+**Chưa chạy thử:** dừng/lên cả stack; restart cloudflared/caddy; các lệnh prune đĩa; quay vòng secret; dựng máy mới từ đầu; Cloudflare có cache HTML hay không (ghi rõ trong `13 §2`/§5).
+**Không thử được:** ping `/fail` ra ngoài host và cảnh báo tới tay người vận hành — chưa có `HEALTHCHECK_PING_URL`.
+
+### Việc còn chờ Product
+1. **Tạo healthcheck ngoài host (healthchecks.io, gói Free)** — các bước:
+   1. Đăng ký tại healthchecks.io → **Add Check**, tên `retro-blog`.
+   2. **Period = 5 phút, Grace = 10 phút** (khớp chu kỳ healthcheck của `ops`).
+   3. Tab **Integrations**: thêm Email (hoặc Telegram) làm nơi nhận cảnh báo — đây chính là *kênh liên lạc sự cố*.
+   4. Sao chép **ping URL** (dạng `https://hc-ping.com/<uuid>`), gửi cho Claude (hoặc tự điền) vào `HEALTHCHECK_PING_URL` trong `.env.production` trên server, rồi `docker compose --env-file .env.production up -d ops`.
+   5. Kiểm: check chuyển *Up* trong ≤ 5 phút. Thử lỗi: `docker compose --env-file .env.production stop ops` rồi đợi ≈ 15 phút → phải nhận được email; bật lại `ops`.
+   `healthcheck.sh` gọi URL khi OK và `URL/fail` khi lỗi (healthchecks.io hiểu cả hai), nên mất ping (host chết) cũng báo động.
+2. Chốt **error tracking** (đề xuất: không dùng dịch vụ ngoài).

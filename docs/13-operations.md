@@ -44,13 +44,13 @@
 
 | Thao tác | Khi nào | Các bước | Rủi ro |
 |---|---|---|---|
-| Khởi động / dừng hệ thống | | TODO | |
+| Khởi động / dừng hệ thống | Bảo trì máy, tắt điện có kế hoạch | Trong `~/retro-blog`: **backup tay trước** (`docker compose --env-file .env.production exec -T ops sh services/ops/backup.sh`). Dừng: `docker compose --env-file .env.production stop` (giữ dữ liệu; **không** dùng `down -v`). Lên: `docker compose --env-file .env.production up -d --wait --wait-timeout 1200` — Compose tự theo thứ tự phụ thuộc postgres → directus → web (build lần đầu, healthy sau ≤ 15 phút trên J1900) → caddy/ops/cloudflared. Kiểm: `docker compose --env-file .env.production exec -T ops sh services/ops/healthcheck.sh` toàn `OK`. _Chưa chạy thử dừng/lên **cả** stack riêng lẻ (cần downtime vài phút); thứ tự lên đã được `update.sh` thực thi đúng ở lần deploy 2026-11-01._ | Trung bình: site và CMS ngừng suốt thời gian dừng |
 | Triển khai phiên bản mới | | Xem [08-deployment](./08-deployment.md). Server tại nhà: `./scripts/update.sh` (đầy đủ, áp lại schema/quyền/Flow/theme, hỏi mật khẩu admin nếu đã đổi) hoặc `./scripts/update.sh --web-only` khi chỉ đổi code web (bỏ qua bước CMS, không cần mật khẩu) — [08a](./08a-deploy-home-tunnel.md) | Thấp |
 | Rollback (site) | Deploy/rebuild lỗi | **Atomic swap** về build trước: đổi symlink `current` trong volume `site_dist` sang `builds/<TS-cũ>` (giữ `KEEP_BUILDS` bản). Xem [08 §6](./08-deployment.md) | Thấp (không rebuild) |
 | Rebuild site (sau publish) | Nội dung đổi | **Tự động** qua Directus Flow → webhook → `services/rebuild/rebuild.sh` (build + atomic swap; ADR-0008). **Thủ công/fallback:** chạy `sh services/rebuild/rebuild.sh` trên host | Thấp (atomic; fail → giữ bản cũ) |
 | Xuất bản bài (publish) | Editor đặt `status=published` | Directus **Flow "Auto set published_at"** (`services/directus/apply-publish-flow.mjs`, Sprint 6.5) tự đặt `published_at = thời điểm hiện tại` **CHỈ khi field còn trống** — vá "bẫy 2 bước" (publish nhưng quên `published_at` → bài ẩn). **Editor vẫn chỉnh `published_at` thủ công** được (vd xuất bản lùi/định ngày); Flow **KHÔNG ghi đè** giá trị đã có. Chạy `emitEvents=false` ⇒ không loop/rebuild thừa. Áp dụng khi deploy: `node services/directus/apply-publish-flow.mjs` | Thấp |
-| Khởi động lại Directus / DB | Treo/lỗi | TODO | |
-| Xoá cache | Dữ liệu cũ | TODO | |
+| Khởi động lại Directus / DB | Treo/lỗi, sau đổi env | `docker compose --env-file .env.production restart directus` hoặc `... restart postgres`. Xác nhận: `docker compose --env-file .env.production ps` (cột health = healthy) rồi `healthcheck.sh`. **Đã chạy thử 2026-11-02:** Directus healthy sau **55 giây**; Postgres healthy sau **6 giây** và Directus tự kết nối lại (healthy, healthcheck công khai OK sau đó). Trong lúc khởi động lại: CMS/admin và webhook rebuild gián đoạn (publish trong thời gian này không kích hoạt rebuild → chạy `sh services/rebuild/rebuild.sh`); **site tĩnh vẫn phục vụ** từ volume `site_dist` | Thấp |
+| Xoá cache | Trang/ảnh hiển thị bản cũ | Các tầng thực có: (1) **site tĩnh** — không có cache ứng dụng; nội dung cũ = chưa rebuild → `sh services/rebuild/rebuild.sh` (atomic swap); (2) **Directus** — `CACHE_ENABLED` không đặt (mặc định tắt) nên không có gì để xoá; (3) **trình duyệt / Cloudflare** — _chưa kiểm_ Cloudflare có cache HTML của site hay không; nếu có, xoá ở dashboard (Caching → Purge). Caddy không cache | Thấp |
 
 **Container không chạy root (2026-11-01):** `web` và `caddy` chạy uid 1000. Server dựng mới từ đầu không cần làm gì thêm. Server **đã có volume cũ thuộc root** (nâng cấp từ trước mốc này) phải chown một lần, khi hai service đã dừng, rồi mới `update.sh`:
 `for v in site_dist caddy_data caddy_config; do docker run --rm -v retro-blog_$v:/v alpine chown -R 1000:1000 /v; done`
@@ -91,9 +91,38 @@ Công cụ: [`services/ops/backup.sh`](../services/ops/backup.sh) và [`prune-ba
 
 ## 5. Xử lý sự cố (Incident Response)
 
-- **Mức độ (Severity):** SEV1 (sập/dữ liệu) · SEV2 (suy giảm) · SEV3 (nhỏ).
-- **Vai trò:** người điều phối (IC), người xử lý, người liên lạc.
-- **Kênh liên lạc:** TODO.
+- **Mức độ (Severity):**
+  - **SEV1:** site **hoặc** CMS không truy cập được > 1 giờ; mất/hỏng dữ liệu; nghi lộ secret/token. Xử lý ngay.
+  - **SEV2:** một chức năng hỏng nhưng site còn phục vụ (rebuild kẹt, không đăng nhập CMS được, backup hỏng 1 ngày, đĩa ≥ 85%). Trong ngày.
+  - **SEV3:** nhỏ, có cách tránh (cảnh báo log, 5xx thoáng qua tự hết). Ghi nhận, xử lý khi tiện.
+- **Vai trò:** chỉ một người vận hành — kiêm điều phối, xử lý và liên lạc. Việc cần làm: ghi dòng thời gian ngay khi xử lý (để viết postmortem), không sửa vội khi chưa backup.
+- **Kênh liên lạc/cảnh báo:** **TODO — Product chọn** (email/Telegram…). Cảnh báo ngoài host cần `HEALTHCHECK_PING_URL` (hướng dẫn tạo: xem Kết quả Sprint 12); hiện **chưa có** cảnh báo tự đến tay người vận hành, chỉ có `FAIL` trong log `ops`.
+
+### Playbook (mỗi kịch bản: dấu hiệu → kiểm → xử lý)
+Mọi lệnh chạy trong `~/retro-blog` trên server (`ssh retro-home`); `D="docker compose --env-file .env.production"`. Cột *Đã thử* ghi rõ lệnh đã chạy thật hay chưa.
+
+| Kịch bản | Kiểm | Xử lý | Đã thử |
+|---|---|---|---|
+| Site 5xx/530 (tunnel) | `$D ps`; `$D logs --tail 50 cloudflared caddy` | 530/1033 = cloudflared mất kết nối: `$D restart cloudflared`; 502 = Caddy/web: `$D restart caddy`; sau đó `healthcheck.sh` | `ps`/`logs`/healthcheck: ✅. Restart cloudflared/caddy: ❌ chưa |
+| CMS không vào được | `$D ps directus`; `$D logs --tail 100 directus` | `$D restart directus` (≈ 55 giây); vẫn lỗi → kiểm Postgres | restart directus ✅ (55 giây) |
+| Postgres không lên | `$D logs --tail 100 postgres`; `df -h /` | Hết đĩa → playbook đĩa đầy; hỏng dữ liệu → khôi phục từ backup (§4, `restore.sh`) | restart postgres ✅ (6 giây); khôi phục hỏng: ❌ |
+| Đĩa đầy (`hostcheck` FAIL) | `df -h /`; `docker system df`; `du -sh backups` | `docker builder prune -f` (build cache từng 25 GB, 21 GB thu hồi được); `docker image prune -f`; giảm `BACKUP_KEEP`. **Không** `docker volume prune` | `df`/`system df`/`du` ✅; các lệnh prune ❌ |
+| Chứng chỉ gần hết hạn | `healthcheck.sh` báo TLS < 14 ngày | Chứng chỉ do Cloudflare quản lý (tunnel) — xem dashboard SSL/TLS; Caddy ACME chỉ khi chạy chế độ không tunnel | ❌ |
+| Token/secret bị lộ | — | Xoay vòng ngay: `REBUILD_TOKEN`, mật khẩu admin/DB, token R2, `TUNNEL_TOKEN` (Cloudflare → tạo token mới); sửa `.env.production`, `update.sh` đầy đủ. Hỏi Product trước khi sửa `.env.production` | ❌ (quy trình, không chạy thử) |
+| Rebuild kẹt | `$D logs --tail 50 web`; `ls -l` volume `site_dist` | Site cũ vẫn phục vụ (swap nguyên tử). `$D restart web` rồi `sh services/rebuild/rebuild.sh` | ❌ |
+| Backup quá cũ / hỏng | `hostcheck.sh` FAIL; `$D logs --tail 50 ops` | Chạy tay `$D exec -T ops sh services/ops/backup.sh`; lỗi R2 → `... offsite.sh --check` | backup tay + offsite ✅; ép FAIL tuổi backup ✅ |
+| **Máy hỏng hoàn toàn** | — | Dựng lại máy theo [08a](./08a-deploy-home-tunnel.md); lấy bản mới nhất từ R2 (`offsite.sh --pull`, hoặc rclone từ máy khác); `env.bak` **không** có trên R2 → tạo lại secret/token; `restore.sh`; `rebuild.sh`. Tính khả thi của khôi phục DB+uploads từ R2 đã chứng minh bằng restore drill | Phần khôi phục ✅ (drill 2026-11-01, 70 giây); dựng máy mới từ đầu: ❌ |
+
+### Ví dụ postmortem — 530 thoáng qua (2026-11-01)
+```
+- Tóm tắt: site/CMS trả 530 trong thời gian ngắn khi container cloudflared khởi động lại (trong đợt deploy).
+- Dòng thời gian: chưa ghi lại giờ cụ thể lúc đó — bài học: ghi giờ ngay khi xảy ra.
+- Nguyên nhân gốc: cloudflared (tunnel) chưa đăng ký lại kết nối với Cloudflare edge trong lúc khởi động.
+- Ảnh hưởng: SEV3, vài giây-phút, tự hết.
+- Cách khắc phục: không cần; smoke test của update.sh kiểm "cloudflared đã đăng ký tunnel".
+- Hành động phòng ngừa: giữ bước smoke test đó; cảnh báo ngoài host (ping) sẽ báo nếu kéo dài.
+```
+(Ví dụ viết lại từ ghi chú sprint; giờ chính xác không còn.)
 
 ### Mẫu ghi nhận sự cố (Postmortem)
 ```
@@ -107,4 +136,7 @@ Công cụ: [`services/ops/backup.sh`](../services/ops/backup.sh) và [`prune-ba
 
 ## 6. Bảo trì, On-call, Chi phí
 
-- TODO _(cửa sổ bảo trì, ai trực, theo dõi chi phí hạ tầng)_.
+- **Người vận hành:** một người (Product/chủ dự án); không có trực ca. Rủi ro đã chấp nhận: không UPS, ổ HDD (mất điện đột ngột/HDD hỏng — bù bằng backup R2).
+- **Cửa sổ bảo trì:** đề xuất **sáng sớm 04:00–06:00** (sau backup 03:30), lưu ý site tĩnh vẫn phục vụ khi chỉ khởi động lại Directus.
+- **Hằng tuần:** xử lý PR Dependabot (§2) → thử → backup tay → `update.sh --web-only` → xem `hostcheck`/log `ops`. **Hằng quý:** `./scripts/restore-drill.sh --r2` (lần gần nhất: 2026-11-01, đạt); kiểm hạn token R2/Cloudflare.
+- **Chi phí hiện có:** tên miền (hằng năm); hạ tầng $0 (điện nhà, Cloudflare Tunnel/DNS gói Free, R2 trong hạn mức miễn phí — kích thước backup hiện ≈ 36 MB × ≤ 30 bản). Theo dõi dung lượng R2 nếu uploads tăng.
