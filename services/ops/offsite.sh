@@ -8,6 +8,7 @@
 #        BACKUP_DIR (mặc định /backups), R2_KEEP (mặc định 30), R2_PREFIX (mặc định backups).
 #   Cách dùng: offsite.sh           đẩy + dọn (backup.sh tự gọi)
 #              offsite.sh --check   chỉ kiểm tra kết nối + liệt kê bản trên R2
+#              offsite.sh --pull DEST   tải bản MỚI NHẤT trên R2 về DEST (restore-drill.sh dùng; dòng cuối = tên bản)
 set -eu
 
 if [ -z "${R2_BUCKET:-}" ]; then
@@ -39,6 +40,16 @@ if [ "${1:-}" = "--check" ]; then
   echo "[offsite] kết nối $REMOTE"
   rc lsf --dirs-only "$REMOTE" | sort
   echo "[offsite] kết nối OK"
+  exit 0
+fi
+
+if [ "${1:-}" = "--pull" ]; then
+  DEST="${2:?cần thư mục đích: offsite.sh --pull DEST}"
+  latest=$(rc lsf --dirs-only "$REMOTE" | tr -d / | grep -E '^[0-9]{8}-[0-9]{6}$' | sort | tail -1 || true)
+  [ -n "$latest" ] || { echo "[offsite] R2 chưa có bản backup nào" >&2; exit 1; }
+  mkdir -p "$DEST"
+  rc copy "$REMOTE/$latest" "$DEST/$latest" --retries 3 -v
+  echo "$latest"
   exit 0
 fi
 
