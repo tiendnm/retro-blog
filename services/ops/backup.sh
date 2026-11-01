@@ -65,3 +65,9 @@ echo "[backup] xong → $FINAL"
 
 # Giữ BACKUP_KEEP bản gần nhất (mặc định 14) — dọn bản cũ, tránh đầy đĩa.
 BACKUP_DIR="${BACKUP_DIR:-./backups}" sh "$(dirname "$0")/prune-backups.sh"
+
+# Đẩy ra ngoài máy (R2) nếu đã cấu hình. Lỗi ở đây KHÔNG làm hỏng backup cục bộ (đã xong ở trên) nhưng phải thấy trong log;
+# lần backup sau sẽ tự đẩy bù những bản còn thiếu.
+if [ -n "${R2_BUCKET:-}" ]; then
+  BACKUP_DIR="${BACKUP_DIR:-./backups}" sh "$(dirname "$0")/offsite.sh" || echo "[backup] ⚠ ĐẨY RA NGOÀI MÁY (R2) LỖI — backup cục bộ vẫn an toàn, sẽ thử lại ở lần sau"
+fi
