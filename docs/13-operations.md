@@ -13,7 +13,7 @@
                        Internet (qua Cloudflare Tunnel hoặc 80/443)
                               │
                      ┌────────▼─────────┐  Caddy (edge) — auto-TLS ACME
-                     │  caddy:2.8       │  (ADR-0007)
+                     │  caddy:2.10      │  (ADR-0007)
                      └───┬──────────┬───┘
         retro.<domain>   │          │   cms.<domain>
         (site tĩnh)      │          │   (Directus admin+API+/assets)
@@ -31,7 +31,7 @@
 
 | Service | Ảnh | Cổng | Ghi chú |
 |---|---|---|---|
-| caddy | `caddy:2.8-alpine` | 80/443 (public) | Edge: TLS + serve static `current` + proxy Directus |
+| caddy | `caddy:2.10-alpine` | 80/443 (public) | Edge: TLS + serve static `current` + proxy Directus |
 | web (build-runner + receiver) | build từ `apps/web/Dockerfile` | — (nội bộ :9000) | Build lần đầu → `site_dist/builds/<TS>` → swap `current`; rồi nghe `POST /rebuild` ([ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md)) |
 | directus | `directus/directus:11.17.4` | (không publish) | Chỉ trong mạng compose; public qua Caddy `cms.` |
 | postgres | `postgres:16` | — | Trong compose, volume `pgdata` ([ADR-0014](./adr/0014-postgres-in-compose-for-production.md)) |
