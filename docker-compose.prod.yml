@@ -103,6 +103,11 @@ services:
     # Ghi file backup bằng đúng uid/gid của user triển khai → đọc/chép được không cần sudo.
     user: "${DEPLOY_UID:-1000}:${DEPLOY_GID:-1000}"
     working_dir: /repo
+    # DNS công cộng: host dùng resolver loopback nên DNS nhúng của Docker không có upstream ("NO EXTERNAL NAMESERVERS")
+    # → ops không tra được tên ngoài (R2, healthcheck công khai). Tên nội bộ (postgres, web…) vẫn do Docker phân giải.
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
     depends_on:
       postgres:
         condition: service_healthy
