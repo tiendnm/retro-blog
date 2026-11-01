@@ -667,6 +667,14 @@ main {
   border: var(--border-width) solid var(--color-border);
   padding: var(--space-2) var(--space-3);
   text-align: left;
+  min-width: 8ch;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+/* Cột đầu (nhãn) giữ một dòng; các cột còn lại chỉ xuống dòng ở khoảng trắng */
+.prose th:first-child,
+.prose td:first-child {
+  white-space: nowrap;
 }
 .prose th {
   background: var(--color-surface);
