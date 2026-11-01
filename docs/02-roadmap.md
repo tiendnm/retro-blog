@@ -18,7 +18,7 @@
 | M0 — Tài liệu nền tảng | Bộ `docs/` + ADR stack | ✅ Sprint 0 |
 | M1 — Khung hệ thống | Astro + Directus + PostgreSQL chạy local | ✅ Sprint 1 |
 | M2 — MVP nội dung | Editor publish → Reader xem (list/detail/category) | ✅ Sprint 2 |
-| M3 — Ra mắt (Launch) | Public HTTPS + SEO + a11y + checklist | ✅ **Đạt 2026-11-01 (v0.1)** — lịch sử: Site + CMS + rebuild-on-publish đã chạy trên domain thật (2026-10-30); backup/healthcheck nay chạy trong compose (Sprint 10); backup ngoài máy lên Cloudflare R2 đã chạy (2026-11-01); restore drill từ R2 đạt (2026-11-01); HSTS 1 năm đã bật. Theo dõi sau v0.1: diễn tập dựng server mới hoàn toàn từ backup R2 (cần tạo lại secret/token tunnel vì `env.bak` không lên R2) ([08 §8](./08-deployment.md)) |
+| M3 — Ra mắt (Launch) | Public HTTPS + SEO + a11y + checklist | ✅ **Đạt 2026-11-01 (v0.1)** — lịch sử: Site + CMS + rebuild-on-publish đã chạy trên domain thật (2026-10-30); backup/healthcheck nay chạy trong compose (Sprint 10); backup ngoài máy lên Cloudflare R2 đã chạy (2026-11-01); restore drill từ R2 đạt (2026-11-01); HSTS 1 năm đã bật. Diễn tập dựng server mới hoàn toàn từ backup R2: **bỏ qua có chủ đích** (Product, 2026-11-01; restore DB + uploads từ R2 đã kiểm, còn lại phải tạo lại secret/token tunnel vì `env.bak` không lên R2) ([08 §8](./08-deployment.md)) |
 
 ## 3. Sprint
 
