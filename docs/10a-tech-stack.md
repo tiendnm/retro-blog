@@ -18,7 +18,7 @@
 | Vai trò / Port ([03](./03-architecture.md)) | Công nghệ | Phiên bản | Trạng thái | ADR | Principle chính |
 |---|---|---|---|---|---|
 | Presentation / Site (Site Generator) | Astro | 7.x | **Accepted** | [0002](./adr/0002-use-astro-site-generator.md) | P1, P3, P5 |
-| Headless Content Service (CMS) | Directus | `11.3.5` (image, pin) | **Accepted** | [0003](./adr/0003-use-directus-headless-cms.md) | P1, P2, P4 |
+| Headless Content Service (CMS) | Directus | `11.17.4` (image, pin) | **Accepted** | [0003](./adr/0003-use-directus-headless-cms.md) | P1, P2, P4 |
 | Content Store (Persistence) | PostgreSQL | 16 (dev: instance host :5433; production: trong compose — ADR-0014) | **Accepted** | [0004](./adr/0004-use-postgresql-content-store.md), [0010](./adr/0010-external-postgres-instance.md) | P4, P6 |
 | Đóng gói & Runtime | Docker Engine + Compose v2 | 29.x | **Accepted** | [0005](./adr/0005-use-docker-packaging.md) | P4, P5 |
 | Edge / Reverse Proxy | _TBD_ | — | ⏳ | _TBD_ | — |
@@ -34,7 +34,7 @@
 | Node.js | **22 LTS** (`engines >=22.23.4`, `.nvmrc` 22) | web (Astro) & Directus chạy trong container (Node 22 image) → `docker compose up` không cần Node 22 trên host; chạy Astro trực tiếp trên host thì cài Node ≥22.23.4 (Astro 7 yêu cầu; máy dev hiện 26.13.0 LTS) |
 | Package manager | **pnpm 10.x** (workspace) | pin qua `packageManager` trong `package.json` |
 | Astro | **7.x** | apps/web (container `node:22.23.4-alpine`) |
-| Directus | **11.3.5** (pin) | image `directus/directus:11.3.5` |
+| Directus | **11.17.4** (pin) | image `directus/directus:11.17.4` |
 | PostgreSQL | **16.8-alpine** (pin) | image `postgres:16.8-alpine` |
 | Docker Engine / Compose | **29.x / Compose v2** | đóng gói & runtime |
 

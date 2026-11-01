@@ -40,7 +40,7 @@
 **Đã có (Sprint 6):**
 - **TLS bắt buộc:** Caddy auto-HTTPS (Let's Encrypt/ACME), HTTP→HTTPS redirect ([ADR-0007](./adr/0007-reverse-proxy-and-tls.md)).
 - **Network segmentation:** Postgres **không expose** (chỉ nội bộ `retro-net`); Directus **bind `127.0.0.1`** trên host (public **chỉ** qua Caddy). Edge duy nhất = Caddy (80/443).
-- **Image pin cứng** (không `latest`): `postgres:16.8-alpine` · `directus:11.3.5` · `caddy:2.8-alpine` · web + ops build từ `node:22.23.4-alpine`.
+- **Image pin cứng** (không `latest`): `postgres:16.8-alpine` · `directus:11.17.4` · `caddy:2.8-alpine` · web + ops build từ `node:22.23.4-alpine`.
 - **Build tái lập:** `--frozen-lockfile` (chống drift → giảm rủi ro chuỗi cung ứng, [S6-P1](./10-decisions.md)).
 - **Secrets ngoài repo:** `.env.production` gitignored; chỉ commit `.env.production.example` (placeholder).
 
@@ -59,7 +59,7 @@
 - **Astro 5 → 7 (2026-11-01):** audit giảm từ 31 (1 critical, 11 high) xuống 3 (2 low, 1 moderate). Kéo theo base image `node:22.23.4-alpine` (Astro 7 cần Node ≥22.23.4). Đã so build trước/sau trên nội dung thật: cùng 19 trang/39 file, không script/style inline (CSP giữ nguyên), khác biệt chỉ là tên gói CSS, khoảng trắng và `&amp;` trong URL ảnh; tìm kiếm và lightbox chạy đúng.
 - **Quét dependency:** `.github/dependabot.yml` (npm, docker, compose, actions — hằng tuần) và workflow `security.yml` (`pnpm audit --prod --audit-level high`, hằng tuần, hiện chỉ báo cáo).
 
-**Còn lại (Backlog):** bỏ `continue-on-error` của `security.yml` khi 3 lỗ hổng còn lại được vá · nâng Directus 11.3.5 lên bản mới nhất · chưa có rate limit riêng cho đăng nhập admin.
+**Còn lại (Backlog):** bỏ `continue-on-error` của `security.yml` khi 3 lỗ hổng còn lại được vá · cân nhắc Directus 12.x (đã nâng 11.3.5 → 11.17.4, 2026-11-01) · chưa có rate limit riêng cho đăng nhập admin.
 
 ## 7. Bảo mật chuỗi cung ứng (Supply chain)
 

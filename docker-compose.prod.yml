@@ -54,6 +54,8 @@ services:
       # Cookie đăng nhập chỉ đi qua HTTPS (trình duyệt luôn thấy HTTPS: Caddy TLS hoặc Cloudflare edge).
       REFRESH_TOKEN_COOKIE_SECURE: "true"
       SESSION_COOKIE_SECURE: "true"
+      # Tắt trợ lý AI tích hợp (Directus ≥11.14): không dùng, bớt bề mặt tấn công và tính năng ngoài ý muốn.
+      AI_ENABLED: "false"
       # Rate limiting theo IP client (bộ nhớ trong tiến trình — 1 instance). Mặc định cho phép ~10 req/s kéo dài, đủ cho
       # trang tải nhiều ảnh /assets; vượt → 429. IP thật lấy từ CF-Connecting-IP (Cloudflare luôn ghi đè header này, và
       # Caddy không publish cổng nên chỉ tunnel tới được — không giả mạo được). Chỉnh bằng RATE_LIMITER_POINTS/DURATION.
