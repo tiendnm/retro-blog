@@ -124,4 +124,4 @@ Vitest 102 → 120 (+18 độ bền thin client). `check-site` 15 test. Playwrig
 - **Product should verify:** (1) timeout 15 s có phù hợp với Directus trên máy chủ yếu khi build? (2) có làm favicon không (Backlog); (3) các job mới thành bắt buộc ở Sprint 13.
 
 ### Độ ổn định (tiêu chí 10 lần xanh)
-_(điền sau khi chạy lại — xem commit tiếp theo)_
+**10/10 lần xanh liên tiếp, không flake.** Cùng commit `be30aad` (run 41310443193): lần chạy gốc + 9 lần rerun, cả `quality`, `build` và `site-checks` đều `success`, không step nào fail. Trước đó run `72ac3b3` cũng xanh. Đo ngày 01/11/2026.
