@@ -18,7 +18,7 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: "22"
+  NODE_VERSION: "26"
 
 jobs:
   quality:
@@ -103,7 +103,7 @@ jobs:
             -e ADMIN_EMAIL="$ADMIN_EMAIL" -e ADMIN_PASSWORD="$ADMIN_PASSWORD" \
             -e PUBLIC_URL="$DIRECTUS_URL" \
             -v "$PWD/services/directus/snapshots:/directus/snapshots:ro" \
-            directus/directus:11.3.5
+            directus/directus:11.17.4
       - name: Wait for Directus healthy
         run: |
           for _ in $(seq 1 40); do

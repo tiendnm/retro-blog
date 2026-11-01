@@ -54,6 +54,8 @@ services:
       # Cookie đăng nhập chỉ đi qua HTTPS (trình duyệt luôn thấy HTTPS: Caddy TLS hoặc Cloudflare edge).
       REFRESH_TOKEN_COOKIE_SECURE: "true"
       SESSION_COOKIE_SECURE: "true"
+      # Tắt trợ lý AI tích hợp (Directus ≥11.14): không dùng, bớt bề mặt tấn công và tính năng ngoài ý muốn.
+      AI_ENABLED: "false"
       # Rate limiting theo IP client (bộ nhớ trong tiến trình — 1 instance). Mặc định cho phép ~10 req/s kéo dài, đủ cho
       # trang tải nhiều ảnh /assets; vượt → 429. IP thật lấy từ CF-Connecting-IP (Cloudflare luôn ghi đè header này, và
       # Caddy không publish cổng nên chỉ tunnel tới được — không giả mạo được). Chỉnh bằng RATE_LIMITER_POINTS/DURATION.
@@ -62,6 +64,14 @@ services:
       RATE_LIMITER_POINTS: ${RATE_LIMITER_POINTS:-100}
       RATE_LIMITER_DURATION: ${RATE_LIMITER_DURATION:-10}
       IP_CUSTOM_HEADER: cf-connecting-ip
+    # DNS công cộng: host dùng resolver loopback nên DNS nhúng của Docker không có upstream → Directus không tra được
+    # tên ngoài (Marketplace gọi registry.directus.io → 503 sau ~16s). Tên nội bộ (postgres, web…) vẫn do Docker phân giải.
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+    # Extension cài từ Marketplace ghi vào /directus/extensions → cần volume bền, nếu không mất khi container bị tạo lại.
+    volumes:
+      - directus_extensions:/directus/extensions
     # Image đã chạy bằng user `node`; bỏ mọi capability và chặn leo quyền.
     cap_drop: [ALL]
     security_opt:
@@ -209,6 +219,7 @@ services:
 
 volumes:
   pgdata:
+  directus_extensions:
   site_dist:
   caddy_data:
   caddy_config:

@@ -59,6 +59,8 @@ setup_cms() {
   ops_run bash services/directus/apply-permissions.sh
   say "Áp Flow rebuild-on-publish"
   ops_run node services/directus/apply-rebuild-flow.mjs
+  say "Áp Flow tự sinh slug"
+  ops_run node services/directus/apply-slug-flow.mjs
   say "Áp theme/branding admin"
   ops_run node services/directus/apply-theme.mjs
 }

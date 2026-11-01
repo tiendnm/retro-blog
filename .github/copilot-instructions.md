@@ -1,6 +1,6 @@
 # Copilot Instructions — Retro Blog
 
-Headless blog: **Astro 5.x** (SSG, static site) + **Directus 11.3.5** (headless CMS) + **PostgreSQL 16.8**, packaged entirely in **Docker Compose**. Architecture uses a Ports & Adapters (Hexagonal) model; the `docs/` folder is the tech-neutral "core" (stable contracts), and the concrete tools are swappable adapters.
+Headless blog: **Astro 7.x** (SSG, static site) + **Directus 11.17.4** (headless CMS) + **PostgreSQL 16.8**, packaged entirely in **Docker Compose**. Architecture uses a Ports & Adapters (Hexagonal) model; the `docs/` folder is the tech-neutral "core" (stable contracts), and the concrete tools are swappable adapters.
 
 ---
 

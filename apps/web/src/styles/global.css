@@ -53,7 +53,7 @@
   --container-max: 880px; /* bề rộng trang (cột đọc) */
   --container-wide: 1080px; /* trang list: lưới ảnh (Sprint 8) */
   --container-pad-x: 1.25rem;
-  --reading-width: 50rem; /* độ rộng dòng thân bài (áp dụng ở Phase 3) */
+  --reading-width: 100%; /* cột đọc = đúng bề rộng <main> (840px), thẳng hàng header/footer; trước đây 50rem lệch 40px */
 
   /* ---- Border ----------------------------------------------------------- */
   --border-width: 1px;
@@ -312,10 +312,14 @@ main {
 .hero__img {
   display: block;
   line-height: 0;
+  min-height: 0;
 }
+/* Ảnh giãn theo chiều cao của khối chữ (không để trống dưới ảnh khi chữ dài hơn); tối thiểu 3:2 */
 .hero__img img {
   display: block;
   width: 100%;
+  height: 100%;
+  min-height: 240px;
   aspect-ratio: 3 / 2;
   object-fit: cover;
 }
@@ -332,6 +336,14 @@ main {
 }
 .hero__txt p {
   margin: 0;
+}
+/* Tóm tắt dài không kéo cao cả khung hero */
+.hero__txt p:not(.kicker):not(.meta):not(:last-child) {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .hero__more {
   font-weight: var(--weight-bold);
@@ -412,6 +424,9 @@ main {
 @media (max-width: 860px) {
   .hero__inner {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .hero__img img {
+    height: auto;
   }
   .paper-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -503,22 +518,17 @@ main {
 .post__header .meta {
   margin: 0;
 }
-/* Ảnh bìa kiểu banner (Notion): nằm trên tiêu đề, rộng hơn cột chữ, cắt dẹt bằng object-fit. */
+/* Ảnh bìa: vừa đúng bề rộng cột bài viết (cùng khung với tiêu đề và thân bài), cắt dẹt 2:1 bằng object-fit. */
 .post__cover {
   display: block;
-  width: min(var(--container-wide), calc(100vw - 2 * var(--container-pad-x)));
-  max-width: none; /* thắng `img { max-width: 100% }` — nếu không banner bị kẹt ở bề rộng cột */
-  height: 280px;
-  margin: 0 0 var(--space-6) 50%;
-  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--reading-width);
+  aspect-ratio: 2 / 1;
+  height: auto;
+  margin: 0 0 var(--space-6);
   object-fit: cover;
   object-position: center;
   border: var(--border-width) solid var(--color-border);
-}
-@media (max-width: 600px) {
-  .post__cover {
-    height: 160px;
-  }
 }
 
 .prose {
@@ -695,6 +705,10 @@ html:has(dialog.lightbox[open]) {
   overflow: hidden; /* khoá cuộn nền khi đang xem ảnh */
 }
 dialog.lightbox {
+  --lb-stage-h: calc(
+    100dvh -
+    7rem
+  ); /* chiều cao khung xem ảnh: dùng chung cho .lightbox__stage và .lightbox__img */
   width: 100vw;
   max-width: none;
   height: 100dvh;
@@ -722,14 +736,39 @@ dialog.lightbox::backdrop {
   align-items: center;
   gap: var(--space-3);
 }
+/* Khung xem: chiếm toàn vùng ảnh, cắt phần phóng tràn; touch-action:none để tự xử lý kéo/chụm */
+.lightbox__stage {
+  width: 100%;
+  height: var(--lb-stage-h);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  touch-action: none;
+  cursor: zoom-in;
+}
+.lightbox__stage.is-zoomed {
+  cursor: grab;
+}
+.lightbox__stage.is-dragging {
+  cursor: grabbing;
+}
 .lightbox__img {
   display: block;
   max-width: 100%;
-  max-height: calc(100dvh - 7rem);
+  /* KHÔNG dùng 100%: hàng lưới auto làm % chiều cao vô hiệu → ảnh rộng tràn và bị cắt đáy */
+  max-height: var(--lb-stage-h);
   object-fit: contain;
   border: var(--border-width) solid var(--color-border);
   background: var(--color-surface);
+  transform-origin: center;
+  user-select: none;
+  -webkit-user-select: none;
   transition: opacity 0.15s;
+}
+.lightbox__img.is-animating {
+  transition:
+    opacity 0.15s,
+    transform 0.18s ease-out;
 }
 .lightbox__img.is-loading {
   opacity: 0.35;
@@ -757,6 +796,28 @@ dialog.lightbox::backdrop {
   border-color: var(--color-accent);
   outline: none;
 }
+.lightbox__tools {
+  position: fixed;
+  top: var(--space-4);
+  left: var(--space-4);
+  z-index: 1;
+  display: flex;
+  gap: var(--space-2);
+}
+.lightbox__tools .lightbox__btn {
+  font-size: var(--text-lg);
+}
+.lightbox__tools .lightbox__zoom-reset {
+  min-width: 4.5rem;
+}
+.lightbox__btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.lightbox__btn:disabled:hover {
+  background: transparent;
+  border-color: var(--color-card);
+}
 .lightbox__close {
   position: fixed;
   top: var(--space-4);
@@ -767,6 +828,11 @@ dialog.lightbox::backdrop {
   dialog.lightbox[open] {
     grid-template-columns: minmax(0, 1fr);
     align-content: center;
+    /* chừa dải đỉnh (zoom/đóng) và dải đáy (‹ ›) — các nút này cố định nên không được đè ảnh/chú thích */
+    padding-block: calc(2.75rem + var(--space-4) * 2);
+  }
+  dialog.lightbox {
+    --lb-stage-h: calc(100dvh - 15rem);
   }
   .lightbox__prev,
   .lightbox__next {

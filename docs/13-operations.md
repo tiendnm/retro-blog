@@ -19,7 +19,7 @@
         (site tĩnh)      │          │   (Directus admin+API+/assets)
               ┌──────────▼───┐   ┌──▼──────────┐
               │ site_dist    │   │ directus     │ :8055 (không publish)
-              │  builds/<TS> │   │ 11.3.5       │
+              │  builds/<TS> │   │ 11.17.4      │
               │  current ───►│   └──┬───────────┘
               └──────▲───────┘      │ retro-net (nội bộ)
      web build-runner│         ┌────▼─────┐
@@ -33,7 +33,7 @@
 |---|---|---|---|
 | caddy | `caddy:2.8-alpine` | 80/443 (public) | Edge: TLS + serve static `current` + proxy Directus |
 | web (build-runner + receiver) | build từ `apps/web/Dockerfile` | — (nội bộ :9000) | Build lần đầu → `site_dist/builds/<TS>` → swap `current`; rồi nghe `POST /rebuild` ([ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md)) |
-| directus | `directus/directus:11.3.5` | (không publish) | Chỉ trong mạng compose; public qua Caddy `cms.` |
+| directus | `directus/directus:11.17.4` | (không publish) | Chỉ trong mạng compose; public qua Caddy `cms.` |
 | postgres | `postgres:16` | — | Trong compose, volume `pgdata` ([ADR-0014](./adr/0014-postgres-in-compose-for-production.md)) |
 | ops | build từ `services/ops/Dockerfile` | — | Backup hằng ngày + healthcheck 5 phút; mount `:ro`, không `docker.sock` ([ADR-0017](./adr/0017-ops-services-in-compose.md)) |
 
@@ -51,6 +51,14 @@
 | Xuất bản bài (publish) | Editor đặt `status=published` | Directus **Flow "Auto set published_at"** (`services/directus/apply-publish-flow.mjs`, Sprint 6.5) tự đặt `published_at = thời điểm hiện tại` **CHỈ khi field còn trống** — vá "bẫy 2 bước" (publish nhưng quên `published_at` → bài ẩn). **Editor vẫn chỉnh `published_at` thủ công** được (vd xuất bản lùi/định ngày); Flow **KHÔNG ghi đè** giá trị đã có. Chạy `emitEvents=false` ⇒ không loop/rebuild thừa. Áp dụng khi deploy: `node services/directus/apply-publish-flow.mjs` | Thấp |
 | Khởi động lại Directus / DB | Treo/lỗi | TODO | |
 | Xoá cache | Dữ liệu cũ | TODO | |
+
+**Container không chạy root (2026-11-01):** `web` và `caddy` chạy uid 1000. Server dựng mới từ đầu không cần làm gì thêm. Server **đã có volume cũ thuộc root** (nâng cấp từ trước mốc này) phải chown một lần, khi hai service đã dừng, rồi mới `update.sh`:
+`for v in site_dist caddy_data caddy_config; do docker run --rm -v retro-blog_$v:/v alpine chown -R 1000:1000 /v; done`
+(đã làm trên server nhà). **Rate limit Directus:** nhật ký có dòng `WARN: Custom IP header didn't return valid IP address: undefined` cho yêu cầu nội bộ (web build, ops) — bình thường, vì chúng không đi qua Cloudflare; yêu cầu công khai khi quá 100/10 giây sẽ nhận 429 và tự hết sau vài giây.
+
+**Nâng phiên bản Directus (quy trình đã dùng 2026-11-01, 11.3.5 → 11.17.4):** (1) đọc mục *Potential Breaking Changes* của các release ở giữa; (2) lấy backup mới nhất về máy (`db.dump` + `uploads.tgz`, không lấy `env.bak`), khôi phục vào Postgres tạm cùng Directus bản mới; (3) chạy đúng các bước `setup_cms` (schema apply, permissions, Flow, theme), build site từ bản mới và so với bản đang chạy — phải giống hệt; thử thêm `/assets`, `/users` (403), rate limit và cài mới trên DB trống; (4) backup ngay trước khi deploy rồi `update.sh` đầy đủ. **Migration của Directus một chiều:** quay lại bản cũ = đặt lại image cũ **và** khôi phục `db.dump` ([§4](#4-sao-lưu--khôi-phục-backup--recovery)).
+
+**Marketplace Directus (Settings → Marketplace):** cần `directus` ra được internet để gọi `registry.directus.io`. Host dùng resolver loopback nên DNS nhúng của Docker không có upstream → phải đặt `dns: [1.1.1.1, 1.0.0.1]` cho service (đã có; thiếu thì Marketplace báo 503 sau ~16 giây, `wget registry.directus.io` trong container báo `bad address`). Extension cài từ Marketplace nằm trong volume `directus_extensions` (không nằm trong backup — cài lại được). `MARKETPLACE_TRUST` giữ mặc định `sandbox`: chỉ cài extension chạy trong sandbox; muốn cho phép loại khác phải đặt `all` có chủ đích, vì extension chạy mã trong tiến trình Directus.
 
 ## 3. Observability (Log / Metric / Alert)
 

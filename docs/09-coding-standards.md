@@ -7,9 +7,9 @@
 
 ## 1. Ngôn ngữ & phiên bản
 
-- **Node:** 22 (runtime chuẩn — Docker `node:22.12.0`; engines `>=22`). Local dev có thể ≥20.3 (Astro 5 hỗ trợ).
+- **Node:** 26 trong Docker (`node:26.13.0-alpine`, thử trọn pipeline 2026-11-01); CI cũng chạy Node 26. Astro 7 yêu cầu Node `>=22.23.4`. **Máy local cần Node ≥22.23.4** để chạy `astro`; nếu chưa có, chạy các lệnh kiểm tra trong container: `docker build -t retro-web apps/web && docker run --rm retro-web pnpm test`.
 - **pnpm:** 10.33.2 (pin qua `packageManager`).
-- **TypeScript:** 5.x (pin `^5.9.3`); Astro 5.x.
+- **TypeScript:** 5.x (pin `^5.9.3`); Astro 7.x.
 - **Công cụ chất lượng (Sprint 7):** **Biome** (lint+format) · **Vitest** (test) · **astro check** (typecheck) — quyết định ở [ADR-0009](./adr/0009-quality-tooling-biome-vitest.md).
 
 ## 2. Cấu trúc thư mục dự án (dự kiến)

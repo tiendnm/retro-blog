@@ -1,5 +1,5 @@
 version: 1
-directus: 11.3.5
+directus: 11.17.4
 vendor: postgres
 collections:
   - collection: authors
@@ -165,6 +165,7 @@ fields:
       options: null
       readonly: true
       required: false
+      searchable: true
       sort: 1
       special:
         - uuid
@@ -205,6 +206,7 @@ fields:
       options: null
       readonly: false
       required: true
+      searchable: true
       sort: 2
       special: null
       translations: null
@@ -240,10 +242,13 @@ fields:
       group: null
       hidden: false
       interface: input
-      note: null
+      note: >-
+        Định danh URL tác giả. Để TRỐNG khi tạo mới → tự sinh từ tên (trùng thì
+        thêm -2, -3). Tránh đổi sau khi đã có bài để không gãy link.
       options: null
       readonly: false
-      required: true
+      required: false
+      searchable: true
       sort: 3
       special: null
       translations: null
@@ -283,6 +288,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 4
       special: null
       translations: null
@@ -322,6 +328,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 5
       special:
         - m2o
@@ -362,6 +369,7 @@ fields:
       options: null
       readonly: true
       required: false
+      searchable: true
       sort: 1
       special:
         - uuid
@@ -402,6 +410,7 @@ fields:
       options: null
       readonly: false
       required: true
+      searchable: true
       sort: 2
       special: null
       translations: null
@@ -437,10 +446,13 @@ fields:
       group: null
       hidden: false
       interface: input
-      note: null
+      note: >-
+        Định danh URL chuyên mục. Để TRỐNG khi tạo mới → tự sinh từ tên (trùng
+        thì thêm -2, -3). Tránh đổi để không gãy link.
       options: null
       readonly: false
-      required: true
+      required: false
+      searchable: true
       sort: 3
       special: null
       translations: null
@@ -480,6 +492,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 4
       special: null
       translations: null
@@ -519,6 +532,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 5
       special:
         - m2o
@@ -562,6 +576,7 @@ fields:
       options: null
       readonly: false
       required: true
+      searchable: true
       sort: 1
       special: null
       translations: null
@@ -601,6 +616,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 2
       special: null
       translations: null
@@ -640,6 +656,7 @@ fields:
       options: null
       readonly: true
       required: false
+      searchable: true
       sort: 1
       special:
         - uuid
@@ -680,6 +697,7 @@ fields:
       options: null
       readonly: false
       required: true
+      searchable: true
       sort: 2
       special: null
       translations: null
@@ -716,13 +734,15 @@ fields:
       hidden: false
       interface: input
       note: >-
-        Định danh URL: chữ thường, không dấu, dùng gạch nối thay khoảng trắng.
-        Ổn định sau khi xuất bản (BR-2) — tránh đổi để không gãy link.
+        Định danh URL: chữ thường, không dấu, dùng gạch nối. Để TRỐNG khi tạo
+        mới → tự sinh từ tiêu đề (trùng thì thêm -2, -3). Ổn định sau khi xuất
+        bản (BR-2) — tránh đổi để không gãy link.
       options:
         slug: true
         trim: true
       readonly: false
-      required: true
+      required: false
+      searchable: true
       sort: 3
       special: null
       translations: null
@@ -764,6 +784,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 4
       special: null
       translations: null
@@ -823,6 +844,7 @@ fields:
           - fullscreen
       readonly: false
       required: false
+      searchable: true
       sort: 5
       special: null
       translations: null
@@ -869,6 +891,7 @@ fields:
             value: published
       readonly: false
       required: true
+      searchable: true
       sort: 6
       special: null
       translations: null
@@ -910,6 +933,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 7
       special: null
       translations: null
@@ -949,6 +973,7 @@ fields:
       options: null
       readonly: false
       required: true
+      searchable: true
       sort: 8
       special:
         - m2o
@@ -989,6 +1014,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 9
       special:
         - m2o
@@ -1029,6 +1055,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 10
       special:
         - m2o
@@ -1070,6 +1097,7 @@ fields:
         template: '{{tags_id.name}}'
       readonly: false
       required: false
+      searchable: true
       sort: 11
       special:
         - m2m
@@ -1093,6 +1121,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 1
       special: null
       translations: null
@@ -1132,6 +1161,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 2
       special: null
       translations: null
@@ -1171,6 +1201,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 3
       special: null
       translations: null
@@ -1210,6 +1241,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 1
       special: null
       translations: null
@@ -1249,6 +1281,7 @@ fields:
       options: null
       readonly: false
       required: true
+      searchable: true
       sort: 2
       special: null
       translations: null
@@ -1288,6 +1321,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 3
       special: null
       translations: null
@@ -1327,6 +1361,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 4
       special: null
       translations: null
@@ -1366,6 +1401,7 @@ fields:
       options: null
       readonly: false
       required: false
+      searchable: true
       sort: 5
       special:
         - file
@@ -1406,6 +1442,7 @@ fields:
       options: null
       readonly: true
       required: false
+      searchable: true
       sort: 1
       special:
         - uuid
@@ -1446,6 +1483,7 @@ fields:
       options: null
       readonly: false
       required: true
+      searchable: true
       sort: 2
       special: null
       translations: null
@@ -1481,10 +1519,13 @@ fields:
       group: null
       hidden: false
       interface: input
-      note: null
+      note: >-
+        Định danh URL thẻ. Để TRỐNG khi tạo mới → tự sinh từ tên (trùng thì thêm
+        -2, -3). Tránh đổi để không gãy link.
       options: null
       readonly: false
-      required: true
+      required: false
+      searchable: true
       sort: 3
       special: null
       translations: null
@@ -1525,6 +1566,7 @@ fields:
         template: '{{posts_id.title}}'
       readonly: false
       required: false
+      searchable: true
       sort: 4
       special:
         - o2m
@@ -1532,6 +1574,7 @@ fields:
       validation: null
       validation_message: null
       width: full
+systemFields: []
 relations:
   - collection: authors
     field: avatar
