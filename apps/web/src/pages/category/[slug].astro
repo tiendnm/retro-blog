@@ -3,7 +3,8 @@
 // Chỉ dùng thin client → DTO; KHÔNG gọi Directus trực tiếp.
 import Base from '../../layouts/Base.astro';
 import PostListView from '../../components/PostListView.astro';
-import { getAllCategorySlugs, getCategoryBySlug, getSiteSettings, listCategories, listPostsByCategory } from '../../lib/directus';
+import { getAllCategorySlugs, getCategoryBySlug, getSiteSettings, listCategories, listCategoryInfos, listPostsByCategory } from '../../lib/directus';
+import { paragraphs } from '../../lib/format';
 
 export async function getStaticPaths() {
   const slugs = await getAllCategorySlugs();
@@ -16,6 +17,8 @@ const categories = await listCategories();
 const category = await getCategoryBySlug(slug!);
 if (!category) throw new Error(`Không tìm thấy chuyên mục: ${slug}`);
 
+const info = (await listCategoryInfos()).find((c) => c.slug === slug);
+const intro = paragraphs(info?.description);
 const { items, pageInfo } = await listPostsByCategory(slug!, { page: 1 });
 const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
 ---
@@ -36,5 +39,7 @@ const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
     variant="home"
     categories={categories}
     activeCategory={slug}
-  />
+  >
+    {intro.length > 0 && <div slot="intro" class="lead">{intro.map((p) => <p>{p}</p>)}</div>}
+  </PostListView>
 </Base>

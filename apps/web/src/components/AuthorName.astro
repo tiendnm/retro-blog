@@ -1,0 +1,12 @@
+---
+// AuthorName — tên tác giả, là link tới /author/<slug> khi có slug (tác giả trong bài đã xuất bản luôn có trang).
+// Chỉ nhận DTO AuthorSummary; không gọi Directus.
+import type { AuthorSummary } from '../lib/types';
+
+interface Props {
+  author: AuthorSummary;
+}
+const { author } = Astro.props;
+---
+
+{author.slug ? <a href={`/author/${author.slug}`}>{author.name}</a> : author.name}

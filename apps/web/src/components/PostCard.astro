@@ -7,6 +7,7 @@ import type { PostSummary } from '../lib/types';
 import { formatDate } from '../lib/format';
 import CoverImage from './CoverImage.astro';
 import TagList from './TagList.astro';
+import AuthorName from './AuthorName.astro';
 
 interface Props {
   post: PostSummary;
@@ -35,7 +36,7 @@ const href = `/posts/${post.slug}`;
     <h2><a href={href}>{post.title}</a></h2>
     {post.excerpt && <p>{post.excerpt}</p>}
     <p class="meta">
-      Bởi {post.author.name}{post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
+      Bởi <AuthorName author={post.author} />{post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
     </p>
     <TagList tags={post.tags} />
   </div>

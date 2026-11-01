@@ -12,7 +12,9 @@
 // ============================================================================
 import type {
   AuthorDetail,
+  AuthorProfile,
   AuthorSummary,
+  CategoryInfo,
   CategoryRef,
   MediaRef,
   PostDetail,
@@ -51,11 +53,13 @@ interface RawFile {
 interface RawAuthor {
   name?: string | null;
   slug?: string | null;
+  bio?: string | null;
   avatar?: RawFile | null;
 }
 interface RawCategory {
   name?: string | null;
   slug?: string | null;
+  description?: string | null;
 }
 interface RawPost {
   tags?: { tags_id?: RawCategory | null }[] | null;
@@ -306,6 +310,40 @@ export async function getTagBySlug(slug: string): Promise<TagRef | null> {
   }
 }
 
+/** Liệt kê bài đã xuất bản của một tác giả (mới nhất trước). */
+export async function listPostsByAuthor(
+  authorSlug: string,
+  params: ListParams = {},
+): Promise<PostListResult> {
+  const page = clampPage(params.page);
+  const pageSize = clampPageSize(params.pageSize);
+  const offset = (page - 1) * pageSize;
+  const { data, meta } = await directusGet<RawPost[]>(
+    `/items/posts?filter[author][slug][_eq]=${encodeURIComponent(authorSlug)}` +
+      `&fields=${SUMMARY_FIELDS}&sort=-published_at&limit=${pageSize}&offset=${offset}&meta=filter_count`,
+  );
+  const total = meta?.filter_count ?? data.length;
+  return {
+    items: data.map(toSummary),
+    pageInfo: { total, page, pageSize, hasMore: offset + data.length < total },
+  };
+}
+
+/** Hồ sơ tác giả theo slug. `null` nếu không có. bio là văn bản thuần (không HTML). */
+export async function getAuthorBySlug(slug: string): Promise<AuthorProfile | null> {
+  try {
+    const { data } = await directusGet<RawAuthor[]>(
+      `/items/authors?filter[slug][_eq]=${encodeURIComponent(slug)}` +
+        '&fields=name,slug,bio,avatar.id,avatar.alt&limit=1',
+    );
+    if (!data.length || !data[0].slug) return null;
+    return { ...toAuthorDetail(data[0]), bio: data[0].bio?.trim() || null };
+  } catch (e) {
+    if (e instanceof DirectusError && e.code === 'not_found') return null;
+    throw e;
+  }
+}
+
 /** Danh sách chuyên mục (thanh chuyên mục). Build (PROD) cache 1 lần/tiến trình. */
 let categoriesCache: Promise<CategoryRef[]> | undefined;
 export function listCategories(): Promise<CategoryRef[]> {
@@ -371,6 +409,42 @@ export async function getAllTagSlugs(): Promise<string[]> {
     `/items/tags?fields=slug&sort=slug&limit=-1`,
   );
   return data.map((t) => t.slug);
+}
+
+/** Slug các tác giả CÓ bài đã xuất bản (dựng route tĩnh /author/[slug]) — tác giả chưa có bài không có trang. */
+export async function getAllAuthorSlugs(): Promise<string[]> {
+  const { data } = await directusGet<{ author?: { slug?: string | null } | null }[]>(
+    '/items/posts?fields=author.slug&limit=-1',
+  );
+  return [...new Set(data.map((p) => p.author?.slug ?? '').filter(Boolean))].sort();
+}
+
+/** Chuyên mục kèm mô tả + số bài đã xuất bản, theo tên. Build (PROD) cache 1 lần/tiến trình. */
+let categoryInfosCache: Promise<CategoryInfo[]> | undefined;
+export function listCategoryInfos(): Promise<CategoryInfo[]> {
+  if (import.meta.env.PROD && categoryInfosCache) return categoryInfosCache;
+  const p = Promise.all([
+    directusGet<RawCategory[]>('/items/categories?fields=name,slug,description&sort=name&limit=-1'),
+    directusGet<{ category?: { slug?: string | null } | null }[]>(
+      '/items/posts?fields=category.slug&limit=-1',
+    ),
+  ]).then(([cats, posts]) => {
+    const counts = new Map<string, number>();
+    for (const post of posts.data) {
+      const s = post.category?.slug;
+      if (s) counts.set(s, (counts.get(s) ?? 0) + 1);
+    }
+    return cats.data
+      .map((c) => {
+        const ref = toCategory(c);
+        return ref
+          ? { ...ref, description: c.description?.trim() || null, count: counts.get(ref.slug) ?? 0 }
+          : null;
+      })
+      .filter((c): c is CategoryInfo => c !== null);
+  });
+  if (import.meta.env.PROD) categoryInfosCache = p;
+  return p;
 }
 
 /** Tất cả slug chuyên mục (dựng route tĩnh /category/[slug]). */

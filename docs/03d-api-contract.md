@@ -20,6 +20,9 @@
 | Liệt kê bài đã xuất bản | Trang danh sách | phân trang, sắp xếp | `PostSummary[]` + metadata phân trang |
 | Lấy bài theo slug | Trang chi tiết | slug | `PostDetail` |
 | Liệt kê theo Category | Trang chuyên mục | category slug + phân trang | `PostSummary[]` + metadata |
+| Liệt kê theo Author | Trang tác giả | author slug + phân trang | `PostSummary[]` + metadata |
+| Lấy Author theo slug | Đầu trang tác giả | author slug | `AuthorProfile` (`name`, `slug`, `avatar`, `bio` văn bản thuần) hoặc không có |
+| Liệt kê Category kèm số bài | Trang `/categories`, mô tả đầu trang chuyên mục | — | `CategoryInfo[]` (`name`, `slug`, `description`, `count` bài đã xuất bản) |
 | Liệt kê theo Tag | Trang thẻ | tag slug + phân trang | `PostSummary[]` + metadata |
 | Lấy Tag theo slug | Tiêu đề trang thẻ | tag slug | `TagRef` hoặc không có |
 | Liệt kê tháng lưu trữ | Trang `/archive` | — | `{year, month, count}[]` (tháng theo giờ VN, mới nhất trước) |

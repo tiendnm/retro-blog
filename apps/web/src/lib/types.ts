@@ -20,10 +20,21 @@ export interface AuthorDetail extends AuthorSummary {
   avatar: MediaRef | null;
 }
 
+/** Hồ sơ tác giả (trang /author/<slug>) — thêm bio (văn bản thuần, nhiều dòng). */
+export interface AuthorProfile extends AuthorDetail {
+  bio: string | null;
+}
+
 /** Chuyên mục (độc quyền theo 03c). */
 export interface CategoryRef {
   name: string;
   slug: string;
+}
+
+/** Chuyên mục kèm mô tả + số bài đã xuất bản (trang /categories và đầu trang chuyên mục). */
+export interface CategoryInfo extends CategoryRef {
+  description: string | null;
+  count: number;
 }
 
 /** Thẻ (03c §2.4) — nhãn tự do, nhiều-nhiều với bài. */

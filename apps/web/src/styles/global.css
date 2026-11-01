@@ -853,3 +853,46 @@ dialog.lightbox::backdrop {
 .search-form button:focus-visible {
   background: var(--color-accent-strong);
 }
+
+/* Mô tả chuyên mục / giới thiệu tác giả dưới tiêu đề trang */
+.lead {
+  margin: 0 0 var(--space-6);
+  color: var(--color-muted);
+}
+.lead p {
+  margin: 0 0 var(--space-2);
+}
+.author-intro {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  margin: 0 0 var(--space-6);
+}
+.author-intro__avatar {
+  flex: none;
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border: 1.5px solid var(--color-accent);
+}
+.author-intro__bio p {
+  margin: 0 0 var(--space-2);
+}
+
+/* Trang /categories */
+.category-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.category-item {
+  padding: var(--space-4) 0;
+  border-bottom: 1px dashed var(--color-border);
+}
+.category-list h2 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-lg);
+}
+.category-list p {
+  margin: 0 0 var(--space-1);
+}

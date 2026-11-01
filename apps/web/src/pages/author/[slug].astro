@@ -1,0 +1,56 @@
+---
+// Trang TÁC GIẢ — TRANG 1 (page 2+ ở /author/[slug]/page/[page]). Route tĩnh, chỉ cho tác giả có bài đã xuất bản.
+// Chỉ dùng thin client → DTO; KHÔNG gọi Directus trực tiếp.
+import Base from '../../layouts/Base.astro';
+import PostListView from '../../components/PostListView.astro';
+import CoverImage from '../../components/CoverImage.astro';
+import { paragraphs } from '../../lib/format';
+import {
+  getAllAuthorSlugs,
+  getAuthorBySlug,
+  getSiteSettings,
+  listPostsByAuthor,
+} from '../../lib/directus';
+
+export async function getStaticPaths() {
+  const slugs = await getAllAuthorSlugs();
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const { siteName } = await getSiteSettings();
+const author = await getAuthorBySlug(slug!);
+if (!author) throw new Error(`Không tìm thấy tác giả: ${slug}`);
+
+const { items, pageInfo } = await listPostsByAuthor(slug!, { page: 1 });
+const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
+const bio = paragraphs(author.bio);
+---
+
+<Base
+  title={`${author.name} — ${siteName}`}
+  description={bio[0] ?? `Các bài viết của ${author.name} trên ${siteName}.`}
+  wide
+>
+  <PostListView
+    heading={`Tác giả: ${author.name}`}
+    items={items}
+    emptyText="Tác giả này chưa có bài viết nào."
+    currentPage={1}
+    totalPages={totalPages}
+    baseUrl={`/author/${slug}`}
+    pagePrefix={`/author/${slug}/page`}
+  >
+    <div slot="intro" class="author-intro">
+      {
+        author.avatar && (
+          <CoverImage class="author-intro__avatar" src={author.avatar.url} alt={author.avatar.alt} widths={[96, 192]} sizes="96px" />
+        )
+      }
+      <div class="author-intro__bio">
+        {bio.map((p) => <p>{p}</p>)}
+        <p class="meta">{pageInfo.total} bài viết</p>
+      </div>
+    </div>
+  </PostListView>
+</Base>

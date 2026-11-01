@@ -63,8 +63,8 @@
 | Collection | **Public** (read-only) | **Editor** (`app_access`) | **Admin** (`admin_access`) |
 |---|---|---|---|
 | `posts` | read — **lọc `status=published` AND `published_at ≤ $NOW`**; field: `id,title,slug,excerpt,body,published_at,author,category,cover,tags` | create · read · update · delete | full |
-| `authors` | read (mọi hàng); field: `id,name,slug,avatar` | create · read · update · delete | full |
-| `categories` | read (mọi hàng); field: `id,name,slug` | create · read · update · delete | full |
+| `authors` | read (mọi hàng); field: `id,name,slug,bio,avatar` | create · read · update · delete | full |
+| `categories` | read (mọi hàng); field: `id,name,slug,description` | create · read · update · delete | full |
 | `tags` | read — **chỉ thẻ có ≥ 1 bài `status=published`**; field: `id,name,slug` | create · read · update · delete | full |
 | `posts_tags` | read — **chỉ dòng nối của bài `status=published` AND `published_at ≤ $NOW`**; field: `id,posts_id,tags_id` | create · read · update · delete | full |
 | `directus_files` | read (mọi hàng); field: `id,alt` *(đủ cho `/assets/<id>` + a11y)* | create · read · update · delete | full |
@@ -75,7 +75,7 @@
 - **Editor không quản trị user/role/policy** (không `admin_access`); chỉ thao tác nội dung. **Public không có** create/update/delete ở bất kỳ collection nào; không frontend auth, không public CMS users.
 - `site_settings` (singleton): Public đọc **4 field** `site_name`/`description`/`footer_text`/`default_og_image`; Editor **read + update** (không create/delete). Sửa → Flow rebuild-on-publish kích hoạt rebuild.
 - **Tags (Directus 11.3.5):** `$NOW` (và `_and`) lồng trong đường quan hệ O2M `tags → posts` làm Directus sinh SQL sai (HTTP 500 "unnamed portal parameter") nên quyền `tags` chỉ lọc `status=published`; `posts_tags` đi qua M2O nên lọc đủ cả `published_at`. Hệ quả: thẻ của bài *hẹn giờ chưa tới hạn* lộ **tên thẻ** (không lộ bài). Kiểm chứng trên Directus tạm: thẻ chỉ ở bài nháp và thẻ mồ côi không đọc được.
-- `authors`/`categories`/`directus_files` cho Public đọc **mọi hàng** (dữ liệu tham chiếu để render bài) nhưng **giới hạn field** như trên — không lộ `bio`/`description`/`parent`…
+- `authors`/`categories`/`directus_files` cho Public đọc **mọi hàng** (dữ liệu tham chiếu để render bài) nhưng **giới hạn field** như trên — không lộ `parent`… (`authors.bio` và `categories.description` là văn bản giới thiệu do Editor viết để hiển thị công khai ở trang tác giả/chuyên mục, nên được đọc; thêm 2026-11-01, `apply-permissions.sh` nâng cấp tại chỗ). Cả hai là **văn bản thuần** (`input-multiline`), web hiển thị dạng đoạn văn đã thoát ký tự, không `set:html`.
 
 ### 2.2. Tái lập (reproducible) — **không thao tác thủ công**
 

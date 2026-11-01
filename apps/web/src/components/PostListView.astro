@@ -44,6 +44,7 @@ const rows = featured ? items.slice(4) : items;
 ---
 
 <h1>{heading}</h1>
+<slot name="intro" />
 {categories.length > 0 && <CategoryNav categories={categories} activeSlug={activeCategory} />}
 {
   items.length === 0 ? (

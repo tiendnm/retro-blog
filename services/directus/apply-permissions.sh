@@ -44,9 +44,9 @@ if [ "${HAS_PUB:-0}" = "0" ] || [ -z "$HAS_PUB" ]; then
   # thêm về sau sẽ KHÔNG tự động lộ ra Public API (Sprint 2 Phase 3 — bảo mật).
   # posts: rule status=published AND published_at<=$NOW + allowlist (không có 'status').
   api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"posts\",\"action\":\"read\",\"fields\":[\"id\",\"title\",\"slug\",\"excerpt\",\"body\",\"published_at\",\"author\",\"category\",\"cover\",\"tags\"],\"permissions\":{\"_and\":[{\"status\":{\"_eq\":\"published\"}},{\"published_at\":{\"_lte\":\"\$NOW\"}}]}}" >/dev/null
-  # authors/categories: dữ liệu tham chiếu để render (không lộ bio/description/parent).
-  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"authors\",\"action\":\"read\",\"fields\":[\"id\",\"name\",\"slug\",\"avatar\"],\"permissions\":{}}" >/dev/null
-  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"categories\",\"action\":\"read\",\"fields\":[\"id\",\"name\",\"slug\"],\"permissions\":{}}" >/dev/null
+  # authors/categories: dữ liệu tham chiếu để render (bio/description là văn bản hiển thị công khai; KHÔNG lộ parent).
+  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"authors\",\"action\":\"read\",\"fields\":[\"id\",\"name\",\"slug\",\"bio\",\"avatar\"],\"permissions\":{}}" >/dev/null
+  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"categories\",\"action\":\"read\",\"fields\":[\"id\",\"name\",\"slug\",\"description\"],\"permissions\":{}}" >/dev/null
   # directus_files: chỉ id (dựng URL /assets/<id>) + alt (a11y).
   api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"directus_files\",\"action\":\"read\",\"fields\":[\"id\",\"alt\"],\"permissions\":{}}" >/dev/null
   echo "   done public"
@@ -78,6 +78,18 @@ if [ -n "$PUB_POSTS" ]; then
   echo "-> thêm 'tags' vào allowlist Public của posts"
   api PATCH "/permissions/${PUB_POSTS%% *}" "{\"fields\":${PUB_POSTS#* }}" >/dev/null
 fi
+
+# ---- PUBLIC: authors.bio + categories.description (Sprint 11 — trang tác giả / chuyên mục) ----
+# Cả hai là văn bản giới thiệu do Editor viết để HIỂN THỊ CÔNG KHAI → thêm vào allowlist (permission authors/categories đã có
+# từ trước → cập nhật tại chỗ, idempotent). `parent` (categories) vẫn KHÔNG lộ.
+for spec in "authors:bio" "categories:description"; do
+  COL="${spec%%:*}"; FLD="${spec#*:}"
+  PERM=$(api GET "/permissions?filter[policy][_eq]=$PUB&filter[collection][_eq]=$COL&fields=id,fields" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const f=process.argv[1];const r=JSON.parse(d).data[0];if(r&&!r.fields.includes(f))process.stdout.write(r.id+' '+JSON.stringify([...r.fields,f]))}catch(e){}})" "$FLD")
+  if [ -n "$PERM" ]; then
+    echo "-> thêm '$FLD' vào allowlist Public của $COL"
+    api PATCH "/permissions/${PERM%% *}" "{\"fields\":${PERM#* }}" >/dev/null
+  fi
+done
 
 # ---- EDITOR policy + role + access + permissions (idempotent) ----
 ED_ROLE=$(api GET "/roles?filter[name][_eq]=Editor&fields=id" | val id)

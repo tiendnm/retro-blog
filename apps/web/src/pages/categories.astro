@@ -1,0 +1,31 @@
+---
+// Trang CHUYÊN MỤC (tổng hợp) — mọi chuyên mục kèm mô tả và số bài, để độc giả khám phá nội dung theo chủ đề.
+// Route tĩnh; chỉ dùng thin client → DTO.
+import Base from '../layouts/Base.astro';
+import { getSiteSettings, listCategoryInfos } from '../lib/directus';
+
+const { siteName } = await getSiteSettings();
+const categories = await listCategoryInfos();
+---
+
+<Base
+  title={`Chuyên mục — ${siteName}`}
+  description={`Các chuyên mục của ${siteName}.`}
+>
+  <h1>Chuyên mục</h1>
+  {
+    categories.length === 0 ? (
+      <p class="empty-state">Chưa có chuyên mục nào.</p>
+    ) : (
+      <ul class="category-list">
+        {categories.map((c) => (
+          <li class="category-item">
+            <h2><a href={`/category/${c.slug}`}>{c.name}</a></h2>
+            {c.description && <p>{c.description}</p>}
+            <p class="meta">{c.count > 0 ? `${c.count} bài` : 'Chưa có bài'}</p>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</Base>

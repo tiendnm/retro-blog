@@ -1,0 +1,50 @@
+---
+// Trang TÁC GIẢ — TRANG 2+ (SSG). getStaticPaths dùng listPostsByAuthor sẵn có.
+import Base from '../../../../layouts/Base.astro';
+import PostListView from '../../../../components/PostListView.astro';
+import {
+  getAllAuthorSlugs,
+  getAuthorBySlug,
+  getSiteSettings,
+  listPostsByAuthor,
+} from '../../../../lib/directus';
+
+export async function getStaticPaths() {
+  const slugs = await getAllAuthorSlugs();
+  const paths = [];
+  for (const slug of slugs) {
+    const { pageInfo } = await listPostsByAuthor(slug, { page: 1 });
+    const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
+    if (totalPages < 2) continue;
+    const author = await getAuthorBySlug(slug);
+    for (let p = 2; p <= totalPages; p++) {
+      const { items } = await listPostsByAuthor(slug, { page: p });
+      paths.push({
+        params: { slug, page: String(p) },
+        props: { items, currentPage: p, totalPages, authorName: author?.name ?? slug },
+      });
+    }
+  }
+  return paths;
+}
+
+const { siteName } = await getSiteSettings();
+const { slug } = Astro.params;
+const { items, currentPage, totalPages, authorName } = Astro.props;
+---
+
+<Base
+  title={`${authorName} — Trang ${currentPage} — ${siteName}`}
+  description={`Các bài viết của ${authorName} trên ${siteName} — Trang ${currentPage}.`}
+  wide
+>
+  <PostListView
+    heading={`Tác giả: ${authorName}`}
+    items={items}
+    emptyText="Tác giả này chưa có bài viết nào."
+    currentPage={currentPage}
+    totalPages={totalPages}
+    baseUrl={`/author/${slug}`}
+    pagePrefix={`/author/${slug}/page`}
+  />
+</Base>

@@ -1,6 +1,6 @@
 // Endpoint sitemap.xml (Sprint 5 Phase 2) — TỰ VIẾT, không thêm dependency.
 // Chính sách (Decision Log [S5-P0]): CHỈ canonical *content* URL —
-//   home + mọi bài published + trang-1 mỗi chuyên mục + trang-1 mỗi thẻ + /archive và mỗi tháng có bài.
+//   home + mọi bài published + trang-1 mỗi chuyên mục + trang-1 mỗi thẻ + /categories + trang-1 mỗi tác giả có bài + /archive và mỗi tháng có bài.
 // LOẠI pagination (/page/N, /category/<slug>/page/N): là điều hướng, không
 //   canonical → tránh loãng crawl budget. Pagination vẫn index được nhờ
 //   self-canonical + rel=prev/next (Base.astro / Pagination.astro).
@@ -10,6 +10,7 @@ import type { APIRoute } from 'astro';
 import {
   getAllPublishedPostSlugs,
   getAllCategorySlugs,
+  getAllAuthorSlugs,
   getAllTagSlugs,
   getArchiveMonths,
 } from '../lib/directus';
@@ -24,10 +25,11 @@ const xmlEscape = (s: string): string =>
 
 export const GET: APIRoute = async ({ site }) => {
   const base = (site?.href ?? 'http://localhost:4321/').replace(/\/$/, '');
-  const [postSlugs, categorySlugs, tagSlugs, months] = await Promise.all([
+  const [postSlugs, categorySlugs, tagSlugs, authorSlugs, months] = await Promise.all([
     getAllPublishedPostSlugs(),
     getAllCategorySlugs(),
     getAllTagSlugs(),
+    getAllAuthorSlugs(),
     getArchiveMonths(),
   ]);
 
@@ -36,6 +38,8 @@ export const GET: APIRoute = async ({ site }) => {
     ...postSlugs.map((s) => `/posts/${s}`),
     ...categorySlugs.map((s) => `/category/${s}`),
     ...tagSlugs.map((s) => `/tag/${s}`),
+    '/categories',
+    ...authorSlugs.map((s) => `/author/${s}`),
     '/archive',
     ...months.map((m) => monthPath(m.year, m.month)),
   ];
