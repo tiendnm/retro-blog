@@ -60,7 +60,7 @@
 - Cuối sprint: review một lần. Phần docs/script không đụng server: commit liên tục.
 
 ## Kết quả
-_(cập nhật 2026-11-02; sprint **chưa đóng** — còn chờ quyết định Product ở cuối)_
+_(cập nhật 2026-11-02; hoàn tất, chờ Product review)_
 
 **Đã deploy (2026-11-01, `update.sh --web-only`, smoke test xanh):** log xoay vòng 10 MB × 3 cho cả 6 service; `hostcheck.sh` chạy cùng healthcheck 5 phút.
 **Đã chạy thật trên server:**
@@ -74,7 +74,7 @@ _(cập nhật 2026-11-02; sprint **chưa đóng** — còn chờ quyết địn
 **Chưa chạy thử:** dừng/lên cả stack; restart cloudflared/caddy; các lệnh prune đĩa; quay vòng secret; dựng máy mới từ đầu; Cloudflare có cache HTML hay không (ghi rõ trong `13 §2`/§5).
 **Cảnh báo ngoài host (healthchecks.io, 2026-11-02):** `HEALTHCHECK_PING_URL` đã điền trên server (bản gốc `.env.production.bak-s12`). Nhật ký của dịch vụ: `new→up` 17:41 UTC; ping `/fail` gây lỗi có chủ đích lúc 17:42 → `up→down`; `ops` tự ping lại lúc 17:46 → `down→up`; ping 5 phút tiếp theo OK. **Email tới tay người vận hành:** đã nhận email "UP — downtime 4 phút 5 giây" (Product xác nhận). **Chưa thử** trường hợp host chết/mất ping (grace 10 phút).
 
-### Việc còn chờ Product
+### Việc Product (đã xong)
 1. **Tạo healthcheck ngoài host (healthchecks.io, gói Free)** — các bước:
    1. Đăng ký tại healthchecks.io → **Add Check**, tên `retro-blog`.
    2. **Period = 5 phút, Grace = 10 phút** (khớp chu kỳ healthcheck của `ops`).
@@ -82,4 +82,4 @@ _(cập nhật 2026-11-02; sprint **chưa đóng** — còn chờ quyết địn
    4. Sao chép **ping URL** (dạng `https://hc-ping.com/<uuid>`), gửi cho Claude (hoặc tự điền) vào `HEALTHCHECK_PING_URL` trong `.env.production` trên server, rồi `docker compose --env-file .env.production up -d ops`.
    5. (đã làm 2026-11-02) Kiểm: check chuyển *Up* trong ≤ 5 phút. Thử lỗi: `docker compose --env-file .env.production stop ops` rồi đợi ≈ 15 phút → phải nhận được email; bật lại `ops`.
    `healthcheck.sh` gọi URL khi OK và `URL/fail` khi lỗi (healthchecks.io hiểu cả hai), nên mất ping (host chết) cũng báo động.
-2. Chốt **error tracking** (đề xuất: không dùng dịch vụ ngoài).
+2. ~~Chốt error tracking~~ — **Product chốt 2026-11-02: không dùng dịch vụ ngoài.** Thử kịch bản mất ping do host chết: Product quyết định **không cần thử**.
