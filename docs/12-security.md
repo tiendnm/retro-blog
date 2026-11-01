@@ -53,18 +53,23 @@
 
 **Sprint 10 (đóng gói deploy):** **không `docker.sock`** ở bất kỳ container nào ([ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md): webhook ngay trong `web`; [ADR-0017](./adr/0017-ops-services-in-compose.md): `ops` mount repo/uploads `:ro`, chạy non-root theo uid của user triển khai); Directus không publish cổng ra host (chỉ Caddy/`ops` tới được qua `retro-net`); không user hệ thống riêng, không unit systemd, không rule `ufw` cho cổng 9000; `.env.production` quyền 600 do script sinh, cấm chú thích cuối dòng.
 
-**Còn lại (Backlog):** container không chạy root · quét lỗ hổng dependency định kỳ · rate limiting cho Directus (`RATE_LIMITER_*`; cần xác nhận IP client thật sau Caddy trước khi bật) · cập nhật vá lỗi.
+**Hardening 2026-11-01:**
+- **Container tối thiểu quyền:** mọi service có `security_opt: no-new-privileges`; `cap_drop: ALL` cho directus, web, ops, caddy (+`NET_BIND_SERVICE`), cloudflared. Không chạy root: directus (`node`), web (`USER node`), ops (uid triển khai), caddy (`1000:1000`), cloudflared (`nonroot`); postgres chạy tiến trình DB bằng user `postgres` (entrypoint hạ quyền, image chuẩn).
+- **Rate limiting Directus:** `RATE_LIMITER_*` theo IP, mặc định 100 yêu cầu/10 giây (`RATE_LIMITER_POINTS/DURATION`), quá mức → 429. IP thật = header `CF-Connecting-IP` (`IP_CUSTOM_HEADER`): Cloudflare luôn ghi đè header này và Caddy không publish cổng nên chỉ tunnel tới được. Yêu cầu nội bộ (web build, ops) không có header → khoá theo IP container. Giới hạn: kho bộ nhớ trong 1 instance; chưa có hạn mức riêng cho `/auth/login`.
+- **Quét dependency:** `.github/dependabot.yml` (npm, docker, compose, actions — hằng tuần) và workflow `security.yml` (`pnpm audit --prod --audit-level high`, hằng tuần, hiện chỉ báo cáo).
+
+**Còn lại (Backlog):** nâng **Astro** lên bản vá (audit 2026-11-01: 1 critical, 11 high, đều ở astro/sharp/vite/zod/undici; site là SSG, không chạy server Astro/ảnh AVIF runtime nên khả năng khai thác thấp nhưng cần nâng major rồi kiểm UI) · nâng Directus 11.3.5 lên bản mới nhất · chưa có rate limit riêng cho đăng nhập admin.
 
 ## 7. Bảo mật chuỗi cung ứng (Supply chain)
 
-- TODO _(khoá phiên bản dependency, quét lỗ hổng, cập nhật định kỳ)_.
+- Khoá phiên bản: image pin cứng, `--frozen-lockfile`. Quét + cập nhật định kỳ: Dependabot và `security.yml` (xem §6 Hardening 2026-11-01).
 
 ## 8. Bảo mật tầng ứng dụng
 
 - **Render nội dung từ CMS (`body`):** `body` lưu **HTML** (WYSIWYG, [ADR-0011](./adr/0011-body-stored-as-html-wysiwyg.md); trước đó markdown + `marked`) và hiển thị qua `set:html`. Nội dung do **Editor tin cậy** nhập (không có input công khai — không comment/không user-generated content ở MVP), nên rủi ro XSS thấp. **Đã hardening ([ADR-0013](./adr/0013-sanitize-body-html.md)):** HTML được sanitize bằng allowlist thẻ/thuộc tính/scheme lúc build (`apps/web/src/lib/sanitize-body.ts`) trước khi render — defense-in-depth kể cả khi tài khoản Editor bị chiếm.
 - **Không tự lộ field nội bộ:** Public API dùng **field allowlist** (không `*`) — field thêm về sau không tự ra Public ([05-cms §2](./05-cms.md), [06-api §1](./06-api.md)).
 - **Security headers:** xem §6 (cấu hình ở Caddyfile, không ở code app). Site không có form/endpoint ghi công khai nên CSRF không áp dụng; admin Directus dùng cơ chế auth của Directus.
-- TODO _(rate limiting — xem §6 Còn lại)_.
+- Rate limiting Directus: xem §6 (Hardening 2026-11-01).
 
 ## 9. Logging & Audit
 

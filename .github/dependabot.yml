@@ -1,0 +1,19 @@
+# Cập nhật phụ thuộc định kỳ (gom vào PR hằng tuần). Image Docker pin cứng nên Dependabot là cách duy nhất biết có bản vá.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /apps/web
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: docker
+    directories: [/apps/web, /services/ops]
+    schedule: { interval: weekly }
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule: { interval: weekly }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }

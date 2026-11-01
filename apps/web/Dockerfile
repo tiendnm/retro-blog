@@ -14,16 +14,19 @@ FROM node:22.12.0-alpine
 
 WORKDIR /app
 ENV CI=1
+# Thư mục làm việc + điểm mount output thuộc user `node` (uid 1000) để chạy không-root (xem USER bên dưới).
+RUN mkdir -p /out && chown node:node /app /out
 
 # pnpm pin cứng (khớp packageManager trong package.json). Cài deps TRƯỚC source
 # để tận dụng cache layer; --frozen-lockfile ⇒ cài đúng theo pnpm-lock.yaml,
 # fail nếu lockfile lệch (chống drift → build tái lập).
 RUN npm i -g pnpm@10.33.2
-COPY package.json pnpm-lock.yaml ./
+USER node
+COPY --chown=node:node package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 # Source (sau deps để cache layer deps không vỡ khi chỉ đổi source).
-COPY . .
+COPY --chown=node:node . .
 
 # URL nội bộ để fetch content lúc build (server-side, không token → vai Public).
 # PUBLIC_SITE_URL / PUBLIC_DIRECTUS_URL set qua ENV lúc chạy (compose prod /

@@ -22,6 +22,10 @@ services:
     dns:
       - 1.1.1.1
       - 1.0.0.1
+    # Image đã chạy nonroot (65532); bỏ capability, chặn leo quyền.
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
     environment:
       TUNNEL_TOKEN: ${TUNNEL_TOKEN:?cần TUNNEL_TOKEN (Cloudflare Zero Trust → Networks → Tunnels)}
     depends_on:

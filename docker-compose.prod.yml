@@ -23,6 +23,9 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
     # Tinh chỉnh cho máy nhỏ (≈4 GB RAM, HDD): ít kết nối, bộ đệm vừa phải.
     command: ["postgres", "-c", "shared_buffers=128MB", "-c", "effective_cache_size=512MB", "-c", "max_connections=30"]
+    # Entrypoint chạy bằng root rồi hạ xuống user `postgres` (gosu) → không đặt `user:`/cap_drop ở đây.
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
@@ -51,6 +54,18 @@ services:
       # Cookie đăng nhập chỉ đi qua HTTPS (trình duyệt luôn thấy HTTPS: Caddy TLS hoặc Cloudflare edge).
       REFRESH_TOKEN_COOKIE_SECURE: "true"
       SESSION_COOKIE_SECURE: "true"
+      # Rate limiting theo IP client (bộ nhớ trong tiến trình — 1 instance). Mặc định cho phép ~10 req/s kéo dài, đủ cho
+      # trang tải nhiều ảnh /assets; vượt → 429. IP thật lấy từ CF-Connecting-IP (Cloudflare luôn ghi đè header này, và
+      # Caddy không publish cổng nên chỉ tunnel tới được — không giả mạo được). Chỉnh bằng RATE_LIMITER_POINTS/DURATION.
+      RATE_LIMITER_ENABLED: "true"
+      RATE_LIMITER_STORE: memory
+      RATE_LIMITER_POINTS: ${RATE_LIMITER_POINTS:-100}
+      RATE_LIMITER_DURATION: ${RATE_LIMITER_DURATION:-10}
+      IP_CUSTOM_HEADER: cf-connecting-ip
+    # Image đã chạy bằng user `node`; bỏ mọi capability và chặn leo quyền.
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
 
   # Web = build-runner + receiver (ADR-0008/0016): web-entrypoint.sh build lần đầu (astro build →
   # staging builds/<TS> → ATOMIC SWAP symlink `current`, build-swap.sh), rồi chạy webhook.mjs;
@@ -62,6 +77,10 @@ services:
     image: retro-web:prod
     restart: unless-stopped
     command: ["sh", "/rebuild/web-entrypoint.sh"]
+    # Không chạy root (Dockerfile: USER node). Volume site_dist cũ thuộc root cần chown 1 lần — docs/13-operations.
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
     environment:
       REBUILD_TOKEN: ${REBUILD_TOKEN:?cần REBUILD_TOKEN (>= 32 ký tự, openssl rand -hex 32)}
       REBUILD_PORT: ${REBUILD_PORT:-9000}
@@ -102,6 +121,9 @@ services:
     restart: unless-stopped
     # Ghi file backup bằng đúng uid/gid của user triển khai → đọc/chép được không cần sudo.
     user: "${DEPLOY_UID:-1000}:${DEPLOY_GID:-1000}"
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
     working_dir: /repo
     # DNS công cộng: host dùng resolver loopback nên DNS nhúng của Docker không có upstream ("NO EXTERNAL NAMESERVERS")
     # → ops không tra được tên ngoài (R2, healthcheck công khai). Tên nội bộ (postgres, web…) vẫn do Docker phân giải.
@@ -163,6 +185,13 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    # Không chạy root: chỉ giữ NET_BIND_SERVICE (nghe cổng 80/443). Volume caddy_data/caddy_config cũ thuộc root cần
+    # chown 1 lần — docs/13-operations. (Caddyfile bind-mount chỉ đọc nên không ảnh hưởng.)
+    user: "1000:1000"
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt:
+      - no-new-privileges:true
     environment:
       SITE_DOMAIN: ${SITE_DOMAIN}
       CMS_DOMAIN: ${CMS_DOMAIN}
