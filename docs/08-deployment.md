@@ -106,5 +106,11 @@ Trạng thái Sprint 6: **✅ = cơ chế đã kiểm chứng** · **@deploy = x
 - [x] **Rollback = atomic swap** về static build trước — ✅ `builds/` giữ N, swap symlink (S6-P3)
 - [x] Không secret trong repo/log — ✅ `.env*` gitignored; **@deploy**: secrets prod mạnh + **2FA admin**
 - [x] SEO đúng ở prod (canonical/OG/sitemap domain thật) — ✅ build `PUBLIC_SITE_URL` (S6-P2); a11y giữ (S3–S5)
-- [ ] **@deploy** (✅ 2026-10-30: tunnel + DNS, `.env.production`, `up -d`, rebuild flow + webhook, site/CMS lên domain thật; 2FA admin **bỏ qua có chủ đích** — [08a §0](./08a-deploy-home-tunnel.md); **còn lại**: dựng lại bằng script Sprint 10 (nghiệm thu P6), restore drill, backup ra ngoài host, HSTS 1 năm). Danh mục gốc: DNS `retro.`/`cms.` trỏ host; mở 80/443; `.env.production` (domain+secrets); `docker compose -f … -f docker-compose.prod.yml up -d`; `pnpm rebuild:flow`; `pnpm theme:apply` (theme/branding Directus admin); chạy `./scripts/deploy-home.sh` (sinh `.env.production`, dựng stack gồm `ops` backup/healthcheck — không còn systemd, [ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md)/[0017](./adr/0017-ops-services-in-compose.md)); **copy backup ra ngoài host**; kiểm CSP bằng trình duyệt rồi nâng HSTS 1 năm
-- [x] DoD release ([14 §2.2](./14-quality-gates.md)) — cơ chế đạt; chốt cuối khi deploy
+- [x] **@deploy** — ✅ **đạt 2026-11-01** trên domain thật (`retro.` / `retro-cms.tiendnm.com`, Cloudflare Tunnel, server nhà):
+  - Dựng bằng `deploy-home.sh` từ trạng thái sạch, nghiệm thu trên server thật (Sprint 10 P6); tunnel + DNS, `.env.production`, rebuild-on-publish + webhook, site/CMS công khai (2026-10-30).
+  - **Backup ra ngoài host:** `ops` đẩy `db.dump` + `uploads.tgz` + config lên Cloudflare R2 sau mỗi backup, không kèm `env.bak` ([13 §4](./13-operations.md)).
+  - **Restore drill từ R2** đạt (2026-11-01): tải bản mới nhất về, `pg_restore` vào Postgres tạm → posts/categories/files = 1/1/12 khớp DB thật; `uploads.tgz` giải nén được.
+  - **CSP** kiểm bằng Chrome thật (trang chủ, bài viết, lightbox): 0 vi phạm. **HSTS 1 năm** `includeSubDomains` (không preload) đã bật cho site, CMS và trang lỗi.
+  - 2FA admin **bỏ qua có chủ đích**, không UPS — rủi ro đã chấp nhận ([08a §0](./08a-deploy-home-tunnel.md)).
+  - Danh mục gốc (tham chiếu): DNS trỏ host; `.env.production`; `docker compose … up -d`; Flow rebuild; theme Directus; `./scripts/deploy-home.sh`.
+- [x] DoD release ([14 §2.2](./14-quality-gates.md)) — ✅ đạt, chốt 2026-11-01
