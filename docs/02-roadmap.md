@@ -36,13 +36,22 @@
 | [8](./sprints/sprint-8.md) | Production Hardening (header, webhook, backup lịch, healthcheck) | ✅ (webhook rebuild đã kiểm chứng trên máy thật; backup/healthcheck timers chưa) |
 | [9](./sprints/sprint-9.md) | Deploy tại nhà: Cloudflare Tunnel + Postgres trong compose | ✅ đã chạy trên máy thật (2026-10-30): site + CMS + rebuild-on-publish qua tunnel |
 | [10](./sprints/sprint-10.md) | Đóng gói deploy (webhook + backup vào compose, script dựng server) | ✅ Product duyệt 2026-10-30: server dựng bằng 4 việc tay (`deploy-home.sh`), webhook + backup + healthcheck trong compose |
+| [11](./sprints/sprint-11.md) | Kiểm thử mở rộng (link-check, axe, Lighthouse, E2E, quyền Public, độ bền thin client) | 📋 Kế hoạch — **sprint kế tiếp** |
+| [12](./sprints/sprint-12.md) | Vận hành & quan sát (runbook, log, metric nhẹ, sự cố, restore drill định kỳ) | 📋 Kế hoạch |
+| [13](./sprints/sprint-13.md) | Bảo mật bổ sung & cổng CI (rate limit đăng nhập admin, check bắt buộc, header test, xoay secret, đánh giá Postgres 18/Directus) | 📋 Kế hoạch |
+| [14](./sprints/sprint-14.md) | Nợ tài liệu (dọn ~70 TODO/TBD, sửa chỗ lệch thực tế, script kiểm docs) | 📋 Kế hoạch |
+| [15](./sprints/sprint-15.md) | Refactor docs Đợt 3 (IA của site, Design System, topology một nguồn, F9–F15) | 📋 Kế hoạch |
+| [16](./sprints/sprint-16.md) | Visual Polish (grain/crease procedural kiểu manual cũ) | 📋 Kế hoạch |
+
+> **Thứ tự sprint 11–16 (Claude đề xuất, Product duyệt):** 11 trước vì tạo lưới an toàn (axe/Lighthouse/E2E/test quyền) cho mọi thay đổi sau; 12–13 giảm rủi ro vận hành/bảo mật của hệ thống đang chạy thật; 14–15 trả nợ tài liệu (14 trước vì 15 dùng `check-docs` và phần điền sẵn); 16 cuối vì cần số đo từ 11 và Design System từ 15. Có thể đổi thứ tự 12–16 khi ưu tiên thay đổi; 11 giữ đầu.
 
 ## 4. Backlog cấp cao
 
 - **Deploy (@deploy):** xác nhận ACME/DNS + CSP trên domain thật, (2FA admin: bỏ qua có chủ đích), (HSTS 1 năm và backup ra ngoài host: xong 2026-11-01); rate limiting Directus, container không chạy root, quét dependency: xong 2026-11-01, đợt Dependabot đầu xử lý + deploy cùng ngày ([12 §6](./12-security.md), [13 §2](./13-operations.md)); Directus 11.3.5 → 11.17.4 xong 2026-11-01; còn: Directus 12.x (đã đánh giá 2026-11-01: bị chặn bởi giới hạn Flow của tầng Core, [12 §6](./12-security.md)), rate limit riêng cho đăng nhập admin, vá nốt 3 lỗ hổng audit mức thấp/vừa.
-- **Kiểm thử mở rộng:** test độ bền thin client, axe a11y, link-check, Lighthouse budget, E2E.
+- **Kiểm thử mở rộng:** test độ bền thin client, axe a11y, link-check, Lighthouse budget, E2E → [Sprint 11](./sprints/sprint-11.md).
+- **Vận hành & quan sát** (runbook, log, metric, sự cố, restore drill) → [Sprint 12](./sprints/sprint-12.md). **Bảo mật bổ sung & cổng CI** (rate limit đăng nhập admin, check bắt buộc, Postgres 18/Directus) → [Sprint 13](./sprints/sprint-13.md). **Nợ tài liệu** → [Sprint 14](./sprints/sprint-14.md). **Visual Polish** → [Sprint 16](./sprints/sprint-16.md).
 - **Reader feature:** (không còn mục nào chờ.) (Search: khi blog lớn tới mức chỉ mục tĩnh quá nặng thì cân nhắc Pagefind/server-side — [15](./15-seo-accessibility.md).)
-- **Refactor docs-architecture:** F1–F15 ([architecture review](./reviews/architecture-review-2026-07-21.md)).
+- **Refactor docs-architecture:** F1–F8 và F13 xong (Đợt 1–2); F9–F12, F14, F15 → [Sprint 15](./sprints/sprint-15.md) ([architecture review](./reviews/architecture-review-2026-07-21.md)).
 
 > Đã làm xong 2026-11-01 — RSS (`/rss.xml`), Tags (`/tag/<slug>`), Archive (`/archive`), Search (`/search`), Tác giả (`/author/<slug>`), Chuyên mục (`/categories`): [15 §A4](./15-seo-accessibility.md).
 
