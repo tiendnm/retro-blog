@@ -15,7 +15,7 @@ name: retro-blog
 services:
   # ─── Content Store (ADR-0004/0014) ───
   postgres:
-    image: postgres:16.8-alpine
+    image: postgres:16.15-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER}
