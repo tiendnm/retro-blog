@@ -23,6 +23,7 @@ import type {
 } from './types';
 import { type ArchiveMonth, groupByMonth, monthRange } from './archive';
 import { optimizeBodyImages, rewriteAssetUrls } from './rewrite-assets';
+import type { SearchDoc } from './search-index';
 import { sanitizeBody } from './sanitize-body';
 
 // URL container→Directus (server-side). Không token ⇒ Public role.
@@ -314,6 +315,22 @@ export function listCategories(): Promise<CategoryRef[]> {
   ).then((r) => r.data.map(toCategory).filter((c): c is CategoryRef => c !== null));
   if (import.meta.env.PROD) categoriesCache = p;
   return p;
+}
+
+/** Toàn bộ bài đã xuất bản (thân bài còn là HTML thô) để dựng chỉ mục tìm kiếm lúc build — mới nhất trước. */
+export async function listSearchDocs(): Promise<SearchDoc[]> {
+  const { data } = await directusGet<RawPost[]>(
+    '/items/posts?fields=title,slug,excerpt,body,published_at,category.name,tags.tags_id.name&sort=-published_at&limit=-1',
+  );
+  return data.map((p) => ({
+    title: p.title,
+    slug: p.slug,
+    excerpt: p.excerpt ?? null,
+    body: p.body ?? null,
+    publishedAt: p.published_at ?? null,
+    categoryName: p.category?.name ?? null,
+    tagNames: (p.tags ?? []).map((t) => t.tags_id?.name ?? '').filter(Boolean),
+  }));
 }
 
 /** Các tháng có bài (mới nhất trước) kèm số bài — trang /archive. Tháng theo giờ VN (archive.ts). */

@@ -1,0 +1,25 @@
+---
+// Trang TÌM KIẾM. Site tĩnh (SSG) nên việc tìm chạy ở trình duyệt trên /search-index.json (scripts/search.ts).
+// Không JS: form GET /search?q=… vẫn gửi được nhưng cần JS để hiện kết quả → <noscript> báo rõ.
+// noindex: trang kết quả không có nội dung riêng để công cụ tìm kiếm lập chỉ mục.
+import Base from '../layouts/Base.astro';
+import { getSiteSettings } from '../lib/directus';
+
+const { siteName } = await getSiteSettings();
+---
+
+<Base title={`Tìm kiếm — ${siteName}`} description={`Tìm bài viết trên ${siteName}.`} noindex>
+  <h1>Tìm kiếm</h1>
+  <form class="search-form" role="search" action="/search" method="get">
+    <label for="q">Từ khoá</label>
+    <input id="q" name="q" type="search" autocomplete="off" autofocus placeholder="vd: pentium 4, bo mạch chủ…" />
+    <button type="submit">Tìm</button>
+  </form>
+  <noscript><p class="empty-state">Tìm kiếm cần bật JavaScript.</p></noscript>
+  <p class="meta" id="search-status" role="status" aria-live="polite"></p>
+  <ul class="post-list" id="search-results"></ul>
+</Base>
+
+<script>
+  import '../scripts/search';
+</script>

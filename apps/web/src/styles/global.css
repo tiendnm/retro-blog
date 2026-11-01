@@ -813,3 +813,43 @@ dialog.lightbox::backdrop {
   color: var(--color-accent);
   text-decoration: underline;
 }
+
+/* Tìm kiếm (/search) */
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin: 0 0 var(--space-4);
+}
+.search-form label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.search-form input {
+  flex: 1 1 14rem;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1.5px solid var(--color-accent);
+  background: var(--color-card);
+  color: var(--color-text);
+  font: inherit;
+}
+.search-form button {
+  padding: var(--space-2) var(--space-4);
+  border: 1.5px solid var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-bg);
+  font: inherit;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+.search-form button:hover,
+.search-form button:focus-visible {
+  background: var(--color-accent-strong);
+}
