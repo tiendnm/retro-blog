@@ -36,4 +36,14 @@
 Thay đổi **Reader/UI** nên bắt buộc có build preview và bằng chứng như trên. Dừng chờ Product ở bước chọn cường độ (giữa sprint) và cuối sprint.
 
 ## Kết quả
-_(điền khi xong sprint: phương án đã chọn, số đo byte/hiệu năng trước-sau, ảnh chụp, quyết định cường độ)_
+### Spike (giữa sprint)
+- **Grain:** `feTurbulence` (+≈0,9 KB CSS) trông giống giấy thật nhất → chọn. Ô lát thủ công (+≈9,8 KB) lộ chấm lặp như bụi → loại. Gradient chồng (+≈0,5 KB) kẻ sọc → loại.
+- **Crease:** gáy sách dọc giữa trang (cuộn theo nội dung) → chọn; hai nếp ngang ở 1/3 và 2/3 thành dải lạ mắt → loại.
+- **Hiệu năng:** cuộn 30 khung: 470–500 ms ở mọi biến thể kể cả tắt (bị giới hạn bởi rAF) → không thấy chậm đi. Tổng CSS thêm ≈1,1 KB.
+- **Tương phản (đo pixel tối nhất trên ảnh chụp):** xem §3.5 của 07b. Mức "rõ" làm `muted` xuống 4,00 < 4,5.
+### Quyết định và số đo (2026-11-02)
+- **Product chọn:** grain mức "vừa" (`--paper-grain: 0.5`), **không** nếp gáy sách (đã gỡ khỏi CSS). Công tắc tổng `--paper-fx`.
+- **Tương phản trên pixel tối nhất của grain:** text 10,15 · muted **5,02** · accent 6,70 (đều ≥ 4,5).
+- **Axe + E2E** (Playwright, 88 test, desktop+mobile): xanh. **Lighthouse** (mobile, trung vị 3 lượt, 9 trang, cùng máy): điểm Perf/A11y/SEO/BP, LCP, TBT, CLS **không đổi** so với bản tắt; byte mỗi trang +≈1,2 KB; JS +0.
+- **Giới hạn bằng chứng:** chưa có Docker build preview — các phép đo trên `dist` cũ (build 2026-11-01) có nối CSS mới, vì chưa dựng Directus. CI (`build` + `site-checks`) sẽ kiểm trên bản build thật khi push.
+- **Product should verify:** cảm nhận grain trên màn hình thật (retina, độ sáng thấp); không đổi gì khác (Unchanged: bố cục, font, màu, nội dung).

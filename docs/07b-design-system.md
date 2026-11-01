@@ -75,6 +75,17 @@ Chưa định nghĩa: bóng đổ/hiệu ứng (chờ chốt phong cách).
 
 Breakpoint dùng trong mã: **860 px** (lưới thẻ rút cột), **560 px** (xếp dọc thành phần danh sách), **600 px** (lightbox). Ba mốc này là *giá trị* chứ không phải token (CSS không cho dùng biến trong điều kiện media); đổi thì sửa ở cả nơi dùng.
 
+### 3.5. Chất giấy (Sprint 16)
+Texture sinh bằng thuật toán, nằm **dưới** nội dung (`z-index: -1`), tĩnh, không tải ảnh ngoài.
+
+| Token | Mặc định | Vai trò |
+|---|---|---|
+| `--paper-fx` | 1 | công tắc tổng; `0` = tắt toàn bộ texture |
+| `--paper-grain` | 0,50 | độ đậm sợi giấy (SVG `feTurbulence` trong `data:` URI) |
+
+- Tắt khi `prefers-contrast: more`, `forced-colors: active` và khi in.
+- Tương phản trên pixel tối nhất của grain (đo 2026-11-02): `text` 10,15 · `muted` 5,02 · `accent` 6,70. Mức "rõ" (0,85) làm `muted` < 4,5 nên không dùng.
+
 ## 4. Hợp đồng thành phần cơ sở
 
 Mỗi thành phần phải thoả hợp đồng, bất kể cách hiện thực.
