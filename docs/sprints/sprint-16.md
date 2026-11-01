@@ -35,7 +35,7 @@
 ## Cổng review
 Thay đổi **Reader/UI** nên bắt buộc có build preview và bằng chứng như trên. Dừng chờ Product ở bước chọn cường độ (giữa sprint) và cuối sprint.
 
-## Kết quả
+## Kết quả (Product duyệt và đóng sprint 2026-11-02, đã xem ảnh)
 ### Spike (giữa sprint)
 - **Grain:** `feTurbulence` (+≈0,9 KB CSS) trông giống giấy thật nhất → chọn. Ô lát thủ công (+≈9,8 KB) lộ chấm lặp như bụi → loại. Gradient chồng (+≈0,5 KB) kẻ sọc → loại.
 - **Crease:** gáy sách dọc giữa trang (cuộn theo nội dung) → chọn; hai nếp ngang ở 1/3 và 2/3 thành dải lạ mắt → loại.
