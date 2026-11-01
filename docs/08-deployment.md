@@ -3,7 +3,7 @@
 > 🎯 **Mục đích:** Mô tả *cách đưa code lên môi trường* — kiến trúc triển khai, phát hành nội dung, secrets, rollback. Đảm bảo phát hành lặp lại được và an toàn.
 > 🔗 **Liên quan:** [Sprint 6 Plan](./sprints/sprint-6.md) · [03-architecture](./03-architecture.md) · [13-operations](./13-operations.md) · [12-security](./12-security.md) · [ADR-0005](./adr/0005-use-docker-packaging.md) · [ADR-0006](./adr/0006-render-strategy.md) · [ADR-0007](./adr/0007-reverse-proxy-and-tls.md) · [ADR-0008](./adr/0008-rebuild-on-publish.md).
 
-> ✅ **Quyết định đã CHỐT (Sprint 6 Phase 0, Product):** reverse proxy = **Caddy** + auto-TLS ([ADR-0007](./adr/0007-reverse-proxy-and-tls.md)); rebuild = **Flow→webhook→script→atomic swap** ([ADR-0008](./adr/0008-rebuild-on-publish.md)); topology = **`retro.<domain>` + `cms.<domain>`**. **`<domain>` thật** do Product cung cấp ở **Phase 2**.
+> ✅ **Quyết định đã CHỐT (Sprint 6 Phase 0, Product):** reverse proxy = **Caddy** + auto-TLS ([ADR-0007](./adr/0007-reverse-proxy-and-tls.md)); rebuild = **Flow→webhook→script→atomic swap** ([ADR-0008](./adr/0008-rebuild-on-publish.md)); topology = **`retro.<domain>` + `retro-cms.<domain>`** (bản đầu ghi `cms.<domain>`; đổi tên khi dựng server nhà).
 
 > 🏠 **Server tại nhà:** chạy sau **Cloudflare Tunnel** (không mở cổng) — [ADR-0015](./adr/0015-cloudflare-tunnel-ingress.md) · Postgres trong compose — [ADR-0014](./adr/0014-postgres-in-compose-for-production.md) · runbook từng bước: [08a](./08a-deploy-home-tunnel.md).
 
@@ -14,41 +14,40 @@
 | Môi trường | Mục đích | URL | Trạng thái |
 |---|---|---|---|
 | dev (local) | Phát triển | `localhost` (Docker compose, `astro dev` on-demand) | 🟢 đang chạy |
-| production | Người dùng thật (Public MVP) | `retro.<domain>` (recommended) | 🟡 Sprint 6 — chờ domain |
+| production | Người dùng thật (Public MVP) | `https://retro.tiendnm.com` (site) · `https://retro-cms.tiendnm.com` (CMS) | 🟢 đang chạy (server nhà, từ 2026-10-30) |
 
-> **Staging:** MVP self-host tối giản **chưa tách staging riêng** — Phase 2 verify trên domain thật (hoặc domain tạm) trước khi công bố. Staging đầy đủ = sau MVP nếu cần.
+> **Staging:** chưa tách staging riêng (blog một người vận hành). Thay vào đó CI job `build` dựng Directus + Postgres + seed thật để kiểm trước khi merge ([§3](#3-pipeline--phát-hành)), và `update.sh` triển khai trực tiếp lên production.
 > Ma trận cấu hình theo môi trường: [13-operations](./13-operations.md).
 
 ## 2. Kiến trúc triển khai *(Accepted — [ADR-0005](./adr/0005-use-docker-packaging.md)/[0007](./adr/0007-reverse-proxy-and-tls.md))*
 
-**Self-host all-in-one** (đúng [ADR-0005](./adr/0005-use-docker-packaging.md)) trên 1 Docker host, qua `docker-compose.prod.yml` (override, **không** đụng `docker-compose.yml` dev):
+**Self-host all-in-one** (đúng [ADR-0005](./adr/0005-use-docker-packaging.md)) trên 1 Docker host, qua `docker-compose.yml` + `docker-compose.prod.yml` (+ `docker-compose.tunnel.yml` cho server nhà); danh sách file nằm trong `COMPOSE_FILE` của `.env.production`:
 
 ```
-                 Internet (443/80)
-                        │
-                ┌───────▼────────┐   auto-TLS (ACME)
-                │  Caddy (edge)  │   (ADR-0007)
-                └───┬────────┬───┘
-       retro.<domain>│        │cms.<domain>
-        (static)    │        │ (admin+API+assets)
-             ┌──────▼──┐  ┌──▼────────┐
-             │ static  │  │ directus  │  :8055 (không expose trực tiếp)
-             │  dist/  │  └──┬────────┘
-             └─────────┘     │ network nội bộ
-                        ┌─────▼──────┐
-                        │ postgres   │  (ngoài compose, ADR-0010)
-                        └────────────┘
+   Internet ──► Cloudflare (TLS) ══ Tunnel ══► cloudflared ──┐   (server nhà: không mở cổng)
+   (VPS: 443/80 thẳng vào Caddy, Caddy tự lấy TLS)           │
+                                                     ┌───────▼────────┐
+                                                     │  Caddy (edge)  │  ADR-0007
+                                                     └───┬────────┬───┘
+                             retro.<domain> (static)     │        │ retro-cms.<domain> (admin+API+assets)
+                                                  ┌──────▼──┐  ┌──▼────────┐
+                                                  │ site_dist│ │ directus  │  :8055 (không publish cổng)
+                                                  │ /current │ └──┬────────┘
+                                                  └─────▲───┘     │ mạng nội bộ retro-net
+                            web (build + receiver) ─────┘   ┌─────▼──────┐   ops (backup, healthcheck,
+                                                            │ postgres   │◄─ offsite R2) — ADR-0017
+                                                            └────────────┘
 ```
 
 - **Web serving:** site là **static build** (`dist/` từ `astro build`) — reverse proxy **serve file tĩnh trực tiếp**, **không** chạy Node runtime cho site (nhanh, ít bề mặt tấn công). Đúng SSG ([ADR-0006](./adr/0006-render-strategy.md)).
-- **Directus:** ra ngoài **chỉ qua proxy** ở `cms.<domain>` (admin UI + REST API + `/assets`). **Postgres chạy ngoài compose** (instance có sẵn trên host, DB `retro-blog` — [ADR-0010](./adr/0010-external-postgres-instance.md)); không expose ra internet.
-- **Domain topology (Accepted):** **subdomain tách** — `retro.<domain>` (site) + `cms.<domain>` (Directus). Lợi: `PUBLIC_SITE_URL`/`PUBLIC_DIRECTUS_URL` rõ ràng, CORS gọn, khớp canonical/OG/sitemap của [Sprint 5](./sprints/sprint-5.md). *(`<domain>` thật do Product cung cấp ở Phase 2.)*
+- **Directus:** ra ngoài **chỉ qua proxy** ở `retro-cms.<domain>` (admin UI + REST API + `/assets`). **Postgres chạy trong compose ở production** ([ADR-0014](./adr/0014-postgres-in-compose-for-production.md); bản đầu dùng instance ngoài, [ADR-0010](./adr/0010-external-postgres-instance.md), nay chỉ còn cho dev); không publish cổng, chỉ tới được qua `retro-net`.
+- **Domain topology (Accepted):** **subdomain tách** — `retro.<domain>` (site) + `retro-cms.<domain>` (Directus). Lợi: `PUBLIC_SITE_URL`/`PUBLIC_DIRECTUS_URL` rõ ràng, CORS gọn, khớp canonical/OG/sitemap của [Sprint 5](./sprints/sprint-5.md).
 
 ## 3. Pipeline / Phát hành
 
 - **Build web tái lập (Phase 1 ✅):** [`apps/web/Dockerfile`](../apps/web/Dockerfile) = **build-runner** — `pnpm install --frozen-lockfile` (pin `apps/web/pnpm-lock.yaml` + pnpm 10.33.2) lúc build image; **`astro build` chạy lúc RUNTIME** (fetch Directus nội bộ) → `dist/`. **Không bake nội dung vào image** (nội dung động; khớp [ADR-0008](./adr/0008-rebuild-on-publish.md)) → serve do Caddy ([ADR-0007](./adr/0007-reverse-proxy-and-tls.md)), không cần runtime-server stage. Loại "cài fresh không lockfile" của dev (nợ [S1-P3](./10-decisions.md)).
   - **Verify reproducibility (tiêu chí S6):** 2 lần build → `dist` **byte-identical** (aggregate sha256 khớp; 123 trang / 126 file).
-- **CI tự động** (Sprint 7 Phase 3, `.github/workflows/ci.yml`): job **`quality`** (biome lint · format · typecheck · test — nhanh, bắt buộc) + job **`build`** (Postgres + Directus pin như compose, bootstrap bằng `schema apply` → `apply-permissions.sh` → `seed-dev.mjs` + `seed-showcase.mjs`, rồi `astro build`, test quyền Public / luồng publish → build, đẩy `dist` làm artifact; hiện `continue-on-error`, nâng thành required khi ổn định) + job **`site-checks`** (Sprint 11; cần `dist`: `check-site`, Playwright + axe, Lighthouse; `continue-on-error`, bắt buộc ở Sprint 13) — chi tiết [11-testing](./11-testing.md). Pipeline **phát hành nội dung** ở §4.
+- **CI tự động** (`.github/workflows/ci.yml`, chạy trên PR và push `main`): job **`quality`** (biome lint · format · typecheck · test · compose config · shellcheck · test webhook/check-site · hồi quy header Caddy · kiểm tài liệu — nhanh, **bắt buộc**) + job **`build`** (Postgres + Directus pin như compose, bootstrap bằng `schema apply` → `apply-permissions.sh` → seed minimal + showcase, rồi `astro build`, test quyền Public / luồng publish → build, đẩy `dist` làm artifact — **bắt buộc từ Sprint 13**) + job **`site-checks`** (Sprint 11; cần `dist`: `check-site`, Playwright + axe, Lighthouse; còn `continue-on-error` tới khi xanh 10 lần liên tiếp, rồi nâng lên required — [14 §4](./14-quality-gates.md)). Chi tiết test: [11-testing](./11-testing.md). Pipeline **phát hành nội dung** ở §4; **triển khai code** lên server bằng `./scripts/update.sh [--web-only]` ([08a §4](./08a-deploy-home-tunnel.md)) — chưa có CD tự động.
 
 ## 4. Phát hành nội dung — Rebuild-on-publish *(Accepted — [ADR-0008](./adr/0008-rebuild-on-publish.md))*
 
@@ -70,8 +69,8 @@ Giải "SSG stale" ([ADR-0006](./adr/0006-render-strategy.md)): Editor publish t
 ## 5. Secrets & cấu hình
 
 - **Không commit secret** ([12-security](./12-security.md)). Prod dùng `.env` (gitignored) trên server từ `.env.production.example`; **secrets mạnh** (`KEY`/`SECRET`/DB password — `openssl rand -hex 32`).
-- `PUBLIC_SITE_URL` = `https://retro.<domain>` · `PUBLIC_DIRECTUS_URL`/`PUBLIC_URL` = `https://cms.<domain>` (đảm bảo canonical/OG/sitemap/assets đúng — khớp Sprint 5).
-- **2FA cho tài khoản admin Directus** — khuyến nghị bật trước công bố ([12 §3](./12-security.md)).
+- `PUBLIC_SITE_URL` = `https://retro.<domain>` · `PUBLIC_DIRECTUS_URL`/`PUBLIC_URL` = `https://retro-cms.<domain>` (đảm bảo canonical/OG/sitemap/assets đúng — khớp Sprint 5). `deploy-home.sh` sinh `.env.production` với các giá trị này.
+- **2FA cho tài khoản admin Directus: không bật** (Product chốt, rủi ro chấp nhận — [12 §3](./12-security.md)). Xoay secret: runbook ở [12 §4](./12-security.md).
 
 ## 6. Rollback *(Recommended)*
 
@@ -81,8 +80,8 @@ Giải "SSG stale" ([ADR-0006](./adr/0006-render-strategy.md)): Editor publish t
 
 ## 7. DNS, TLS, Domain + Reverse proxy *(Accepted = Caddy — [ADR-0007](./adr/0007-reverse-proxy-and-tls.md))*
 
-- **DNS:** `retro.<domain>` + `cms.<domain>` → A/AAAA trỏ IP host; mở **80/443** cho ACME + phục vụ.
-- **TLS:** chứng chỉ tự động (**Let's Encrypt/ACME**) do **Caddy** cấp + gia hạn.
+- **DNS:** `retro.<domain>` + `retro-cms.<domain>`. Server nhà: bản ghi CNAME tới tunnel do Cloudflare quản, **không mở/forward cổng** ([ADR-0015](./adr/0015-cloudflare-tunnel-ingress.md), [08a](./08a-deploy-home-tunnel.md)). VPS: A/AAAA trỏ IP host và mở **80/443**.
+- **TLS:** server nhà — Cloudflare kết thúc TLS với trình duyệt, đoạn tunnel → Caddy là HTTP trong mạng Docker nội bộ ([12 §6](./12-security.md)). VPS — **Caddy** tự cấp và gia hạn chứng chỉ (**Let's Encrypt/ACME**).
 - **Reverse proxy = Caddy (đã chốt).** Ma trận đánh đổi Phase 0 (lý do chọn):
 
 | Tiêu chí | **Caddy** ✅ | Traefik | Nginx (+Certbot) |
@@ -104,7 +103,7 @@ Trạng thái Sprint 6: **✅ = cơ chế đã kiểm chứng** · **@deploy = x
 - [x] **Rebuild-on-publish** (publish → hiện sau rebuild); draft ẩn — ✅ verify end-to-end (S6-P3)
 - [x] **Backup** (db+uploads+config+env) + **restore drill** đạt — ✅ posts 117=117 (S6-P4)
 - [x] **Rollback = atomic swap** về static build trước — ✅ `builds/` giữ N, swap symlink (S6-P3)
-- [x] Không secret trong repo/log — ✅ `.env*` gitignored; **@deploy**: secrets prod mạnh + **2FA admin**
+- [x] Không secret trong repo/log — ✅ `.env*` gitignored; secrets prod do `deploy-home.sh` sinh ngẫu nhiên; 2FA admin: không bật (chấp nhận rủi ro, [12 §3](./12-security.md))
 - [x] SEO đúng ở prod (canonical/OG/sitemap domain thật) — ✅ build `PUBLIC_SITE_URL` (S6-P2); a11y giữ (S3–S5)
 - [x] **@deploy** — ✅ **đạt 2026-11-01** trên domain thật (`retro.` / `retro-cms.tiendnm.com`, Cloudflare Tunnel, server nhà):
   - Dựng bằng `deploy-home.sh` từ trạng thái sạch, nghiệm thu trên server thật (Sprint 10 P6); tunnel + DNS, `.env.production`, rebuild-on-publish + webhook, site/CMS công khai (2026-10-30).

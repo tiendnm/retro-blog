@@ -24,7 +24,8 @@
 | ID | Yêu cầu / User story | Ưu tiên | Tiêu chí chấp nhận |
 |---|---|---|---|
 | FR-E1 | Soạn/sửa bài trong Directus | Must | ... |
-| FR-E2 | Lưu nháp (draft) & xem trước (preview) | Must | ... |
+| FR-E2 | Lưu nháp (draft) | Must | ... |
+| FR-E2b | Xem trước bản nháp trên site (preview) | Could — hạ từ Must 2026-11-02 ([10 §5](./10-decisions.md)); chưa hiện thực | ... |
 | FR-E3 | Xuất bản / lên lịch (schedule) | Should | ... |
 | FR-E4 | Quản lý media (ảnh, thumbnail) | Must | ... |
 

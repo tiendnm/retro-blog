@@ -50,7 +50,7 @@ Nguồn sự thật về phạm vi v1 là [01a-mvp-scope](./01a-mvp-scope.md); d
 | Persona | Vai trò | Nhu cầu chính | Nỗi đau (pain) |
 |---|---|---|---|
 | Độc giả (Reader) | Người đọc bài | Đọc nhanh, tìm bài dễ | Nội dung rải rác, trang nặng quảng cáo, URL chết |
-| Biên tập/Tác giả (Editor/Author) | Soạn & xuất bản nội dung | Soạn thảo tiện, xem trước, xuất bản không cần biết hạ tầng | Công cụ đăng bài phức tạp, lo mất bài |
+| Biên tập/Tác giả (Editor/Author) | Soạn & xuất bản nội dung | Soạn thảo tiện, lưu nháp, xuất bản không cần biết hạ tầng | Công cụ đăng bài phức tạp, lo mất bài |
 | Quản trị (Admin) | Vận hành hệ thống | Cấu hình, an toàn, khôi phục khi hỏng | Bảo trì tốn thời gian, nâng phiên bản gây vỡ |
 
 ## 7. Các bên liên quan (Stakeholders) & vai trò

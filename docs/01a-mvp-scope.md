@@ -27,7 +27,7 @@
 | Xem danh sách bài đã xuất bản | FR-R1 | Cửa vào của blog |
 | Đọc chi tiết một bài | FR-R2 | Giá trị cốt lõi cho độc giả |
 | Soạn/sửa bài trong CMS | FR-E1 | Không có thì không tạo được nội dung |
-| Lưu nháp & xem trước | FR-E2 | Quy trình biên tập tối thiểu |
+| Lưu nháp | FR-E2 | Quy trình biên tập tối thiểu (xem trước: FR-E2b, Nice — §4) |
 | Quản lý media (ảnh bìa) | FR-E4 | Bài cần ảnh; alt-text a11y |
 | **Xuất bản** bài (Nháp → Đã xuất bản) | [03b §4](./03b-domain-model.md) (state machine, nhánh *Published*) | Không xuất bản = không có blog |
 | Content types tối thiểu: **Post, Author, Category, Media** | [03c](./03c-content-model.md) §2.1/2.2/2.3/2.5 | Đủ để hiển thị một bài có tác giả, chuyên mục + ảnh |
@@ -44,6 +44,7 @@
 | RSS / Atom feed | FR-R5 (Should) | |
 | Lên lịch xuất bản (Scheduled) | FR-E3 (phần "schedule"); [03b §4](./03b-domain-model.md) nhánh *Scheduled* | "Publish" là Must; "schedule" là Nice |
 | Trạng thái *Chờ duyệt* (In Review) | [03b §4](./03b-domain-model.md) | Chỉ cần khi nhiều biên tập viên |
+| Xem trước bản nháp trên site | FR-E2b | Hạ từ Must 2026-11-02 ([10 §5](./10-decisions.md)); chưa hiện thực — Editor xem trong trình soạn của CMS ([05 §4](./05-cms.md)) |
 
 > ✂️ Các mục này **có thể cắt khỏi v1** mà không hoãn launch.
 
