@@ -38,7 +38,7 @@
 | [10](./sprints/sprint-10.md) | Đóng gói deploy (webhook + backup vào compose, script dựng server) | ✅ Product duyệt 2026-10-30: server dựng bằng 4 việc tay (`deploy-home.sh`), webhook + backup + healthcheck trong compose |
 | [11](./sprints/sprint-11.md) | Kiểm thử mở rộng (link-check, axe, Lighthouse, E2E, quyền Public, độ bền thin client) | 📋 Kế hoạch — **sprint kế tiếp** |
 | [12](./sprints/sprint-12.md) | Vận hành & quan sát (runbook, log, metric nhẹ, sự cố, restore drill định kỳ) | 📋 Kế hoạch |
-| [13](./sprints/sprint-13.md) | Bảo mật bổ sung & cổng CI (rate limit đăng nhập admin, check bắt buộc, header test, xoay secret, đánh giá Postgres 18/Directus) | 📋 Kế hoạch |
+| [13](./sprints/sprint-13.md) | Bảo mật bổ sung & cổng CI (rate limit đăng nhập admin, check bắt buộc, header test, xoay secret, đánh giá Postgres 18/Directus) | ✅ Xong (2026-11-02) |
 | [14](./sprints/sprint-14.md) | Nợ tài liệu (dọn ~70 TODO/TBD, sửa chỗ lệch thực tế, script kiểm docs) | 📋 Kế hoạch |
 | [15](./sprints/sprint-15.md) | Refactor docs Đợt 3 (IA của site, Design System, topology một nguồn, F9–F15) | 📋 Kế hoạch |
 | [16](./sprints/sprint-16.md) | Visual Polish (grain/crease procedural kiểu manual cũ) | 📋 Kế hoạch |
