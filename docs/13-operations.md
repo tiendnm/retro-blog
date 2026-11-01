@@ -66,16 +66,16 @@
 
 | Hạng mục | Công cụ (dự kiến) | Ngưỡng cảnh báo |
 |---|---|---|
-| Logging | TBD | — |
-| Metrics (CPU/mem/latency) | TBD | TODO |
+| Logging | `docker compose --env-file .env.production logs --tail 100 <service>` (hoặc `-f`). Driver `json-file` xoay vòng **10 MB × 3 bản/service** (≤ 30 MB mỗi service; Sprint 12, đã deploy 2026-11-01). Nhật ký cũ hơn bị mất khi tạo lại container. Bình thường: `WARN: Custom IP header didn't return valid IP address` của Directus (xem §2) | — |
+| Metrics (tài nguyên máy) | Không dựng Prometheus/Grafana (máy 4 GB). [`hostcheck.sh`](../services/ops/hostcheck.sh) chạy cùng healthcheck mỗi 5 phút: đĩa, RAM/swap, kích thước db/uploads/backups, tuổi backup local và R2 (R2 hỏi tối đa mỗi giờ). Xem tay: `docker compose --env-file .env.production exec -T ops sh services/ops/hostcheck.sh` | **FAIL**: đĩa ≥ 85% (xoá `docker builder prune`/ảnh cũ, xem playbook), backup local > 26 giờ, bản mới nhất trên R2 > 26 giờ (kiểm log `ops`, chạy backup tay). **WARN** (chỉ log): RAM khả dụng < 200 MB, swap ≥ 75%. Chỉnh bằng env `DISK_WARN_PCT`, `BACKUP_MAX_AGE_H`, `R2_MAX_AGE_H`, `MEM_MIN_MB`, `SWAP_WARN_PCT` |
 | Uptime / Health check | [`services/ops/healthcheck.sh`](../services/ops/healthcheck.sh) chạy mỗi 5 phút trong service `ops` (xem `docker compose --env-file .env.production logs ops`); kiểm site/robots/sitemap, Directus `/server/health`, hạn chứng chỉ TLS. Báo động ngoài host: đặt `HEALTHCHECK_PING_URL` (kiểu healthchecks.io — cảnh báo khi **mất ping**, bắt được cả trường hợp host chết) | Hỏng ≥ 1 lần chạy → `FAIL` trong log `ops` + ping `/fail`; chứng chỉ < 14 ngày |
-| Error tracking | TBD | TODO |
+| Error tracking | **TODO — chờ Product chốt.** Đề xuất mặc định: không dùng dịch vụ ngoài; nguồn lỗi = log container + healthcheck | — |
 
 ## 4. Sao lưu & Khôi phục (Backup & Recovery)
 
 Công cụ: [`services/ops/backup.sh`](../services/ops/backup.sh) và [`prune-backups.sh`](../services/ops/prune-backups.sh) chạy **tự động trong service `ops`** ([ADR-0017](./adr/0017-ops-services-in-compose.md)); [`restore.sh`](../services/ops/restore.sh) chạy **tay trên host** (uploads mount `:ro` trong `ops`). Backup tay: `docker compose --env-file .env.production exec ops sh services/ops/backup.sh`. Khôi phục: `ENV_FILE=.env.production PG_VIA_COMPOSE=1 sh services/ops/restore.sh backups/<YYYYMMDD-HHMMSS>` rồi `sh services/rebuild/rebuild.sh`. Restore drill với Postgres-trong-compose: đạt (Sprint 9, dump → DB trống → posts 4=4).
 
-> ✅ **Backup ra ngoài máy (2026-11-01):** sau mỗi lần backup, [`offsite.sh`](../services/ops/offsite.sh) (rclone) đẩy `db.dump` + `uploads.tgz` + config lên **Cloudflare R2** (bucket private, token giới hạn theo bucket), giữ `R2_KEEP` bản mới nhất (mặc định 30). **`env.bak` (secret) KHÔNG lên R2** → khi dựng lại server phải tạo lại secret/token (tunnel lấy ở Cloudflare). Dùng `copy` (không `sync`) nên thư mục local trống sau khi thay ổ không xoá backup trên R2. Kiểm tra kết nối: `docker compose --env-file .env.production exec ops sh services/ops/offsite.sh --check`. Lỗi đẩy chỉ cảnh báo trong log `ops`, lần backup sau tự đẩy bù. Còn thiếu: **restore drill từ R2** (tải về → `restore.sh`).
+> ✅ **Backup ra ngoài máy (2026-11-01):** sau mỗi lần backup, [`offsite.sh`](../services/ops/offsite.sh) (rclone) đẩy `db.dump` + `uploads.tgz` + config lên **Cloudflare R2** (bucket private, token giới hạn theo bucket), giữ `R2_KEEP` bản mới nhất (mặc định 30). **`env.bak` (secret) KHÔNG lên R2** → khi dựng lại server phải tạo lại secret/token (tunnel lấy ở Cloudflare). Dùng `copy` (không `sync`) nên thư mục local trống sau khi thay ổ không xoá backup trên R2. Kiểm tra kết nối: `docker compose --env-file .env.production exec ops sh services/ops/offsite.sh --check`. Lỗi đẩy chỉ cảnh báo trong log `ops`, lần backup sau tự đẩy bù. Restore drill từ R2: có, xem bảng dưới.
 
 | Hạng mục | Chính sách |
 |---|---|
@@ -85,7 +85,7 @@ Công cụ: [`services/ops/backup.sh`](../services/ops/backup.sh) và [`prune-ba
 | Nơi lưu | Host (`backups/`) **và** Cloudflare R2 (bucket `R2_BUCKET`, không kèm `env.bak`); thư mục backup trên host NHẠY CẢM (có DB+secret) |
 | **RPO** | ≤ khoảng cách giữa 2 lần backup (hằng ngày → ≤ 24h) |
 | **RTO** | ≈ thời gian `restore.sh` (DB+uploads) + `rebuild.sh` (dựng lại static) |
-| Diễn tập khôi phục (restore drill) | ✅ **Đã diễn tập (Sprint 6 Phase 4):** restore `db.dump` vào Postgres sạch → **posts count khớp nguồn (117=117)**, uploads khớp (4=4 file). Lặp lại định kỳ |
+| Diễn tập khôi phục (restore drill) | ✅ [`scripts/restore-drill.sh`](../scripts/restore-drill.sh) (Sprint 12): `./scripts/restore-drill.sh --r2` trên host tải bản mới nhất từ R2, dựng Postgres + Directus **tạm** (cùng image prod, mạng riêng, không cổng, Directus giới hạn 700 MB), so migrations, file uploads, `/server/health`, `/assets`, số bài công khai rồi dọn sạch; không đụng stack đang chạy. **Chạy thật 2026-11-01: ĐẠT, 70 giây** (bản R2 `20261101-234515`: pg_restore OK, migrations 101=101, 12/12 file gốc có trong `uploads.tgz` — tổng 66 file vì Directus lưu cả thumbnail, Directus tạm `health=ok`, bài công khai 1=1, `/assets/<id>` 200; không còn container/mạng/thư mục tạm). Lịch: **mỗi quý** (và sau mỗi lần nâng Directus/Postgres) |
 
 > ⚠️ Backup chưa được kiểm chứng khôi phục = **không có backup**. Restore drill đã đạt (trên); duy trì diễn tập định kỳ.
 
