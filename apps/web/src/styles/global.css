@@ -705,6 +705,10 @@ html:has(dialog.lightbox[open]) {
   overflow: hidden; /* khoá cuộn nền khi đang xem ảnh */
 }
 dialog.lightbox {
+  --lb-stage-h: calc(
+    100dvh -
+    7rem
+  ); /* chiều cao khung xem ảnh: dùng chung cho .lightbox__stage và .lightbox__img */
   width: 100vw;
   max-width: none;
   height: 100dvh;
@@ -735,7 +739,7 @@ dialog.lightbox::backdrop {
 /* Khung xem: chiếm toàn vùng ảnh, cắt phần phóng tràn; touch-action:none để tự xử lý kéo/chụm */
 .lightbox__stage {
   width: 100%;
-  height: calc(100dvh - 7rem);
+  height: var(--lb-stage-h);
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -751,7 +755,8 @@ dialog.lightbox::backdrop {
 .lightbox__img {
   display: block;
   max-width: 100%;
-  max-height: 100%;
+  /* KHÔNG dùng 100%: hàng lưới auto làm % chiều cao vô hiệu → ảnh rộng tràn và bị cắt đáy */
+  max-height: var(--lb-stage-h);
   object-fit: contain;
   border: var(--border-width) solid var(--color-border);
   background: var(--color-surface);
@@ -826,8 +831,8 @@ dialog.lightbox::backdrop {
     /* chừa dải đỉnh (zoom/đóng) và dải đáy (‹ ›) — các nút này cố định nên không được đè ảnh/chú thích */
     padding-block: calc(2.75rem + var(--space-4) * 2);
   }
-  .lightbox__stage {
-    height: calc(100dvh - 15rem);
+  dialog.lightbox {
+    --lb-stage-h: calc(100dvh - 15rem);
   }
   .lightbox__prev,
   .lightbox__next {
