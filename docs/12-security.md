@@ -56,9 +56,10 @@
 **Hardening 2026-11-01:**
 - **Container tối thiểu quyền:** mọi service có `security_opt: no-new-privileges`; `cap_drop: ALL` cho directus, web, ops, caddy (+`NET_BIND_SERVICE`), cloudflared. Không chạy root: directus (`node`), web (`USER node`), ops (uid triển khai), caddy (`1000:1000`), cloudflared (`nonroot`); postgres chạy tiến trình DB bằng user `postgres` (entrypoint hạ quyền, image chuẩn).
 - **Rate limiting Directus:** `RATE_LIMITER_*` theo IP, mặc định 100 yêu cầu/10 giây (`RATE_LIMITER_POINTS/DURATION`), quá mức → 429. IP thật = header `CF-Connecting-IP` (`IP_CUSTOM_HEADER`): Cloudflare luôn ghi đè header này và Caddy không publish cổng nên chỉ tunnel tới được. Yêu cầu nội bộ (web build, ops) không có header → khoá theo IP container. Giới hạn: kho bộ nhớ trong 1 instance; chưa có hạn mức riêng cho `/auth/login`.
+- **Astro 5 → 7 (2026-11-01):** audit giảm từ 31 (1 critical, 11 high) xuống 3 (2 low, 1 moderate). Kéo theo base image `node:22.23.4-alpine` (Astro 7 cần Node ≥22.23.4). Đã so build trước/sau trên nội dung thật: cùng 19 trang/39 file, không script/style inline (CSP giữ nguyên), khác biệt chỉ là tên gói CSS, khoảng trắng và `&amp;` trong URL ảnh; tìm kiếm và lightbox chạy đúng.
 - **Quét dependency:** `.github/dependabot.yml` (npm, docker, compose, actions — hằng tuần) và workflow `security.yml` (`pnpm audit --prod --audit-level high`, hằng tuần, hiện chỉ báo cáo).
 
-**Còn lại (Backlog):** nâng **Astro** lên bản vá (audit 2026-11-01: 1 critical, 11 high, đều ở astro/sharp/vite/zod/undici; site là SSG, không chạy server Astro/ảnh AVIF runtime nên khả năng khai thác thấp nhưng cần nâng major rồi kiểm UI) · nâng Directus 11.3.5 lên bản mới nhất · chưa có rate limit riêng cho đăng nhập admin.
+**Còn lại (Backlog):** bỏ `continue-on-error` của `security.yml` khi 3 lỗ hổng còn lại được vá · nâng Directus 11.3.5 lên bản mới nhất · chưa có rate limit riêng cho đăng nhập admin.
 
 ## 7. Bảo mật chuỗi cung ứng (Supply chain)
 
