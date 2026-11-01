@@ -96,7 +96,7 @@ Công cụ: [`services/ops/backup.sh`](../services/ops/backup.sh) và [`prune-ba
   - **SEV2:** một chức năng hỏng nhưng site còn phục vụ (rebuild kẹt, không đăng nhập CMS được, backup hỏng 1 ngày, đĩa ≥ 85%). Trong ngày.
   - **SEV3:** nhỏ, có cách tránh (cảnh báo log, 5xx thoáng qua tự hết). Ghi nhận, xử lý khi tiện.
 - **Vai trò:** chỉ một người vận hành — kiêm điều phối, xử lý và liên lạc. Việc cần làm: ghi dòng thời gian ngay khi xử lý (để viết postmortem), không sửa vội khi chưa backup.
-- **Kênh liên lạc/cảnh báo:** **TODO — Product chọn** (email/Telegram…). Cảnh báo ngoài host cần `HEALTHCHECK_PING_URL` (hướng dẫn tạo: xem Kết quả Sprint 12); đã bật 2026-11-02 (healthchecks.io, Period 5 phút / Grace 10 phút; chuyển `up↔down` đã kiểm bằng ping `/fail` có chủ đích). Kênh nhận (email/Telegram) và việc email thực sự tới tay: _chờ Product xác nhận_.
+- **Kênh liên lạc/cảnh báo:** **email** (healthchecks.io). Cảnh báo ngoài host cần `HEALTHCHECK_PING_URL` (hướng dẫn tạo: xem Kết quả Sprint 12); đã bật 2026-11-02 (healthchecks.io, Period 5 phút / Grace 10 phút; chuyển `up↔down` đã kiểm bằng ping `/fail` có chủ đích). **Kênh liên lạc sự cố = email** (`tien.dnm@outlook.com` qua healthchecks.io; email "UP" đã nhận thật 2026-11-02). Chưa thử kịch bản mất ping do host chết.
 
 ### Playbook (mỗi kịch bản: dấu hiệu → kiểm → xử lý)
 Mọi lệnh chạy trong `~/retro-blog` trên server (`ssh retro-home`); `D="docker compose --env-file .env.production"`. Cột *Đã thử* ghi rõ lệnh đã chạy thật hay chưa.

@@ -72,7 +72,7 @@ _(cập nhật 2026-11-02; sprint **chưa đóng** — còn chờ quyết địn
 | Restore drill `--r2` | **ĐẠT, 70 giây** (migrations 101=101; 12/12 file gốc; Directus tạm health=ok; `/assets` 200; bài công khai 1=1; dọn sạch). Sửa 3 lỗi script trong lúc chạy thật |
 | Khởi động lại Directus / Postgres | Directus healthy sau 55 giây, Postgres 6 giây; site công khai OK sau đó |
 **Chưa chạy thử:** dừng/lên cả stack; restart cloudflared/caddy; các lệnh prune đĩa; quay vòng secret; dựng máy mới từ đầu; Cloudflare có cache HTML hay không (ghi rõ trong `13 §2`/§5).
-**Cảnh báo ngoài host (healthchecks.io, 2026-11-02):** `HEALTHCHECK_PING_URL` đã điền trên server (bản gốc `.env.production.bak-s12`). Nhật ký của dịch vụ: `new→up` 17:41 UTC; ping `/fail` gây lỗi có chủ đích lúc 17:42 → `up→down`; `ops` tự ping lại lúc 17:46 → `down→up`; ping 5 phút tiếp theo OK. **Chưa xác nhận:** email cảnh báo có tới hộp thư người vận hành không (chờ Product xác nhận); thử cho trường hợp host chết/mất ping (grace 10 phút) chưa làm.
+**Cảnh báo ngoài host (healthchecks.io, 2026-11-02):** `HEALTHCHECK_PING_URL` đã điền trên server (bản gốc `.env.production.bak-s12`). Nhật ký của dịch vụ: `new→up` 17:41 UTC; ping `/fail` gây lỗi có chủ đích lúc 17:42 → `up→down`; `ops` tự ping lại lúc 17:46 → `down→up`; ping 5 phút tiếp theo OK. **Email tới tay người vận hành:** đã nhận email "UP — downtime 4 phút 5 giây" (Product xác nhận). **Chưa thử** trường hợp host chết/mất ping (grace 10 phút).
 
 ### Việc còn chờ Product
 1. **Tạo healthcheck ngoài host (healthchecks.io, gói Free)** — các bước:
