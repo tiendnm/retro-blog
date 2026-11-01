@@ -23,7 +23,7 @@
 | Field (03c) | Directus type | Interface | Ghi chú |
 |---|---|---|---|
 | title | string | input | required |
-| slug | string | input | required, **unique**; auto-slugify (`options.slug`) + help note (S6.5) |
+| slug | string | input | **unique**; **để trống khi tạo mới → tự sinh từ `title`** (xem §6 "Tự sinh slug"); `required: false` ở giao diện nhưng cột DB vẫn NOT NULL; auto-slugify khi gõ tay (`options.slug`) + help note |
 | excerpt | text | input-multiline | help note: dùng cho list + SEO description (S6.5) |
 | body | text | input-rich-text-html (WYSIWYG) | lưu **HTML**; toolbar giới hạn, không h1 ([ADR-0011](./adr/0011-body-stored-as-html-wysiwyg.md)) |
 | status | string | select-dropdown | choices **draft/published**, default `draft`; help note (S6.5) |
@@ -106,7 +106,8 @@ Theo máy trạng thái [03b §4](./03b-domain-model.md); field `status` (enum `
 
 ## 6. Flows / Webhooks / Automation
 
-- **Rebuild-on-publish** (webhook → build) là *future work* theo [ADR-0006](./adr/0006-render-strategy.md) — không thuộc Sprint 2.
+- **Rebuild-on-publish:** Flow `action` trên `posts/categories/authors/site_settings/tags` → webhook tới `web` ([`apply-rebuild-flow.mjs`](../services/directus/apply-rebuild-flow.mjs), [ADR-0008](./adr/0008-rebuild-on-publish.md)).
+- **Tự sinh slug (2026-11-01):** [`apply-slug-flow.mjs`](../services/directus/apply-slug-flow.mjs) tạo, cho mỗi `posts`/`authors`/`categories`/`tags`, một Flow `filter` (chạy trước khi ghi) trên `items.create` và một Flow guard trên `items.update`. Tạo mới mà `slug` trống → sinh từ `title` (posts) hoặc `name` (còn lại): chữ thường, bỏ dấu tiếng Việt (`đ→d`), ký tự lạ thành `-`, tối đa 80 ký tự; trùng thì thêm `-2`, `-3`… (kiểm tra bằng Read Data quyền đầy đủ nên Editor cũng thấy bản ghi của người khác). Có gõ tay → chỉ chuẩn hoá, **không** thêm hậu tố (trùng → Directus báo unique). Slug **không đổi** khi sửa tiêu đề (URL ổn định, BR-2); cố xoá trắng slug khi sửa bị từ chối. Tên trùng ở `tags` tạo thẻ mới `…-2` (không gộp). Cần Directus ≥ 11.17 (ở 11.3.5 filter không sửa được payload). Chạy trong `setup_cms` của `update.sh`.
 
 ## 7. Cấu hình & Môi trường (không chứa secret)
 
