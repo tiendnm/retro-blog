@@ -48,7 +48,7 @@
 - [x] Cập nhật [11-testing §2–3](../11-testing.md) (kim tự tháp, bảng trạng thái), [15 §B3](../15-seo-accessibility.md), [14 §4](../14-quality-gates.md) (DoD nhắc job mới).
 
 ## Ngoài phạm vi / Backlog
-- **Favicon (chưa có ý tưởng — Product cần thêm thời gian, giữ Backlog):** site không có `<link rel="icon">` nên mọi trình duyệt gọi `/favicon.ico` → 404 (cả ở production). Lighthouse Best Practices bị trừ vì `errors-in-console`. Thêm favicon là thay đổi giao diện → chờ Product.
+- ~~**Favicon**~~ → đã làm sau Sprint 16: CRT pixel-art, khung giấy + viền mực, màn hình hổ phách `#f0a830`, đèn nguồn đỏ gạch (`apps/web/public/favicon.svg`, `favicon.ico`, `apple-touch-icon.png`; thẻ `<link>` trong `Base.astro`). Ghi chú cũ: site không có `<link rel="icon">` nên `/favicon.ico` → 404, Lighthouse Best Practices bị trừ vì `errors-in-console`.
 - ~~`apps/web/biome.json` khai `$schema` 2.5.5~~ → đã `biome migrate` sau review (`$schema` 2.6.4, `rules.preset`). Ghi chú cũ: khai `$schema` 2.5.5 trong khi CLI là 2.6.4 (Dependabot đã nâng) + cảnh báo `recommended` deprecated → chạy `biome migrate` (chỉ là `info`, lint vẫn xanh).
 - Tổng byte mỗi trang **không** đặt ngân sách: khi chạy offline ảnh là ảnh giả 26 KB, không đại diện cho ảnh thật (webp từ Directus). Đo byte thật cần chạy trên bản deploy.
 - Rule Public của `tags` chỉ lọc `status=published` (không lọc `published_at`) → tên/slug thẻ của bài hẹn giờ lộ ra trước giờ đăng. Đã được ghi nhận và chấp nhận trong `apply-permissions.sh` (Directus 11.3.5 lỗi `$NOW` ở đường o2m); test không khẳng định điều này. Cân nhắc xem lại khi nâng Directus.

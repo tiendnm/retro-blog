@@ -54,7 +54,7 @@ module.exports = {
             'categories:performance': ['warn', { minScore: 0.9 }], // baseline thấp nhất 0,96
             'categories:accessibility': ['warn', { minScore: 0.95 }], // baseline 1,00
             'categories:seo': ['warn', { minScore: 0.95 }], // baseline 1,00
-            'categories:best-practices': ['warn', { minScore: 0.9 }], // baseline 0,96 (trừ điểm: /favicon.ico 404)
+            'categories:best-practices': ['warn', { minScore: 0.9 }], // baseline 0,96 trước khi có favicon (trừ điểm: /favicon.ico 404); ngưỡng giữ nguyên, nâng sau khi đo lại
             'resource-summary:script:size': ['warn', { maxNumericValue: 20480 }], // baseline lớn nhất 5,5 KB
           },
         },
