@@ -6,8 +6,9 @@
 # Header bảo mật định nghĩa 1 lần (snippet) và import ở CẢ luồng chính LẪN `handle_errors`:
 # phản hồi lỗi do Caddy sinh (404 của file_server, 502 khi Directus down) đi qua luồng lỗi riêng,
 # nếu không import ở đó thì trang lỗi mất toàn bộ header (đã kiểm: Sprint 8).
-# HSTS khởi đầu 30 ngày (không preload): tăng lên 1 năm SAU khi TLS ổn định vài tuần —
-# HSTS là cam kết phía trình duyệt, đặt dài quá sớm mà TLS lỗi sẽ khoá người dùng ra.
+# HSTS 1 năm (không preload), nâng ngày 2026-11-01 theo quyết định của Product (khởi đầu là 30 ngày; CSP đã kiểm bằng
+# trình duyệt thật, không vi phạm). HSTS là cam kết phía trình duyệt: nếu TLS lỗi thì người đã truy cập bị khoá ra
+# tới khi hết hạn. Muốn lùi lại phải đặt max-age=0 và đợi người dùng quay lại; KHÔNG thêm `preload` khi chưa chắc chắn.
 {
 	# Email ACME (Let's Encrypt) — thông báo hết hạn chứng chỉ.
 	email {$ACME_EMAIL}
@@ -24,7 +25,7 @@
 # hay embed → phải nới có chủ đích tại đây.
 (site_headers) {
 	header {
-		Strict-Transport-Security "max-age=2592000; includeSubDomains"
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "DENY"
 		Referrer-Policy "strict-origin-when-cross-origin"
@@ -37,7 +38,7 @@
 # CMS: KHÔNG áp CSP — Directus tự phát CSP riêng cho admin UI (helmet); đè sẽ làm hỏng admin.
 (cms_headers) {
 	header {
-		Strict-Transport-Security "max-age=2592000; includeSubDomains"
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "SAMEORIGIN"
 		Referrer-Policy "strict-origin-when-cross-origin"

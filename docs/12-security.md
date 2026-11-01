@@ -45,7 +45,7 @@
 - **Secrets ngoài repo:** `.env.production` gitignored; chỉ commit `.env.production.example` (placeholder).
 
 **Sprint 8 (Hardening hạ tầng):**
-- **Security headers ở Caddy** (`Caddyfile`): HSTS (khởi đầu 30 ngày, tăng sau khi TLS ổn định), `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-Frame-Options`, ẩn `Server`; **CSP chặt cho site tĩnh** (không script/style inline; ảnh chỉ từ domain CMS). Admin Directus **không** bị đè CSP (Directus tự phát). Header cũng có trên trang lỗi (404/502) nhờ `handle_errors`.
+- **Security headers ở Caddy** (`Caddyfile`): HSTS 1 năm `includeSubDomains` (không preload; nâng 2026-11-01), `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-Frame-Options`, ẩn `Server`; **CSP chặt cho site tĩnh** (không script/style inline; ảnh chỉ từ domain CMS). Admin Directus **không** bị đè CSP (Directus tự phát). Header cũng có trên trang lỗi (404/502) nhờ `handle_errors`.
 - **Webhook rebuild siết** (`services/rebuild/webhook.mjs`): token chỉ qua header, so sánh hằng-thời-gian, mọi yêu cầu sai trả cùng 404, khoá tạm theo IP sau nhiều lần sai (429), receiver chạy trong container `web`, chỉ tới được trong mạng compose (không publish cổng), token ≥ 32 ký tự. Có test (`node --test services/rebuild/webhook.test.mjs`, chạy trong CI).
 - **Backup:** `umask 077`, tự dọn bản cũ (`BACKUP_KEEP`), chạy hằng ngày trong service `ops`.
 
@@ -80,7 +80,7 @@
 - [x] HTTPS/TLS bắt buộc — Caddy auto-TLS + HTTP→HTTPS _(S6, ADR-0007)_
 - [x] Quyền Directus theo least privilege — Public read + gate `published`/`$NOW` + field allowlist _(S2)_
 - [x] Postgres không expose; Directus chỉ qua proxy _(S6)_
-- [x] **Security headers cấu hình** — Caddyfile, đã kiểm trên 200/404/502 _(S8)_; **@deploy:** xác nhận bằng trình duyệt trên domain thật (CSP không chặn tài nguyên hợp lệ), rồi nâng HSTS lên 1 năm
+- [x] **Security headers cấu hình** — Caddyfile, đã kiểm trên 200/404/502 _(S8)_; đã xác nhận bằng trình duyệt trên domain thật (2026-11-01: trang chủ + bài viết + lightbox, 0 vi phạm CSP) và nâng HSTS lên 1 năm
 - [x] **Webhook rebuild siết** — header-only token, hằng-thời-gian, khoá thử sai, bind loopback _(S8)_
 - [x] **Sanitize HTML body (XSS)** — allowlist lúc build, [ADR-0013](./adr/0013-sanitize-body-html.md) _(S7)_
 - [ ] **Dependencies quét lỗ hổng** — Backlog (vd `pnpm audit` trong CI / Dependabot)

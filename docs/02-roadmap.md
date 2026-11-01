@@ -18,7 +18,7 @@
 | M0 — Tài liệu nền tảng | Bộ `docs/` + ADR stack | ✅ Sprint 0 |
 | M1 — Khung hệ thống | Astro + Directus + PostgreSQL chạy local | ✅ Sprint 1 |
 | M2 — MVP nội dung | Editor publish → Reader xem (list/detail/category) | ✅ Sprint 2 |
-| M3 — Ra mắt (Launch) | Public HTTPS + SEO + a11y + checklist | 🟡 Site + CMS + rebuild-on-publish đã chạy trên domain thật (2026-10-30); backup/healthcheck nay chạy trong compose (Sprint 10); backup ngoài máy lên Cloudflare R2 đã chạy (2026-11-01); còn restore drill từ R2 trên stack mới, HSTS 1 năm ([08 §8](./08-deployment.md)) |
+| M3 — Ra mắt (Launch) | Public HTTPS + SEO + a11y + checklist | 🟡 Site + CMS + rebuild-on-publish đã chạy trên domain thật (2026-10-30); backup/healthcheck nay chạy trong compose (Sprint 10); backup ngoài máy lên Cloudflare R2 đã chạy (2026-11-01); restore drill từ R2 đạt (2026-11-01); HSTS 1 năm đã bật; còn dựng lại server mới hoàn toàn từ backup ([08 §8](./08-deployment.md)) |
 
 ## 3. Sprint
 
@@ -39,7 +39,7 @@
 
 ## 4. Backlog cấp cao
 
-- **Deploy (@deploy):** xác nhận ACME/DNS + CSP trên domain thật, (2FA admin: bỏ qua có chủ đích), nâng HSTS 1 năm, copy backup ra ngoài host; rate limiting Directus, container không chạy root, quét dependency.
+- **Deploy (@deploy):** xác nhận ACME/DNS + CSP trên domain thật, (2FA admin: bỏ qua có chủ đích), (HSTS 1 năm và backup ra ngoài host: xong 2026-11-01); rate limiting Directus, container không chạy root, quét dependency.
 - **Kiểm thử mở rộng:** test độ bền thin client, axe a11y, link-check, Lighthouse budget, E2E.
 - **Reader feature:** Category discoverability, Search, RSS, Tags, Archive, Author pages.
 - **Refactor docs-architecture:** F1–F15 ([architecture review](./reviews/architecture-review-2026-07-21.md)).

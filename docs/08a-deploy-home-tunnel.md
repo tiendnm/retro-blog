@@ -84,6 +84,6 @@ docker compose --env-file .env.production logs -f ops        # backup + healthch
 
 ## 6. Sau go-live
 
-- Sau vài tuần ổn định: nâng HSTS lên 1 năm (`Caddyfile`).
+- HSTS đã nâng lên 1 năm (2026-11-01, `Caddyfile`); không bật `preload`.
 - Reboot thử một lần: mọi service `restart: unless-stopped` phải tự lên; `ops` chạy bù backup nếu lỡ giờ.
 - Cân nhắc: UPS nhỏ; backup ra ngoài máy; thay HDD bằng SSD.
