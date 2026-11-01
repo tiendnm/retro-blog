@@ -16,7 +16,7 @@
 
 ## Phạm vi
 - [ ] **Spike thuật toán (không merge):** thử 2–3 cách sinh grain (SVG `feTurbulence` trong `data:` URI, gradient chồng, ô lát nhỏ lặp) và 2 cách tạo crease (gradient tuyến tính mờ ở vị trí cố định/ngẫu nhiên theo bài); đo byte, thời gian paint, hiển thị trên màn hình thường/retina.
-- [ ] **Chọn phương án + triển khai** vào CSS hiện có (`apps/web/src/styles`), áp cho nền trang và khối bài viết; token mới ghi vào `07-ui-ux`/Design System.
+- [ ] **Chọn phương án + triển khai** vào CSS hiện có (`apps/web/src/styles`), áp cho nền trang và khối bài viết; token mới ghi vào [`07b-design-system`](../07b-design-system.md) §3.
 - [ ] **Phương án cường độ:** trình bày 3 mức (rất nhẹ / vừa / rõ) bằng ảnh chụp cạnh nhau để **Product chọn**; mặc định ship mức nhẹ nhất được Product chấp nhận.
 - [ ] **Kiểm a11y và hiệu năng:** chạy lại axe (0 serious/critical), Lighthouse so với baseline Sprint 11 (không vượt biên cho phép), E2E; kiểm tương phản tại vùng tối nhất/sáng nhất của texture bằng công cụ, không bằng mắt.
 - [ ] **Chế độ đặc biệt:** `forced-colors`, `prefers-contrast`, in ấn (print), màn hình độ sáng thấp; ghi kết quả.

@@ -1,7 +1,7 @@
 # 15 — SEO & Accessibility
 
 > 🎯 **Mục đích:** Đặt mục tiêu và tiêu chuẩn cho *khả năng được tìm thấy* (SEO) và *khả năng tiếp cận* (a11y) — hai yếu tố sống còn với một blog. Ghi sớm để thiết kế & code không phải sửa lại về sau.
-> 🔗 **Liên quan:** [01-requirements](./01-requirements.md) · [07-ui-ux](./07-ui-ux.md) · [06-api](./06-api.md) · [10-decisions `[S5-P0]`/`[S5-P2]`](./10-decisions.md)
+> 🔗 **Liên quan:** [01-requirements](./01-requirements.md) · [07-ui-ux](./07-ui-ux.md) · [07b-design-system](./07b-design-system.md) · [06-api](./06-api.md) · [10-decisions `[S5-P0]`/`[S5-P2]`](./10-decisions.md)
 
 ---
 
@@ -76,7 +76,7 @@
 ## B2. Checklist cốt lõi
 
 - [ ] Điều hướng bằng bàn phím đầy đủ; **focus visible** rõ ràng
-- [ ] Tương phản màu đạt AA (xem [07-ui-ux](./07-ui-ux.md))
+- [ ] Tương phản màu đạt AA (xem [07b §3.1](./07b-design-system.md))
 - [ ] `alt` cho ảnh; ảnh trang trí để alt rỗng
 - [ ] Cấu trúc heading hợp lý; landmark roles
 - [ ] Form có label; thông báo lỗi rõ ràng
@@ -93,6 +93,6 @@
 ## B4. Trách nhiệm
 
 a11y là trách nhiệm chung:
-- **Thiết kế/UI:** token màu giữ tỉ lệ tương phản AA ([07](./07-ui-ux.md)), focus nhìn thấy, skip-link, `prefers-reduced-motion`.
+- **Thiết kế/UI:** token màu giữ tỉ lệ tương phản AA ([07b](./07b-design-system.md)), focus nhìn thấy, skip-link, `prefers-reduced-motion`.
 - **Code:** HTML ngữ nghĩa; thay đổi ảnh hưởng trang xuất ra phải qua job `site-checks` (axe 0 serious/critical — [14 §2.1](./14-quality-gates.md)).
 - **Nội dung (Editor):** nhập **alt text** cho mọi ảnh trong Directus (trường `alt` là bắt buộc ở form soạn — [05-cms](./05-cms.md)); đặt heading đúng cấp trong bài; ảnh trang trí để alt rỗng.

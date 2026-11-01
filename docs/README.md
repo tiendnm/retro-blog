@@ -29,10 +29,12 @@
 | 04 | [Persistence / Database](./04-database.md) | ⚙️ RÌA | Hiện thực lưu trữ vật lý | ✅ |
 | 05 | [CMS Mapping (Directus)](./05-cms.md) | ⚙️ RÌA | Ánh xạ Content Model → CMS | ✅ |
 | 06 | [API Implementation](./06-api.md) | ⚙️ RÌA | Ánh xạ Contract → endpoint | ✅ |
-| 07 | [UI / UX & Design System](./07-ui-ux.md) | — | Ngôn ngữ thiết kế retro | Nên (trước UI) |
-| 08 | [Deployment](./08-deployment.md) | — | CI/CD, môi trường, release | Nên |
-| 09 | [Coding Standards](./09-coding-standards.md) | — | Quy ước code | ✅ |
+| 07 | [UI / UX](./07-ui-ux.md) | — | Định hướng, bố cục trang, hành vi, responsive | Nên (trước UI) |
+| 07a | [Information Architecture](./07a-information-architecture.md) | 🧭 LÕI (§7 RÌA) | Loại trang, taxonomy, URL, điều hướng, phân trang | Nên (trước UI) |
+| 07b | [Design System](./07b-design-system.md) | 🧭 LÕI (§7 RÌA) | Token, hợp đồng thành phần cơ sở, a11y, chuyển động | Nên (trước UI) |
+| 08 | [Deployment](./08-deployment.md) | — | Topology triển khai (SSOT), CI/CD, môi trường, release | Nên |
 | 08a | [Runbook: server tại nhà + Cloudflare Tunnel](./08a-deploy-home-tunnel.md) | — | Dựng server J1900 + tunnel từng bước | Khi deploy |
+| 09 | [Coding Standards](./09-coding-standards.md) | — | Quy ước code | ✅ |
 | 10 | [Decisions (ADR index)](./10-decisions.md) | — | Ghi nhận & tra cứu quyết định | ✅ |
 | 10a | [Tech Stack](./10a-tech-stack.md) | ⚙️ RÌA | Sổ đăng ký công nghệ theo vai trò | Nên |
 | 11 | [Testing Strategy](./11-testing.md) | — | Triết lý test, cổng chất lượng | Nên |
@@ -46,18 +48,22 @@
 | — | [reviews/](./reviews/) | — | Review & change report | — |
 | — | [sprints/](./sprints/) | — | Kế hoạch triển khai theo sprint | — |
 
-> 📌 **Còn thiếu (đợt refactor sau):** `Information Architecture / Navigation` của site (Đợt 3). Xem [Architecture Review Report](./reviews/architecture-review-2026-07-21.md).
+> 📌 Nguồn gốc cấu trúc này: [Architecture Review](./reviews/architecture-review-2026-07-21.md); kết quả refactor: [change report Đợt 3](./reviews/refactor-wave-3-change-report.md).
 
 ---
 
-## 3. Thứ tự đọc (theo tầng — LÕI trước RÌA)
+## 3. Thứ tự đọc (theo phụ thuộc khái niệm — nền tảng trước, chi tiết sau)
 
-- **Pha 0 — Nền tảng:** `16-glossary` → `00-project` → `03a-architecture-principles` → `17-contributing` → `10-decisions` + `adr/0001`.
-- **Pha 1 — Định hướng:** `01-requirements` → `01a-mvp-scope` → `02-roadmap` → `03-architecture` → `adr/0002–0005` + `10a-tech-stack`.
-- **Pha 2a — LÕI (CỔNG trước code):** `03b-domain-model` → `03c-content-model` → `03d-api-contract` → `03e-data-model`.
-- **Pha 2b — RÌA:** `04-database` → `05-cms` → `06-api`.
-- **Pha 2c — Thiết kế & chất lượng:** `07-ui-ux` → `09-coding-standards` → `14-quality-gates` → `11-testing` → `12-security` (baseline).
-- **Pha 3 — Vận hành:** `08-deployment` → `13-operations` → `15-seo-accessibility` → `12-security` (đầy đủ).
+Quy tắc: **một tài liệu chỉ dựa vào tài liệu ở pha sớm hơn.** Tài liệu nền tảng (LÕI) có thể trỏ xuống RÌA, nhưng chỉ như con trỏ "hiện thực xem …", không định nghĩa nội dung phụ thuộc vào đó. Số hiệu **không** phản ánh thứ tự này (số là định danh ổn định).
+
+| Pha | Đọc theo thứ tự | Dựa vào | Vì sao ở đây |
+|---|---|---|---|
+| **0 — Nền tảng** | `16-glossary` → `00-project` → `03a-architecture-principles` → `17-contributing` → `10-decisions` + `adr/0001` | — | Ngôn ngữ chung, tầm nhìn, luật kiến trúc; glossary là "tài liệu tra cứu luôn mở" |
+| **1 — Định hướng** | `01-requirements` → `01a-mvp-scope` → `02-roadmap` → `03-architecture` → `adr/0002–0005` + `10a-tech-stack` | Pha 0 | Cần gì, làm tới đâu, các vai trò; công nghệ chọn nằm ở ADR và Tech Stack, sau kiến trúc |
+| **2a — LÕI (cổng trước code)** | `03b-domain-model` → `03c-content-model` → `03d-api-contract` → `03e-data-model` | Pha 0–1 | Domain → Content → API Contract → Data: nội dung định hình dữ liệu |
+| **2b — RÌA** | `04-database` → `05-cms` → `06-api` | 2a | Hiện thực lưu trữ, CMS, API của LÕI |
+| **2c — Site & chất lượng** | `07a-information-architecture` → `07b-design-system` → `07-ui-ux` → `09-coding-standards` → `14-quality-gates` → `11-testing` → `12-security` (baseline) | 2a (Content Model cho 07a) | Cấu trúc site → giá trị thị giác → bố cục/hành vi; sau đó quy ước và chất lượng |
+| **3 — Vận hành** | `08-deployment` → `13-operations` → `15-seo-accessibility` → `12-security` (đầy đủ) | 2 | Topology và phát hành trước, vận hành sau; SEO/a11y đo trên trang xuất ra |
 
 > 🚦 Cổng "Sẵn sàng code": các tài liệu ✅ phải đạt 🟢 — chi tiết [14-quality-gates §5](./14-quality-gates.md).
 

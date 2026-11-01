@@ -69,7 +69,7 @@ docs/                tài liệu (README.md điều hướng; adr/, sprints/, re
 
 ## 7. CSS / Styling
 
-- **Một file CSS toàn cục** `apps/web/src/styles/global.css` + **token CSS** (`--color-*`, …) ở `:root`; **không** scoped `<style>` trong `.astro`, **không** utility framework. Token màu có ghi tỉ lệ tương phản (AA/AAA) — đổi màu phải giữ ngưỡng, xem [07-ui-ux](./07-ui-ux.md).
+- **Một file CSS toàn cục** `apps/web/src/styles/global.css` + **token CSS** (`--color-*`, …) ở `:root`; **không** scoped `<style>` trong `.astro`, **không** utility framework. Token màu có ghi tỉ lệ tương phản (AA/AAA) — đổi màu phải giữ ngưỡng, xem [07b-design-system §3.1](./07b-design-system.md).
 - Không style inline (CSP). Tôn trọng `prefers-reduced-motion` (khối `@media` cuối file).
 
 ## 8. Git — Commit & Branch

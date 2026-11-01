@@ -55,7 +55,7 @@
 | Tìm kiếm bài viết | FR-R4 (Could) — ✅ làm 2026-11-01 (client-side, chỉ mục tĩnh; [15](./15-seo-accessibility.md)) |
 | Đa ngôn ngữ (i18n) | [03c §6](./03c-content-model.md) — ghi rõ "ngoài MVP" |
 | Bình luận, newsletter/đăng ký | Chưa có trong yêu cầu — **không đưa vào v1** |
-| Dark/light mode | [07-ui-ux §6](./07-ui-ux.md) — hoãn |
+| Dark/light mode | [07-ui-ux §5](./07-ui-ux.md) — hoãn |
 | Related posts, analytics dashboard, tối ưu ảnh nâng cao/CDN, full-text search | **Anti-scope** cho v1 |
 
 > ⛔ Các mục Future **không được** đưa vào v1 nếu không qua §7.
