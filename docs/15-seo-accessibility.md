@@ -15,10 +15,11 @@
 | **Twitter Card** | `summary` (không ảnh) / `summary_large_image` (có cover) + title/description/image | `Base.astro` |
 | **`sitemap.xml`** | Endpoint tự viết — **chỉ canonical content URL** (home + posts + category trang-1), **loại pagination** | `src/pages/sitemap.xml.ts` |
 | **`robots.txt`** | Endpoint — `Allow: /` + trỏ `Sitemap:` tuyệt đối | `src/pages/robots.txt.ts` |
+| **`rss.xml`** | RSS 2.0, 20 bài mới nhất, đủ nội dung (`content:encoded`, body đã sanitize, link nội bộ đổi sang tuyệt đối); autodiscovery `<link rel="alternate">` ở mọi trang + link "RSS" ở footer | `src/pages/rss.xml.ts`, `src/lib/rss.ts` |
 
 > **Địa chỉ tuyệt đối** dẫn xuất từ `PUBLIC_SITE_URL` (→ `Astro.site`) — nguồn sự thật DUY NHẤT; Sprint 6 (deploy) đổi domain chỉ sửa 1 biến. Xem Decision `[S5-P0]` (route/sitemap policy) & `[S5-P2]` (canonical self-referencing).
 >
-> **Chưa làm (đúng scope):** JSON-LD (`BlogPosting`) = *stretch*, không vào Acceptance Criteria S5 — A3 bên dưới. RSS/feed = Future.
+> **Chưa làm (đúng scope):** JSON-LD (`BlogPosting`) = *stretch*, không vào Acceptance Criteria S5 — A3 bên dưới. RSS: xem `rss.xml` ở trên (2026-11-01).
 
 ---
 
@@ -44,7 +45,7 @@
 
 - [x] `sitemap.xml` tự sinh — endpoint canonical-only _(S5-P2)_
 - [x] `robots.txt` — endpoint trỏ sitemap tuyệt đối _(S5-P2)_
-- [ ] RSS/Atom feed (xem FR-R5 [01](./01-requirements.md)) _(Future)_
+- [x] RSS feed `/rss.xml` — RSS 2.0, FR-R5 [01](./01-requirements.md) _(2026-11-01; chỉ feed toàn site, chưa có feed theo chuyên mục; Atom không làm)_
 
 ## A5. Social & Sharing
 

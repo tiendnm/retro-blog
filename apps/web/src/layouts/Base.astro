@@ -61,6 +61,8 @@ const ogImage = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
     <title>{title}</title>
     {metaDescription && <meta name="description" content={metaDescription} />}
     <link rel="canonical" href={canonical} />
+    {/* Autodiscovery: trình đọc RSS tự tìm feed từ bất kỳ trang nào */}
+    <link rel="alternate" type="application/rss+xml" title={`${SITE_NAME} — RSS`} href="/rss.xml" />
 
     {/* OpenGraph — link chia sẻ (Facebook/Zalo/…) hiển thị đẹp */}
     <meta property="og:type" content={type} />
