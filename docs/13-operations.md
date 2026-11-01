@@ -58,6 +58,8 @@
 
 **Nâng phiên bản Directus (quy trình đã dùng 2026-11-01, 11.3.5 → 11.17.4):** (1) đọc mục *Potential Breaking Changes* của các release ở giữa; (2) lấy backup mới nhất về máy (`db.dump` + `uploads.tgz`, không lấy `env.bak`), khôi phục vào Postgres tạm cùng Directus bản mới; (3) chạy đúng các bước `setup_cms` (schema apply, permissions, Flow, theme), build site từ bản mới và so với bản đang chạy — phải giống hệt; thử thêm `/assets`, `/users` (403), rate limit và cài mới trên DB trống; (4) backup ngay trước khi deploy rồi `update.sh` đầy đủ. **Migration của Directus một chiều:** quay lại bản cũ = đặt lại image cũ **và** khôi phục `db.dump` ([§4](#4-sao-lưu--khôi-phục-backup--recovery)).
 
+**Marketplace Directus (Settings → Marketplace):** cần `directus` ra được internet để gọi `registry.directus.io`. Host dùng resolver loopback nên DNS nhúng của Docker không có upstream → phải đặt `dns: [1.1.1.1, 1.0.0.1]` cho service (đã có; thiếu thì Marketplace báo 503 sau ~16 giây, `wget registry.directus.io` trong container báo `bad address`). Extension cài từ Marketplace nằm trong volume `directus_extensions` (không nằm trong backup — cài lại được). `MARKETPLACE_TRUST` giữ mặc định `sandbox`: chỉ cài extension chạy trong sandbox; muốn cho phép loại khác phải đặt `all` có chủ đích, vì extension chạy mã trong tiến trình Directus.
+
 ## 3. Observability (Log / Metric / Alert)
 
 | Hạng mục | Công cụ (dự kiến) | Ngưỡng cảnh báo |
