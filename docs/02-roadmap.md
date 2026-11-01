@@ -40,7 +40,7 @@
 | [12](./sprints/sprint-12.md) | Vận hành & quan sát (runbook, log, metric nhẹ, sự cố, restore drill định kỳ) | ✅ Xong |
 | [13](./sprints/sprint-13.md) | Bảo mật bổ sung & cổng CI (rate limit đăng nhập admin, check bắt buộc, header test, xoay secret, đánh giá Postgres 18/Directus) | ✅ Xong (2026-11-02) |
 | [14](./sprints/sprint-14.md) | Nợ tài liệu (dọn ô placeholder còn trống, sửa chỗ lệch thực tế, script kiểm docs) | ✅ Xong (2026-11-02) |
-| [15](./sprints/sprint-15.md) | Refactor docs Đợt 3 (IA của site, Design System, topology một nguồn, F9–F15) | 🟡 Làm xong, chờ Product duyệt change report |
+| [15](./sprints/sprint-15.md) | Refactor docs Đợt 3 (IA của site, Design System, topology một nguồn, F9–F15) | ✅ Xong (2026-11-02) |
 | [16](./sprints/sprint-16.md) | Visual Polish (grain/crease procedural kiểu manual cũ) | 📋 Kế hoạch |
 
 > **Thứ tự sprint 11–16 (Claude đề xuất, Product duyệt):** 11 trước vì tạo lưới an toàn (axe/Lighthouse/E2E/test quyền) cho mọi thay đổi sau; 12–13 giảm rủi ro vận hành/bảo mật của hệ thống đang chạy thật; 14–15 trả nợ tài liệu (14 trước vì 15 dùng `check-docs` và phần điền sẵn); 16 cuối vì cần số đo từ 11 và Design System từ 15. Có thể đổi thứ tự 12–16 khi ưu tiên thay đổi; 11 giữ đầu.
