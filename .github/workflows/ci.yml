@@ -1,8 +1,10 @@
-# CI — Sprint 7 Phase 3. Hai job độc lập (phương án lai):
-#   quality : cổng tĩnh + test (nhanh, BẮT BUỘC)
-#   build   : dựng Directus + Postgres + seed rồi `astro build` (tích hợp end-to-end).
-#             Giai đoạn đầu KHÔNG chặn merge (continue-on-error); khi chạy ổn định thì
-#             bỏ `continue-on-error` và đặt làm required check (docs/14 §4).
+# CI — Sprint 7 Phase 3, mở rộng Sprint 11. Ba job (phương án lai):
+#   quality     : cổng tĩnh + test (nhanh, BẮT BUỘC)
+#   build       : dựng Directus + Postgres + seed (minimal + showcase) rồi `astro build`; kiểm quyền Public và
+#                 luồng publish → build trên Directus thật; đẩy dist/ làm artifact (tích hợp end-to-end).
+#   site-checks : (cần artifact dist) link/sitemap/canonical/RSS, E2E Playwright + axe, Lighthouse — không cần Directus.
+#   build và site-checks KHÔNG chặn merge (continue-on-error); khi chạy ổn định thì bỏ `continue-on-error`
+#   và đặt làm required check (docs/14 §4; chuyển ở Sprint 13).
 name: CI
 
 on:
@@ -53,6 +55,9 @@ jobs:
       - name: Ops tests (webhook)
         working-directory: .
         run: node --test services/rebuild/webhook.test.mjs
+      - name: Test script kiểm site (check-site)
+        working-directory: .
+        run: node --test scripts/check-site.test.mjs
 
   build:
     runs-on: ubuntu-latest
@@ -67,8 +72,9 @@ jobs:
       ADMIN_PASSWORD: ci-only-admin-password
       DIRECTUS_URL: http://localhost:8055
       DIRECTUS_INTERNAL_URL: http://localhost:8055
-      PUBLIC_DIRECTUS_URL: http://localhost:8055
-      PUBLIC_SITE_URL: http://localhost:4321
+      # HTTPS giả: để check-site bắt `localhost`/`http://` lọt vào dist (chỉ ảnh hưởng URL nhúng trong HTML).
+      PUBLIC_DIRECTUS_URL: https://cms.example.test
+      PUBLIC_SITE_URL: https://blog.example.test
     services:
       postgres:
         image: postgres:16.15-alpine
@@ -123,10 +129,101 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-workspace
       - name: Seed (minimal)
         run: node services/directus/seed/seed-dev.mjs
+      # Showcase: 20 bài có ảnh + thẻ — để E2E/axe/Lighthouse có ảnh, lightbox, phân trang, trang /tag/*.
+      - name: Seed (showcase)
+        run: node services/directus/seed/seed-showcase.mjs --yes
       - name: Build (astro build)
         working-directory: apps/web
         run: pnpm build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: apps/web/dist
+          retention-days: 3
+          if-no-files-found: error
+
+      # Kiểm cấu hình quyền + luồng publish → build trên Directus thật (Sprint 11 §E). Chạy TUẦN TỰ (dùng chung tiền tố bài thử).
+      # Đỏ vì lộ dữ liệu = dừng và báo Product (cổng bảo mật).
+      - name: Quyền Public + luồng publish → build
+        run: node --test --test-concurrency=1 scripts/integration/
 
       - name: Directus logs (on failure)
         if: failure()
         run: docker logs directus | tail -100
+
+  site-checks:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Chưa chặn merge cho tới khi ổn định 10 lần liên tiếp (Sprint 11 → bắt buộc ở Sprint 13).
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.33.2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: e2e/pnpm-lock.yaml
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: apps/web/dist
+
+      # A. Link nội bộ, sitemap ⇄ dist, canonical, RSS, JSON-LD, localhost/http (Node thuần).
+      - name: Kiểm cấu trúc site
+        run: node scripts/check-site.mjs apps/web/dist --site-url=https://blog.example.test --report=check-site-report.txt
+
+      - name: Cài công cụ e2e
+        working-directory: e2e
+        run: pnpm install --frozen-lockfile --ignore-workspace
+      - name: Cache trình duyệt Playwright
+        id: pw-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('e2e/pnpm-lock.yaml') }}
+      - name: Cài Chromium (kèm thư viện hệ thống)
+        working-directory: e2e
+        run: pnpm exec playwright install --with-deps chromium
+
+      # B + D. E2E, axe (WCAG 2.2 AA), bàn phím — desktop + mobile.
+      - name: E2E + axe (Playwright)
+        working-directory: e2e
+        run: pnpm exec playwright test
+
+      # C. Lighthouse (mobile) — ngân sách ở mức warn; bảng số liệu ghi vào tóm tắt của lần chạy.
+      - name: Lighthouse CI
+        working-directory: e2e
+        run: |
+          CHROME_PATH="$(node -e "import('@playwright/test').then(m=>console.log(m.chromium.executablePath()))")"
+          export CHROME_PATH
+          LH_RUNS=1 pnpm exec lhci autorun
+      - name: Tóm tắt Lighthouse
+        if: always()
+        working-directory: e2e
+        run: |
+          if [ -d .lighthouseci ]; then
+            { echo "### Lighthouse (mobile)"; node lh-summary.mjs; } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Báo cáo link ngoài + kết quả (artifact)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: site-checks-reports
+          retention-days: 7
+          path: |
+            check-site-report.txt
+            e2e/.lighthouseci
+      - name: Ảnh chụp lỗi + trace Playwright (khi fail)
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-failures
+          retention-days: 7
+          path: |
+            e2e/test-results
+            e2e/playwright-report
