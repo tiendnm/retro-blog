@@ -5,6 +5,10 @@
 
 ---
 
+> **Cấu trúc tài liệu (F15, quyết định 2026-11-02): giữ gộp SEO + a11y.** Cả hai đo trên cùng trang xuất ra và dùng chung job `site-checks`; Phần B chỉ ≈ 2,3 KB và không tham chiếu SEO, tách ra sẽ phải nối lại 27 liên kết/11 neo cho lợi ích nhỏ. Tách thành `15a`/`15b` (giữ số `15` cho SEO) khi Phần B vượt ≈ 5 KB hoặc có quy trình a11y thủ công riêng.
+
+---
+
 ## A0. SEO baseline đã hiện thực (Sprint 5 Phase 2)
 
 | Hạng mục | Hiện thực | Vị trí |

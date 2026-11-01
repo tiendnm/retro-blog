@@ -96,9 +96,10 @@ Khi xung đột, ưu tiên theo thứ tự trên: ví dụ chọn site tĩnh (hi
 
 | Góc nhìn | Chủ sở hữu | Nội dung |
 |---|---|---|
-| Logic (vai trò, ranh giới, port) | **03 (tài liệu này)** | Sơ đồ vai trò & luồng |
+| Logic (vai trò, ranh giới, port) | **03 (tài liệu này)** | Sơ đồ vai trò & luồng — không nêu host, domain, sản phẩm |
+| **Topology triển khai** (host, container, domain, luồng rebuild) | [08-deployment §2](./08-deployment.md) — **nguồn duy nhất** | Sơ đồ + domain topology |
 | Pipeline / phát hành | [08-deployment](./08-deployment.md) | CI/CD, build, release |
-| Runtime vận hành | [13-operations](./13-operations.md) | Topo thực thi, scaling, backup |
+| Vận hành runtime | [13-operations §1](./13-operations.md) | Dịch vụ cần kiểm/backup, runbook — trỏ về 08 §2, không vẽ lại sơ đồ |
 
 ## 9. Quyết định kiến trúc (→ ADR)
 

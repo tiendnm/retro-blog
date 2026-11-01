@@ -7,37 +7,17 @@
 
 ## 1. Tổng quan môi trường & topo
 
-**Production (self-host, Sprint 6 — [08-deployment §2](./08-deployment.md), [ADR-0005](./adr/0005-use-docker-packaging.md)/[0007](./adr/0007-reverse-proxy-and-tls.md)/[0008](./adr/0008-rebuild-on-publish.md)):** 1 Docker host, `docker-compose.prod.yml`.
+**Sơ đồ topology, domain và luồng rebuild-on-publish: xem [08-deployment §2](./08-deployment.md) (nguồn duy nhất — không vẽ lại ở đây).** Phiên bản image pin: [10a-tech-stack](./10a-tech-stack.md). Production là 1 Docker host chạy `docker-compose.prod.yml` ([ADR-0005](./adr/0005-use-docker-packaging.md)/[0007](./adr/0007-reverse-proxy-and-tls.md)/[0008](./adr/0008-rebuild-on-publish.md)).
 
-```
-                       Internet (qua Cloudflare Tunnel hoặc 80/443)
-                              │
-                     ┌────────▼─────────┐  Caddy (edge) — auto-TLS ACME
-                     │  caddy:2.10      │  (ADR-0007)
-                     └───┬──────────┬───┘
-        retro.<domain>   │          │   cms.<domain>
-        (site tĩnh)      │          │   (Directus admin+API+/assets)
-              ┌──────────▼───┐   ┌──▼──────────┐
-              │ site_dist    │   │ directus     │ :8055 (không publish)
-              │  builds/<TS> │   │ 11.17.4      │
-              │  current ───►│   └──┬───────────┘
-              └──────▲───────┘      │ retro-net (nội bộ)
-     web build-runner│         ┌────▼─────┐
-     (astro build →  │         │ postgres │ 16 (trong compose)
-      atomic swap)   │         └──────────┘
-                     │ rebuild-on-publish (ADR-0008):
-              Directus Flow → webhook (token) → web:9000 → build-swap.sh (trong web)
-```
+| Service | Vai trò khi vận hành | Kiểm / dữ liệu cần giữ |
+|---|---|---|
+| caddy | Edge: TLS, phục vụ file tĩnh `current`, proxy Directus | Log `caddy`; chứng chỉ ở volume `caddy_data` |
+| web (build-runner + receiver) | Build lần đầu → `site_dist/builds/<TS>` → đổi `current`; rồi nghe `POST /rebuild` nội bộ :9000 ([ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md)) | Volume `site_dist` (builds + `current`) |
+| directus | Admin + API + `/assets`; không publish cổng, chỉ ra ngoài qua Caddy | Volume `directus_uploads` (cần backup) |
+| postgres | CSDL nội dung ([ADR-0014](./adr/0014-postgres-in-compose-for-production.md)) | Volume `pgdata` (cần backup) |
+| ops | Backup hằng ngày + healthcheck 5 phút; mount `:ro`, không `docker.sock` ([ADR-0017](./adr/0017-ops-services-in-compose.md)) | Log `ops`; đích backup ở §4 |
+| cloudflared (server nhà) | Tunnel vào Caddy ([ADR-0015](./adr/0015-cloudflare-tunnel-ingress.md)) | `Registered tunnel connection` trong log |
 
-| Service | Ảnh | Cổng | Ghi chú |
-|---|---|---|---|
-| caddy | `caddy:2.10-alpine` | 80/443 (public) | Edge: TLS + serve static `current` + proxy Directus |
-| web (build-runner + receiver) | build từ `apps/web/Dockerfile` | — (nội bộ :9000) | Build lần đầu → `site_dist/builds/<TS>` → swap `current`; rồi nghe `POST /rebuild` ([ADR-0016](./adr/0016-rebuild-receiver-in-web-container.md)) |
-| directus | `directus/directus:11.17.4` | (không publish) | Chỉ trong mạng compose; public qua Caddy `cms.` |
-| postgres | `postgres:16` | — | Trong compose, volume `pgdata` ([ADR-0014](./adr/0014-postgres-in-compose-for-production.md)) |
-| ops | build từ `services/ops/Dockerfile` | — | Backup hằng ngày + healthcheck 5 phút; mount `:ro`, không `docker.sock` ([ADR-0017](./adr/0017-ops-services-in-compose.md)) |
-
-> **Volumes:** `directus_uploads`, `site_dist` (builds + `current`), `caddy_data`/`caddy_config`.
 > **Dev** ([docker-compose.yml](../docker-compose.yml)): `astro dev` on-demand (:4321), Directus :8055 — không có Caddy/build-runner.
 
 ## 2. Runbook — thao tác thường gặp
