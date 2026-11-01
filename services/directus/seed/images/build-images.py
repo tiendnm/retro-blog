@@ -1,4 +1,4 @@
-"""Sinh bộ ảnh DEMO (máy tính cổ) cho seed — DEV-only. Chạy MỘT LẦN, ảnh đầu ra được commit.
+"""Sinh bộ ảnh DEMO (máy tính một thời) cho seed — DEV-only. Chạy MỘT LẦN, ảnh đầu ra được commit.
 
 Nguồn: Wikimedia Commons (giấy phép CC BY / CC BY-SA / CC0 / Public domain). Danh sách ảnh ở sources.json
 (key → tên file Commons). Script tải bản thumbnail 1280px qua API, áp "tông giấy cũ" nhẹ (giảm bão hoà, ấm,

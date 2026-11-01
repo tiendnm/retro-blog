@@ -1,5 +1,5 @@
 ---
-// PostHero — bài NỔI BẬT đầu trang (Sprint 8, phương án D): khung "cửa sổ" kiểu OS cổ,
+// PostHero — bài NỔI BẬT đầu trang (Sprint 8, phương án D): khung "cửa sổ" kiểu OS đời đầu,
 // ảnh lớn + chữ. Không cover → chỉ còn khối chữ (không placeholder). Chỉ nhận DTO PostSummary.
 import type { PostSummary } from '../lib/types';
 import { formatDate } from '../lib/format';
@@ -15,7 +15,7 @@ const href = `/posts/${post.slug}`;
 ---
 
 <article class:list={['hero', { 'hero--text': !post.cover }]}>
-  {/* Thanh tiêu đề trang trí (aria-hidden): gợi cửa sổ / đường dẫn tập tin của OS cổ */}
+  {/* Thanh tiêu đề trang trí (aria-hidden): gợi cửa sổ / đường dẫn tập tin của OS đời đầu */}
   <div class="hero__bar" aria-hidden="true">
     <span>■ MỚI NHẤT</span>
     <span>C:\BAIVIET\{post.slug.toUpperCase()}.TXT</span>

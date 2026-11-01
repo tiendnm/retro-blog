@@ -9,11 +9,11 @@
 
 > _1–2 câu: "Retro Blog là một ___ giúp ___ có thể ___, khác biệt bởi ___."_
 
-Retro Blog là một **blog về máy tính cổ** (phần cứng, phần mềm, lập trình, kiến thức nền tảng, lịch sử, retro gaming) giúp độc giả tìm và đọc nhanh các bài viết chọn lọc, khác biệt bởi **giao diện và nội dung cùng một chất retro** (motif cửa sổ/terminal/danh mục DIR, "thẻ giấy") và bởi một **hệ thống tự host, bền, ít bảo trì** — site tĩnh, CMS tách rời, có thể đổi từng thành phần mà không viết lại nội dung.
+Retro Blog là một **blog về máy tính một thời** (phần cứng, phần mềm, lập trình, kiến thức nền tảng, lịch sử, retro gaming) giúp độc giả tìm và đọc nhanh các bài viết chọn lọc, khác biệt bởi **giao diện và nội dung cùng một chất retro** (motif cửa sổ/terminal/danh mục DIR, "thẻ giấy") và bởi một **hệ thống tự host, bền, ít bảo trì** — site tĩnh, CMS tách rời, có thể đổi từng thành phần mà không viết lại nội dung.
 
 ## 2. Vấn đề & Cơ hội
 
-Nội dung về máy tính cổ tiếng Việt nằm rải rác (diễn đàn, mạng xã hội, trang cá nhân bỏ hoang), khó tìm, khó duy trì. Một blog riêng cho phép gom bài theo chuyên mục/thẻ, có URL ổn định, tải nhanh và không phụ thuộc nền tảng bên thứ ba. Đồng thời dự án là cơ hội thực hành một kiến trúc **headless, tech-neutral ở tầng LÕI** ([03a](./03a-architecture-principles.md)) chạy được nhiều năm trên phần cứng nhà.
+Nội dung về máy tính một thời tiếng Việt nằm rải rác (diễn đàn, mạng xã hội, trang cá nhân bỏ hoang), khó tìm, khó duy trì. Một blog riêng cho phép gom bài theo chuyên mục/thẻ, có URL ổn định, tải nhanh và không phụ thuộc nền tảng bên thứ ba. Đồng thời dự án là cơ hội thực hành một kiến trúc **headless, tech-neutral ở tầng LÕI** ([03a](./03a-architecture-principles.md)) chạy được nhiều năm trên phần cứng nhà.
 
 ## 3. Tầm nhìn sản phẩm (Product Vision)
 

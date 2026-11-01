@@ -19,9 +19,9 @@ export const CATEGORIES = [
 export const AUTHORS = [
   {
     key: 'author-main',
-    name: 'Nguyễn Hoài Cổ',
-    slug: 'nguyen-hoai-co',
-    bio: 'Người sưu tầm và viết về máy tính cổ, dành phần lớn thời gian rảnh để phục chế phần cứng thập niên 80–90.',
+    name: 'Nguyễn Hoài Nam',
+    slug: 'nguyen-hoai-nam',
+    bio: 'Người sưu tầm và viết về máy tính một thời, dành phần lớn thời gian rảnh để phục chế phần cứng thập niên 80–90.',
     share: 0.8,
   },
   {

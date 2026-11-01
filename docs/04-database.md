@@ -46,7 +46,7 @@ Quy tắc xoá thực tế khớp [03e §3](./03e-data-model.md): `posts.author`
 
 ## 5. Seeding
 
-- **Dev:** `pnpm seed:dev` (`services/directus/seed/seed-dev.mjs`) — bộ dữ liệu tối thiểu; `pnpm seed:showcase` (`seed-showcase.mjs`) — bộ nhiều bài/ảnh để xem thiết kế. Nội dung theo chủ đề máy tính cổ, ảnh có credit. Cả hai chạy sau `schema:apply` + `permissions:apply`; CI job `build` chạy cả hai.
+- **Dev:** `pnpm seed:dev` (`services/directus/seed/seed-dev.mjs`) — bộ dữ liệu tối thiểu; `pnpm seed:showcase` (`seed-showcase.mjs`) — bộ nhiều bài/ảnh để xem thiết kế. Nội dung theo chủ đề máy tính một thời, ảnh có credit. Cả hai chạy sau `schema:apply` + `permissions:apply`; CI job `build` chạy cả hai.
 - **Production:** không seed; nội dung do Editor nhập.
 
 ## 6. Backup & khôi phục (móc nối)

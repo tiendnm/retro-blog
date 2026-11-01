@@ -1,11 +1,11 @@
 // ============================================================================
-// Retro Blog — SEED SHOWCASE (DEV-only): nhiều bài viết về MÁY TÍNH CỔ + ẢNH thật.
+// Retro Blog — SEED SHOWCASE (DEV-only): nhiều bài viết về MÁY TÍNH MỘT THỜI + ẢNH thật.
 // Bổ sung cho seed-dev (KHÔNG xoá dữ liệu seed-dev): chạy SAU `pnpm seed:dev`.
 //   pnpm seed:showcase
 // Có gì: 4 chuyên mục mới · 2 tác giả mới · avatar tác giả · 20 bài có ảnh bìa (1 bài cố ý
 // KHÔNG có ảnh bìa để thấy thẻ text-only) · ảnh minh hoạ trong thân bài · ảnh bìa cho 3 bài seed-dev.
 // Ảnh: services/directus/seed/images (Wikimedia Commons — xem CREDITS.md; build-images.py).
-// Nội dung là DEMO tự soạn (kiến thức máy tính cổ), không phải bài blog thật. body soạn markdown
+// Nội dung là DEMO tự soạn (kiến thức máy tính một thời), không phải bài blog thật. body soạn markdown
 // → ghi HTML (ADR-0011). Idempotent theo slug / tiêu đề file `showcase-*`.
 // ============================================================================
 import { readFileSync } from 'node:fs';
@@ -35,7 +35,7 @@ const PHOTOS = {
   'crt-monitor': 'Bên trong màn hình CRT của Macintosh Plus: ống tia và bo mạch nguồn',
   'crt-tube': 'Ống tia âm cực (CRT) thủy tinh với màn hình phủ lưới kẻ ô',
   'model-m': 'Bàn phím IBM Model M màu xám nhạt đặt trên nền trắng',
-  'smk-switch': 'Hai công tắc phím cơ cổ đã tháo rời cùng hai chiếc lò xo',
+  'smk-switch': 'Hai công tắc phím cơ đời đầu đã tháo rời cùng hai chiếc lò xo',
   gameboy: 'Máy chơi game Nintendo Game Boy nguyên bản với màn hình xanh lá',
   'punch-card': 'Thẻ đục lỗ màu xanh với các hàng lỗ chữ nhật',
   'punch-cards-stack': 'Xấp thẻ đục lỗ in mẫu hồng dùng để lập trình',
@@ -52,10 +52,10 @@ const PHOTOS = {
   ascii: 'Bảng tra mã ASCII gồm cột thập phân, thập lục phân và nhị phân',
   amstrad: 'Máy Amstrad CPC464 với màn hình xanh hiển thị chữ "Ready" của BASIC',
   nes: 'Máy chơi game Nintendo Entertainment System màu xám',
-  'shop-window': 'Tủ kính trưng bày các máy tính cổ đời đầu',
+  'shop-window': 'Tủ kính trưng bày các máy tính đời đầu',
   'amiga-board': 'Bo mạch chủ Amiga 500+ màu xanh lục bên trong vỏ nhựa',
   'retro-lab': 'Phòng máy retro với hàng bàn đặt màn hình CRT và những chiếc ghế xanh',
-  'avatar-keyboard': 'Ảnh đại diện: công tắc bàn phím cơ cổ',
+  'avatar-keyboard': 'Ảnh đại diện: công tắc bàn phím cơ đời đầu',
   'avatar-floppy': 'Ảnh đại diện: hộp đĩa mềm',
   'avatar-chip': 'Ảnh đại diện: con chip trên bo mạch',
 };
@@ -68,7 +68,7 @@ const NEW_CATEGORIES = [
   { name: 'Retro gaming', slug: 'retro-gaming', description: 'Máy chơi game và trò chơi một thời (demo).' },
 ];
 const NEW_AUTHORS = [
-  { name: 'Lan Hương', slug: 'lan-huong', bio: 'Sưu tầm máy 8-bit, viết về phần mềm cổ và lập trình BASIC. (Tác giả demo)', avatar: 'avatar-floppy' },
+  { name: 'Lan Hương', slug: 'lan-huong', bio: 'Sưu tầm máy 8-bit, viết về phần mềm thuở trước và lập trình BASIC. (Tác giả demo)', avatar: 'avatar-floppy' },
   { name: 'Quốc Bảo', slug: 'quoc-bao', bio: 'Sửa phần cứng cũ, mê bàn phím cơ và màn hình CRT. (Tác giả demo)', avatar: 'avatar-keyboard' },
 ];
 const BASE_AUTHOR = { slug: 'bien-tap-vien-demo', avatar: 'avatar-chip' };
@@ -200,7 +200,7 @@ Màn hình CRT có một **súng điện tử** bắn chùm electron vào lớp 
 
 {{crt-tube}}
 
-*Một ống tia âm cực (CRT) cổ, mặt trước phủ lưới kẻ ô.*
+*Một ống tia âm cực (CRT) đời đầu, mặt trước phủ lưới kẻ ô.*
 
 ⚠️ **Lưu ý an toàn:** CRT có thể giữ điện áp rất cao (hàng chục nghìn volt) ngay cả khi đã rút điện. Đừng tự mở máy nếu chưa biết cách xả điện.`,
   },
@@ -213,7 +213,7 @@ IBM Model M (giữa thập niên 1980) dùng cơ chế **buckling spring**: khi 
 
 {{smk-switch}}
 
-*Công tắc phím cơ cổ (loại SMK) tháo rời — mỗi phím là một cơ cấu cơ khí riêng.*
+*Công tắc phím cơ đời đầu (loại SMK) tháo rời — mỗi phím là một cơ cấu cơ khí riêng.*
 
 Hôm nay, bàn phím cơ hiện đại là hậu duệ tinh thần của những chiếc như vậy: mỗi phím một công tắc, có cảm giác bấm riêng.`,
   },
@@ -257,7 +257,7 @@ Nhờ kiến trúc này, Amiga trở thành nền tảng yêu thích của dân 
 
 {{hdd-2}}
 
-*Mặt dưới ổ cứng cổ với bo mạch điều khiển.*
+*Mặt dưới ổ cứng đời đầu với bo mạch điều khiển.*
 
 Ổ cứng đầu tiên, IBM 305 RAMAC (1956), lưu khoảng 5 triệu ký tự — tương đương chưa tới 4 MB — trên một thiết bị to cỡ vài chiếc tủ lạnh.`,
   },

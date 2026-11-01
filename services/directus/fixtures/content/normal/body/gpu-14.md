@@ -1,4 +1,4 @@
-Có những món đồ tưởng đã lỗi thời, nhưng card Hercules vẫn khiến người chơi hoài cổ say mê khi bàn về GPU.
+Có những món đồ tưởng đã lỗi thời, nhưng card Hercules vẫn khiến người chơi say mê khi bàn về GPU.
 
 ## Ghi chú kỹ thuật
 

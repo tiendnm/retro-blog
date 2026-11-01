@@ -53,7 +53,7 @@ const INTRO = [
   'Trong thế giới {c}, {s} là một cái tên khó quên với những ai từng gắn bó với máy tính thời kỳ đầu.',
   'Nhắc tới {c}, nhiều người sẽ nghĩ ngay tới {s} — thứ đã định hình cả một thế hệ.',
   'Bài viết này ghi lại đôi điều về {s}, một mảnh ghép thú vị trong lịch sử {c}.',
-  'Có những món đồ tưởng đã lỗi thời, nhưng {s} vẫn khiến người chơi hoài cổ say mê khi bàn về {c}.',
+  'Có những món đồ tưởng đã lỗi thời, nhưng {s} vẫn khiến người chơi say mê khi bàn về {c}.',
 ];
 const PARA = [
   'Ra mắt khoảng năm {y}, {s} phản ánh rõ những ràng buộc kỹ thuật của thời đại: tài nguyên eo hẹp buộc kỹ sư phải tối ưu từng chi tiết.',
@@ -106,7 +106,7 @@ function specTable(subjects) {
 
 /** @param {import('../../model.mjs').FixturePost & {length:string}} sk */
 export function produceBody(sk, rng, ctx) {
-  const cat = ctx.categoryName ?? 'máy tính cổ';
+  const cat = ctx.categoryName ?? 'máy tính một thời';
   const subjects = SUBJECTS[sk.categoryKey] ?? GENERIC;
   const subj = pick(rng, subjects);
   const c = { c: cat, s: subj.s, y: subj.y };
@@ -132,7 +132,7 @@ export function produceBody(sk, rng, ctx) {
 export function produceExcerpt(sk, rng, ctx) {
   const subjects = SUBJECTS[sk.categoryKey] ?? GENERIC;
   const subj = pick(rng, subjects);
-  const cat = ctx.categoryName ?? 'máy tính cổ';
+  const cat = ctx.categoryName ?? 'máy tính một thời';
   return fill(pick(rng, ['Đôi dòng về {s} — một lát cắt của {c}.', 'Ghi chép ngắn về {s} trong dòng chảy {c}.']), {
     c: cat, s: subj.s, y: subj.y,
   });

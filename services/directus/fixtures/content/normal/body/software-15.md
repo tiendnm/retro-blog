@@ -1,4 +1,4 @@
-Có những món đồ tưởng đã lỗi thời, nhưng Norton Commander vẫn khiến người chơi hoài cổ say mê khi bàn về Phần mềm.
+Có những món đồ tưởng đã lỗi thời, nhưng Norton Commander vẫn khiến người chơi say mê khi bàn về Phần mềm.
 
 ## Trải nghiệm sử dụng
 

@@ -1,4 +1,4 @@
-Có những món đồ tưởng đã lỗi thời, nhưng bus ISA vẫn khiến người chơi hoài cổ say mê khi bàn về Mainboard.
+Có những món đồ tưởng đã lỗi thời, nhưng bus ISA vẫn khiến người chơi say mê khi bàn về Mainboard.
 
 ## Di sản để lại
 

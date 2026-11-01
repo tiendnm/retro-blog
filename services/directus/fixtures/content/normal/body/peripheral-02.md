@@ -1,4 +1,4 @@
-Có những món đồ tưởng đã lỗi thời, nhưng chuột bi vẫn khiến người chơi hoài cổ say mê khi bàn về Ngoại vi.
+Có những món đồ tưởng đã lỗi thời, nhưng chuột bi vẫn khiến người chơi say mê khi bàn về Ngoại vi.
 
 ## Di sản để lại
 

@@ -1,4 +1,4 @@
-Có những món đồ tưởng đã lỗi thời, nhưng băng từ lưu trữ vẫn khiến người chơi hoài cổ say mê khi bàn về Lưu trữ.
+Có những món đồ tưởng đã lỗi thời, nhưng băng từ lưu trữ vẫn khiến người chơi say mê khi bàn về Lưu trữ.
 
 ## Ghi chú kỹ thuật
 

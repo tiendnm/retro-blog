@@ -1,4 +1,4 @@
-Có những món đồ tưởng đã lỗi thời, nhưng card Sound Blaster vẫn khiến người chơi hoài cổ say mê khi bàn về Âm thanh.
+Có những món đồ tưởng đã lỗi thời, nhưng card Sound Blaster vẫn khiến người chơi say mê khi bàn về Âm thanh.
 
 ## Góc hoài niệm
 

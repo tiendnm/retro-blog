@@ -37,7 +37,7 @@
 ## A1. Mục tiêu SEO
 
 - Được công cụ tìm kiếm **index đầy đủ và đúng canonical** (sitemap hợp lệ, không trang trùng — phân trang/tìm kiếm không vào sitemap); ngưỡng kỹ thuật **Lighthouse SEO ≥ 0,95** (baseline 1,00) ở job `site-checks`.
-- Chủ đề mục tiêu: máy tính cổ ([00 §1](./00-project.md)). **Không đặt chỉ tiêu thứ hạng hay lưu lượng** — phụ thuộc nội dung và thời gian, không do hệ thống quyết định; rich result dừng ở `BlogPosting` (A3).
+- Chủ đề mục tiêu: máy tính một thời ([00 §1](./00-project.md)). **Không đặt chỉ tiêu thứ hạng hay lưu lượng** — phụ thuộc nội dung và thời gian, không do hệ thống quyết định; rich result dừng ở `BlogPosting` (A3).
 
 ## A2. On-page & Semantic HTML
 

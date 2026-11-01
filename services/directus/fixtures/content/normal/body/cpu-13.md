@@ -1,4 +1,4 @@
-Có những món đồ tưởng đã lỗi thời, nhưng Intel 80386 vẫn khiến người chơi hoài cổ say mê khi bàn về CPU.
+Có những món đồ tưởng đã lỗi thời, nhưng Intel 80386 vẫn khiến người chơi say mê khi bàn về CPU.
 
 ## Thiết kế
 

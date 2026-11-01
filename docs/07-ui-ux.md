@@ -9,7 +9,7 @@
 
 ## 1. Nguyên tắc thiết kế & Định vị thương hiệu (Brand)
 
-- **Hướng (provisional — CHƯA khóa):** vintage print / máy đánh chữ — nền giấy ngả vàng, phông monospace, đường kẻ nét đứt, bảng màu ấm trầm. Chủ đề nội dung: máy tính cổ ([00 §1](./00-project.md)).
+- **Hướng (provisional — CHƯA khóa):** vintage print / máy đánh chữ — nền giấy ngả vàng, phông monospace, đường kẻ nét đứt, bảng màu ấm trầm. Chủ đề nội dung: máy tính một thời ([00 §1](./00-project.md)).
 - ⚠️ **Phong cách thị giác cuối cùng chưa chốt**; hoàn thiện dần sau khi review giao diện thực tế với Product Owner ([sprint-3 plan §4](./sprints/sprint-3.md)). Hướng kế tiếp (giấy cũ, nếp gấp): [Sprint 16](./sprints/sprint-16.md).
 - **Không có nguồn thiết kế ngoài (không Figma):** thiết kế sống trong code; token và hợp đồng thành phần ở [07b](./07b-design-system.md). Ý đồ thiết kế mô tả ở tài liệu này.
 
@@ -22,7 +22,7 @@
 | Khung trang | skip-link → đầu trang → vùng nội dung chính → chân trang (landmark ngữ nghĩa) |
 | Thẻ bài (list item) | **Option B**: ảnh hỗ trợ (nhỏ, trái) + chữ chủ đạo; không ảnh → chỉ chữ, không ảnh giữ chỗ |
 | Trang bài (detail) | **Banner** ảnh bìa (rộng bằng cột đọc, tỉ lệ 2:1, cắt vừa khung) **nằm trên tiêu đề**; sau đó tiêu đề, thông tin bài, thân bài trong cột đọc |
-| Bố cục trang danh sách (D) | **Hero** (cửa sổ hệ điều hành cổ; ảnh giãn theo chiều cao khối chữ, tóm tắt cắt ở 4 dòng) → **lưới thẻ giấy** 3 cột → **danh sách gọn** "Cũ hơn"; thanh chuyên mục dạng chip; vùng danh sách ~1080 px, trang bài giữ cột đọc; ảnh `srcset` qua bộ biến đổi ảnh của CMS — [proposal](./sprints/homepage-layout-proposal.md) |
+| Bố cục trang danh sách (D) | **Hero** (cửa sổ hệ điều hành đời đầu; ảnh giãn theo chiều cao khối chữ, tóm tắt cắt ở 4 dòng) → **lưới thẻ giấy** 3 cột → **danh sách gọn** "Cũ hơn"; thanh chuyên mục dạng chip; vùng danh sách ~1080 px, trang bài giữ cột đọc; ảnh `srcset` qua bộ biến đổi ảnh của CMS — [proposal](./sprints/homepage-layout-proposal.md) |
 | Hộp xem ảnh (lightbox) | Bấm ảnh trong thân bài → hộp thoại toàn màn hình: ảnh 2000 px, chú thích = `alt` + (n/N), đóng bằng `Esc`/✕/bấm nền, ←/→ chuyển ảnh (vòng lặp), Enter/Space mở bằng bàn phím, trả focus khi đóng, khoá cuộn nền. **Zoom:** nút −/100 %/+, phím `+` `-` `0`, lăn chuột (quanh con trỏ), nhấp/chạm đúp (2,5×), chụm 2 ngón; kéo để di chuyển khi đã phóng (tối đa 5×); `Esc` khi đang phóng thì về vừa khung trước |
 
 ## 3. Responsive

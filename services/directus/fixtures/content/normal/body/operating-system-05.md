@@ -1,4 +1,4 @@
-Có những món đồ tưởng đã lỗi thời, nhưng AmigaOS vẫn khiến người chơi hoài cổ say mê khi bàn về Hệ điều hành.
+Có những món đồ tưởng đã lỗi thời, nhưng AmigaOS vẫn khiến người chơi say mê khi bàn về Hệ điều hành.
 
 ## Góc hoài niệm
 

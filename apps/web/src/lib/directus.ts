@@ -158,7 +158,7 @@ interface RawSiteSettings {
 }
 const DEFAULT_SITE_NAME = 'Retro Blog';
 const DEFAULT_DESCRIPTION =
-  'Blog về máy tính cổ: phần cứng, phần mềm, lập trình và kiến thức nền tảng.';
+  'Phần cứng, phần mềm, lập trình và những câu chuyện của máy tính thế hệ trước — build log, thử nghiệm và kiến thức nền tảng.';
 
 /** Map + áp fallback: CMS chưa cấu hình / field trống → giá trị mặc định (không đổi hành vi cũ). */
 function toSiteSettings(
@@ -167,7 +167,7 @@ function toSiteSettings(
 ): SiteSettings {
   const siteName = raw?.site_name?.trim() || DEFAULT_SITE_NAME;
   const footer =
-    raw?.footer_text?.trim() || `© {year} ${siteName} — nhật ký của những chiếc máy tính cổ.`;
+    raw?.footer_text?.trim() || `© {year} ${siteName} — nhật ký của những chiếc máy tính một thời.`;
   return {
     siteName,
     description: raw?.description?.trim() || DEFAULT_DESCRIPTION,

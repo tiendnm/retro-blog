@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { absolutizeUrls, buildRss, cdata, xmlEscape } from '../src/lib/rss';
 import type { PostDetail } from '../src/lib/types';
 
-const SITE = { base: 'https://retro.example.com', name: 'Retro & Co', description: 'Máy tính cổ' };
+const SITE = { base: 'https://retro.example.com', name: 'Retro & Co', description: 'Máy tính một thời' };
 
 const post = (over: Partial<PostDetail> = {}): PostDetail => ({
   id: '1',

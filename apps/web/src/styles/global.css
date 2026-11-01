@@ -262,7 +262,7 @@ main {
 }
 
 /* ---- Bố cục trang list (Sprint 8 — phương án D): lớn → vừa → nhỏ ----------
-   Motif "máy tính cổ" tiết chế: thanh tiêu đề cửa sổ, thẻ lệnh [ ], đổ bóng cứng
+   Motif "máy tính một thời" tiết chế: thanh tiêu đề cửa sổ, thẻ lệnh [ ], đổ bóng cứng
    kiểu in offset, tiêu đề kiểu `>` của dấu nhắc DIR. Không animation. */
 .cat-nav {
   display: flex;

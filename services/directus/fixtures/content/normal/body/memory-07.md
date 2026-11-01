@@ -1,4 +1,4 @@
-Có những món đồ tưởng đã lỗi thời, nhưng thanh RAM 30-pin SIMM vẫn khiến người chơi hoài cổ say mê khi bàn về Bộ nhớ.
+Có những món đồ tưởng đã lỗi thời, nhưng thanh RAM 30-pin SIMM vẫn khiến người chơi say mê khi bàn về Bộ nhớ.
 
 ## Ghi chú kỹ thuật
 

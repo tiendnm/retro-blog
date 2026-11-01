@@ -1,4 +1,4 @@
-Có những món đồ tưởng đã lỗi thời, nhưng đĩa mềm 5.25 inch vẫn khiến người chơi hoài cổ say mê khi bàn về Lưu trữ.
+Có những món đồ tưởng đã lỗi thời, nhưng đĩa mềm 5.25 inch vẫn khiến người chơi say mê khi bàn về Lưu trữ.
 
 ## Trải nghiệm sử dụng
 
