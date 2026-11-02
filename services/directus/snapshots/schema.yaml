@@ -693,7 +693,7 @@ fields:
       group: null
       hidden: false
       interface: input
-      note: null
+      note: "Mẹo: nhấn Ctrl+S để lưu và ở lại trang (xem Live Preview), không bị thoát ra danh sách."
       options: null
       readonly: false
       required: true
