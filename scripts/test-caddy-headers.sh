@@ -28,6 +28,7 @@ trap cleanup EXIT
 
 mkdir -p "$WORK/site/current"
 echo '<!doctype html><title>ok</title>' >"$WORK/site/current/index.html"
+echo '<!doctype html><title>trang-404-cua-site</title>' >"$WORK/site/current/404.html"
 chmod -R a+rX "$WORK"
 
 # `docker cp` thay vì bind-mount: chạy giống nhau trên Linux/macOS/Git Bash (không lỗi chuyển đường dẫn).
@@ -93,6 +94,10 @@ check() {
 
 check "Site 200" "$SITE_HOST" / 200 site
 check "Site 404 (handle_errors)" "$SITE_HOST" /khong-co-trang-nay 404 site
+# 404 phải là trang 404.html của site (không phải văn bản trơn), vẫn mang mã 404.
+echo "▶ Site 404 phục vụ trang 404.html"
+BODY="$(curl -s -H "Host: $SITE_HOST" "http://127.0.0.1:$PORT/khong-co-trang-nay")"
+if [[ "$BODY" == *trang-404-cua-site* ]]; then ok "nội dung là 404.html"; else fail "404 không phục vụ 404.html (thấy '$BODY')"; fi
 check "CMS 502 (Directus down, handle_errors)" "$CMS_HOST" /server/ping 502 cms
 
 echo

@@ -21,6 +21,7 @@
 |---|---|---|---|---|
 | title | text | ✅ | Tiêu đề | |
 | slug | slug | ✅ | Định danh URL | duy nhất, ổn định (BR-2) |
+| previous_slugs | danh sách chuỗi | ❌ | Slug cũ của bài (chỉ khi đã đổi slug sau xuất bản) | tạo trang chuyển hướng `/posts/<slug-cũ>`; không trùng bài đang sống |
 | excerpt | text | ❌ | Tóm tắt | dùng cho list & SEO |
 | body | rich-text | ✅ | Nội dung chính | |
 | status | enum | ✅ | Trạng thái biên tập | theo state machine [03b §4](./03b-domain-model.md) |

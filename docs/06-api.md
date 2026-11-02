@@ -32,6 +32,7 @@
 | Liệt kê bài published | `GET /items/posts?fields=<summary>&sort=-published_at&limit&offset&meta=filter_count` | `listPublishedPosts()` | `PostSummary[]` + `PageInfo` |
 | Lấy bài theo slug | `GET /items/posts?filter[slug][_eq]=<slug>&fields=<detail>&limit=1` | `getPostBySlug()` | `PostDetail \| null` |
 | Liệt kê theo Category | `GET /items/posts?filter[category][slug][_eq]=<slug>&fields=<summary>&sort=-published_at&limit&offset&meta=filter_count` | `listPostsByCategory()` | `PostSummary[]` + `PageInfo` |
+| (SSG) slug cũ → mới của bài | `GET /items/posts?fields=slug,previous_slugs&limit=-1` | `getPostSlugRedirects()` | `{ from, to }[]` |
 | (SSG) slug bài/chuyên mục | `GET /items/{posts,categories}?fields=slug&limit=-1` | `getAllPublishedPostSlugs()` · `getAllCategorySlugs()` | `string[]` |
 
 - **Không có filter `status`/`published_at` trong truy vấn** — Public role đã enforce (defense-in-depth: client quên cũng không lộ draft).

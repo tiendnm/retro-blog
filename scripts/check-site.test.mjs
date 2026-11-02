@@ -60,6 +60,17 @@ describe('check-site', () => {
     assert.deepEqual([...res.externals.keys()], ['https://ext.example.org/x']);
   });
 
+  const redirectPage = (to) =>
+    `<!doctype html><title>Redirecting to: ${to}</title><meta http-equiv="refresh" content="0;url=${to}"><link rel="canonical" href="${SITE}${to}"><body><a href="${to}">chuyển</a></body>`;
+
+  it('trang chuyển hướng slug cũ: canonical = đích, không cần JSON-LD/sitemap → 0 lỗi', () => {
+    assert.deepEqual(run({ 'posts/cu/index.html': redirectPage('/posts/a') }).errors, []);
+  });
+
+  it('trang chuyển hướng trỏ tới bài không còn → lỗi link hỏng', () => {
+    assert.ok(has(run({ 'posts/cu/index.html': redirectPage('/posts/da-xoa') }), /link nội bộ hỏng.*da-xoa/));
+  });
+
   it('suy ra site URL từ robots.txt khi không truyền', () => {
     assert.deepEqual(checkSite(makeDist()).errors, []);
   });

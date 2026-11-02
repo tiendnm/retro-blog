@@ -61,10 +61,20 @@
 	try_files {path}.html {path}/index.html {path}
 	file_server
 
-	# Trang lỗi: giữ nguyên status, kèm header bảo mật (nội dung tối giản).
+	# Trang lỗi: giữ nguyên status, kèm header bảo mật. 404 phục vụ trang 404.html của site (Astro, giữ nhận diện
+	# retro); lỗi khác — hoặc thiếu 404.html — rơi về văn bản tối giản.
 	handle_errors {
 		import site_headers
-		respond "{err.status_code} {err.status_text}"
+		@notfound expression {err.status_code} == 404
+		handle @notfound {
+			rewrite * /404.html
+			file_server {
+				status 404
+			}
+		}
+		handle {
+			respond "{err.status_code} {err.status_text}"
+		}
 	}
 }
 

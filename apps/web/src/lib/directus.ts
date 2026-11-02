@@ -412,6 +412,41 @@ export async function getAllPublishedPostSlugs(): Promise<string[]> {
   return data.map((p) => p.slug);
 }
 
+export interface SlugRedirect {
+  from: string;
+  to: string;
+}
+
+/**
+ * Gom slug cũ (`previous_slugs`) thành danh sách chuyển hướng. Bỏ giá trị không phải slug hợp lệ, slug cũ trùng
+ * một bài đang sống (bài sống luôn thắng — không bao giờ che bài) và trùng giữa các bài (bài đầu tiên thắng).
+ */
+export function buildSlugRedirects(
+  rows: { slug: string; previous_slugs?: unknown }[],
+): SlugRedirect[] {
+  const live = new Set(rows.map((r) => r.slug));
+  const seen = new Set<string>();
+  const out: SlugRedirect[] = [];
+  for (const r of rows) {
+    if (!Array.isArray(r.previous_slugs)) continue;
+    for (const raw of r.previous_slugs) {
+      const from = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
+      if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(from) || live.has(from) || seen.has(from)) continue;
+      seen.add(from);
+      out.push({ from, to: r.slug });
+    }
+  }
+  return out;
+}
+
+/** Slug cũ → slug hiện tại của bài đã xuất bản (dựng trang chuyển hướng /posts/<slug-cũ>). */
+export async function getPostSlugRedirects(): Promise<SlugRedirect[]> {
+  const { data } = await directusGet<{ slug: string; previous_slugs?: unknown }[]>(
+    `/items/posts?fields=slug,previous_slugs&limit=-1`,
+  );
+  return buildSlugRedirects(data);
+}
+
 /** Slug các thẻ có bài đã xuất bản (dựng route tĩnh /tag/[slug]). Public chỉ đọc được thẻ như vậy (apply-permissions.sh). */
 export async function getAllTagSlugs(): Promise<string[]> {
   const { data } = await directusGet<{ slug: string }[]>(

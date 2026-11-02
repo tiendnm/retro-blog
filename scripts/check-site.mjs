@@ -118,11 +118,14 @@ export function checkSite(distDir, { siteUrl } = {}) {
 
   const htmlFiles = files.filter((f) => f.endsWith('.html'));
   const pageUrls = new Map(); // urlPath → file
+  const redirectUrls = new Set(); // trang chuyển hướng (slug cũ → slug mới): chỉ cần link đích còn sống
 
   for (const f of htmlFiles) {
     const html = readFileSync(f, 'utf8');
     const urlPath = filePathToUrlPath(rel(f));
     pageUrls.set(urlPath, f);
+    const isRedirect = /<meta[^>]*http-equiv=["']refresh["']/i.test(html);
+    if (isRedirect) redirectUrls.add(urlPath);
     const where = `/${rel(f).split(sep).join('/')}`;
 
     // 1. Link/asset nội bộ
@@ -144,8 +147,8 @@ export function checkSite(distDir, { siteUrl } = {}) {
     }
 
     // 3. Canonical
-    if (/^\/404$/.test(urlPath)) {
-      // 404.html được phục vụ ở mọi URL lỗi nên canonical không có nghĩa — bỏ qua.
+    if (/^\/404$/.test(urlPath) || isRedirect) {
+      // 404.html được phục vụ ở mọi URL lỗi nên canonical không có nghĩa; trang chuyển hướng có canonical = ĐÍCH — bỏ qua.
     } else {
       const m = html.match(/<link\b[^>]*\brel=["']canonical["'][^>]*>/i);
       const href = m?.[0].match(/\bhref=["']([^"']*)["']/i)?.[1];
@@ -166,7 +169,7 @@ export function checkSite(distDir, { siteUrl } = {}) {
         errors.push(`${where}: JSON-LD không phải JSON hợp lệ (${e.message})`);
       }
     }
-    if (blocks === 0 && /^\/posts\/[^/]+$/.test(urlPath)) errors.push(`${where}: trang bài thiếu JSON-LD`);
+    if (blocks === 0 && !isRedirect && /^\/posts\/[^/]+$/.test(urlPath)) errors.push(`${where}: trang bài thiếu JSON-LD`);
   }
 
   // 2. Sitemap ⇄ dist
@@ -191,7 +194,7 @@ export function checkSite(distDir, { siteUrl } = {}) {
       if (!pageUrls.has(p)) errors.push(`sitemap.xml: ${loc} không có trang tương ứng trong dist`);
     }
     for (const p of pageUrls.keys()) {
-      if (NOT_IN_SITEMAP.some((re) => re.test(p))) continue;
+      if (redirectUrls.has(p) || NOT_IN_SITEMAP.some((re) => re.test(p))) continue;
       if (!inSitemap.has(p)) errors.push(`${p}: có trong dist nhưng thiếu trong sitemap.xml`);
     }
   }

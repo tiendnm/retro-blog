@@ -7,14 +7,26 @@ import TagList from '../../components/TagList.astro';
 import AuthorName from '../../components/AuthorName.astro';
 import { formatDate } from '../../lib/format';
 import { buildPostJsonLd, serializeJsonLd } from '../../lib/json-ld';
-import { getAllPublishedPostSlugs, getPostBySlug, getSiteSettings } from '../../lib/directus';
+import {
+  getAllPublishedPostSlugs,
+  getPostBySlug,
+  getPostSlugRedirects,
+  getSiteSettings,
+} from '../../lib/directus';
 
 export async function getStaticPaths() {
-  const slugs = await getAllPublishedPostSlugs();
-  return slugs.map((slug) => ({ params: { slug } }));
+  const [slugs, redirects] = await Promise.all([getAllPublishedPostSlugs(), getPostSlugRedirects()]);
+  // Slug cũ (previous_slugs) → trang chuyển hướng tới slug hiện tại; sitemap/RSS chỉ liệt kê slug sống.
+  return [
+    ...slugs.map((slug) => ({ params: { slug }, props: { redirectTo: null as string | null } })),
+    ...redirects.map((r) => ({ params: { slug: r.from }, props: { redirectTo: r.to as string | null } })),
+  ];
 }
 
 const { slug } = Astro.params;
+const { redirectTo } = Astro.props;
+// Bản build tĩnh: Astro.redirect sinh trang <meta http-equiv="refresh"> + canonical (không cần script → hợp CSP).
+if (redirectTo) return Astro.redirect(`/posts/${redirectTo}`, 301);
 const { siteName, defaultOgImage } = await getSiteSettings();
 const post = await getPostBySlug(slug!);
 // getStaticPaths chỉ sinh slug hợp lệ ⇒ nhánh này chỉ là chốt an toàn khi build.

@@ -7,7 +7,7 @@ import { admin, cleanup, makePost, pub } from './lib.mjs';
 
 // Allowlist Public — hợp đồng bảo mật (services/directus/apply-permissions.sh, docs/05-cms §2).
 const ALLOW = {
-  posts: ['id', 'title', 'slug', 'excerpt', 'body', 'published_at', 'author', 'category', 'cover', 'tags'],
+  posts: ['id', 'title', 'slug', 'previous_slugs', 'excerpt', 'body', 'published_at', 'author', 'category', 'cover', 'tags'],
   authors: ['id', 'name', 'slug', 'bio', 'avatar'],
   categories: ['id', 'name', 'slug', 'description'],
   tags: ['id', 'name', 'slug'],

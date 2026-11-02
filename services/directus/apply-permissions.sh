@@ -43,7 +43,7 @@ if [ "${HAS_PUB:-0}" = "0" ] || [ -z "$HAS_PUB" ]; then
   # FIELD ALLOWLIST — CHỈ field cần cho hợp đồng 03d. KHÔNG dùng '*': field nội bộ
   # thêm về sau sẽ KHÔNG tự động lộ ra Public API (Sprint 2 Phase 3 — bảo mật).
   # posts: rule status=published AND published_at<=$NOW + allowlist (không có 'status').
-  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"posts\",\"action\":\"read\",\"fields\":[\"id\",\"title\",\"slug\",\"excerpt\",\"body\",\"published_at\",\"author\",\"category\",\"cover\",\"tags\"],\"permissions\":{\"_and\":[{\"status\":{\"_eq\":\"published\"}},{\"published_at\":{\"_lte\":\"\$NOW\"}}]}}" >/dev/null
+  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"posts\",\"action\":\"read\",\"fields\":[\"id\",\"title\",\"slug\",\"previous_slugs\",\"excerpt\",\"body\",\"published_at\",\"author\",\"category\",\"cover\",\"tags\"],\"permissions\":{\"_and\":[{\"status\":{\"_eq\":\"published\"}},{\"published_at\":{\"_lte\":\"\$NOW\"}}]}}" >/dev/null
   # authors/categories: dữ liệu tham chiếu để render (bio/description là văn bản hiển thị công khai; KHÔNG lộ parent).
   api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"authors\",\"action\":\"read\",\"fields\":[\"id\",\"name\",\"slug\",\"bio\",\"avatar\"],\"permissions\":{}}" >/dev/null
   api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"categories\",\"action\":\"read\",\"fields\":[\"id\",\"name\",\"slug\",\"description\"],\"permissions\":{}}" >/dev/null
@@ -82,7 +82,8 @@ fi
 # ---- PUBLIC: authors.bio + categories.description (Sprint 11 — trang tác giả / chuyên mục) ----
 # Cả hai là văn bản giới thiệu do Editor viết để HIỂN THỊ CÔNG KHAI → thêm vào allowlist (permission authors/categories đã có
 # từ trước → cập nhật tại chỗ, idempotent). `parent` (categories) vẫn KHÔNG lộ.
-for spec in "authors:bio" "categories:description"; do
+# posts.previous_slugs: slug cũ của bài, để dựng trang chuyển hướng /posts/<slug-cũ> (đã nằm trong URL công khai cũ → không nhạy cảm).
+for spec in "authors:bio" "categories:description" "posts:previous_slugs"; do
   COL="${spec%%:*}"; FLD="${spec#*:}"
   PERM=$(api GET "/permissions?filter[policy][_eq]=$PUB&filter[collection][_eq]=$COL&fields=id,fields" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const f=process.argv[1];const r=JSON.parse(d).data[0];if(r&&!r.fields.includes(f))process.stdout.write(r.id+' '+JSON.stringify([...r.fields,f]))}catch(e){}})" "$FLD")
   if [ -n "$PERM" ]; then

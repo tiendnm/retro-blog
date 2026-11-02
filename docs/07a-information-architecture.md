@@ -44,7 +44,7 @@
 4. **Lưu trữ theo tháng:** `/archive/<năm>/<tháng 2 chữ số>`, vd `/archive/2026/11`.
 5. **Phân trang:** trang 1 dùng URL gốc của danh sách (`/`, `/category/<slug>`…); trang N ≥ 2 thêm `/page/N` (`/page/2`, `/category/<slug>/page/2`). **Không có** `/page/1`.
 6. **Canonical:** mỗi trang tự trỏ về chính URL (tuyệt đối) của nó, kể cả trang phân trang. Địa chỉ tuyệt đối suy ra từ một biến cấu hình duy nhất ([15 §A0](./15-seo-accessibility.md)).
-7. **Slug đổi = URL đổi:** không có cơ chế chuyển hướng; vì vậy slug phải ổn định. (Xem Backlog §8.)
+7. **Slug đổi = URL đổi, trừ khi khai báo slug cũ:** slug phải ổn định; nếu buộc đổi, Editor ghi slug cũ vào `previous_slugs` của bài — lần build sau sinh `/posts/<slug-cũ>` là trang chuyển hướng (meta refresh + canonical về URL mới, `noindex`) tới bài. Slug cũ trùng bài đang sống thì bị bỏ; trang chuyển hướng không vào sitemap/RSS.
 
 ## 4. Điều hướng
 
@@ -65,7 +65,7 @@
 | Mục | Quy tắc |
 |---|---|
 | **Tìm kiếm** | Tra cứu ngay trên trình duyệt từ một chỉ mục dựng lúc build; trang `noindex,follow`, không vào sitemap. Chi tiết thuật toán: [15 §A0](./15-seo-accessibility.md) |
-| **404** | Giữ nhận diện của site; không gọi nguồn dữ liệu. Hiện trạng phục vụ: xem Backlog §8 |
+| **404** | Giữ nhận diện của site; không gọi nguồn dữ liệu. Production phục vụ `404.html` với mã 404 qua `handle_errors` của Caddy ([08 §7](./08-deployment.md)); lỗi khác (vd 502) vẫn là văn bản tối giản |
 | **Sitemap** | Chỉ **canonical content URL**: trang chủ, mọi bài, trang 1 mỗi chuyên mục/thẻ/tác giả, tổng hợp chuyên mục, lưu trữ và mỗi tháng có bài. **Không** có trang phân trang, tìm kiếm, 404 |
 | **robots** | Cho phép mọi robot, trỏ tới sitemap bằng URL tuyệt đối |
 | **RSS** | Một feed toàn site: 20 bài mới nhất, đủ nội dung; khai báo tự động ở mọi trang. Không có feed theo chuyên mục |
@@ -106,7 +106,5 @@
 
 ## 8. Backlog (điểm bất hợp lý phát hiện khi lập tài liệu — chưa sửa)
 
-- **404 chưa được dùng ở production:** `404.astro` sinh `404.html` có nhận diện site, nhưng cấu hình Caddy (`handle_errors`) trả văn bản trơn `404 Not Found`; chỉ môi trường e2e/check-site phục vụ `404.html`. Chú thích đầu `404.astro` ("Caddy trỏ về trang này") đã lệch thực tế. Sửa cần đổi cấu hình proxy → ngoài phạm vi Sprint 15.
-- **Không có chuyển hướng khi đổi slug** (mục 3.7): đổi slug bài đã xuất bản làm gãy liên kết cũ.
 - **Không có trang liệt kê mọi thẻ** (mục 2): chỉ vào thẻ qua chip.
 - **Không có feed theo chuyên mục** ([15 §A4](./15-seo-accessibility.md)).
