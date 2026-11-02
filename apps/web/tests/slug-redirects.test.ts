@@ -3,9 +3,7 @@ import { buildSlugRedirects } from '../src/lib/directus';
 
 describe('buildSlugRedirects', () => {
   it('slug cũ trỏ về slug hiện tại của bài', () => {
-    expect(
-      buildSlugRedirects([{ slug: 'z80-moi', previous_slugs: ['z80', ' Z80-Cu '] }]),
-    ).toEqual([
+    expect(buildSlugRedirects([{ slug: 'z80-moi', previous_slugs: ['z80', ' Z80-Cu '] }])).toEqual([
       { from: 'z80', to: 'z80-moi' },
       { from: 'z80-cu', to: 'z80-moi' },
     ]);
@@ -24,10 +22,7 @@ describe('buildSlugRedirects', () => {
 
   it('slug cũ trùng một bài đang sống thì bỏ (bài sống thắng)', () => {
     expect(
-      buildSlugRedirects([
-        { slug: 'moi', previous_slugs: ['dang-song'] },
-        { slug: 'dang-song' },
-      ]),
+      buildSlugRedirects([{ slug: 'moi', previous_slugs: ['dang-song'] }, { slug: 'dang-song' }]),
     ).toEqual([]);
   });
 

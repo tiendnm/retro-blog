@@ -56,7 +56,11 @@ describe('Directus trả HTTP 429 (rate limit)', () => {
 
   it('không có Retry-After → chờ tăng dần, vẫn thử lại được', async () => {
     vi.useFakeTimers();
-    const fn = vi.fn().mockResolvedValueOnce(limited()).mockResolvedValueOnce(limited()).mockResolvedValueOnce(ok());
+    const fn = vi
+      .fn()
+      .mockResolvedValueOnce(limited())
+      .mockResolvedValueOnce(limited())
+      .mockResolvedValueOnce(ok());
     vi.stubGlobal('fetch', fn);
     const { getAllPublishedPostSlugs } = await loadClient();
     const pending = getAllPublishedPostSlugs();

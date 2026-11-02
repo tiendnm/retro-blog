@@ -7,7 +7,7 @@ afterEach(() => {
 });
 
 const authOf = (f: ReturnType<typeof mockFetch>) =>
-  (f.mock.calls[0]?.[1] as { headers: Record<string, string> }).headers.Authorization;
+  (f.mock.calls[0]?.[1] as { headers: Record<string, string> } | undefined)?.headers.Authorization;
 
 describe('token xem trước bản nháp', () => {
   it('máy chủ xem trước (PREVIEW_SERVER=1 + token) gửi Bearer', async () => {

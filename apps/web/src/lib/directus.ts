@@ -25,7 +25,12 @@ import type {
   TagRef,
 } from './types';
 import { type ArchiveMonth, groupByMonth, monthRange } from './archive';
-import { type AssetSize, assetIdsNeedingSize, optimizeBodyImages, rewriteAssetUrls } from './rewrite-assets';
+import {
+  type AssetSize,
+  assetIdsNeedingSize,
+  optimizeBodyImages,
+  rewriteAssetUrls,
+} from './rewrite-assets';
 import type { SearchDoc } from './search-index';
 import { sanitizeBody } from './sanitize-body';
 
@@ -39,7 +44,9 @@ const PUBLIC_URL = process.env.PUBLIC_DIRECTUS_URL ?? 'http://localhost:8055';
 // Chỉ có hiệu lực khi PREVIEW_SERVER=1 (Dockerfile.preview đặt): token lọt vào môi trường của một lần build SSG
 // (vd chạy test trên máy có sẵn biến) cũng KHÔNG làm bài nháp lọt vào site công khai.
 const PREVIEW_TOKEN =
-  process.env.PREVIEW_SERVER === '1' ? process.env.DIRECTUS_PREVIEW_TOKEN?.trim() || undefined : undefined;
+  process.env.PREVIEW_SERVER === '1'
+    ? process.env.DIRECTUS_PREVIEW_TOKEN?.trim() || undefined
+    : undefined;
 
 // Giới hạn thời gian mỗi request: Directus treo thì build lỗi rõ ràng thay vì treo vô hạn.
 const REQUEST_TIMEOUT_MS = 15_000;
@@ -108,7 +115,10 @@ export class DirectusError extends Error {
 /** Thời gian chờ trước lần thử lại sau HTTP 429: ưu tiên `Retry-After` (giây) của Directus, không thì tăng dần. */
 function retryDelayMs(res: Response, attempt: number): number {
   const seconds = Number(res.headers.get('retry-after'));
-  const ms = Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : RATE_LIMIT_BASE_DELAY_MS * (attempt + 1);
+  const ms =
+    Number.isFinite(seconds) && seconds > 0
+      ? seconds * 1000
+      : RATE_LIMIT_BASE_DELAY_MS * (attempt + 1);
   return Math.min(ms, RATE_LIMIT_MAX_DELAY_MS);
 }
 
@@ -233,9 +243,9 @@ async function fetchAssetSizes(ids: string[]): Promise<Map<string, AssetSize>> {
   const sizes = new Map<string, AssetSize>();
   if (!ids.length) return sizes;
   try {
-    const { data } = await directusGet<{ id: string; width?: number | null; height?: number | null }[]>(
-      `/files?filter[id][_in]=${ids.join(',')}&fields=id,width,height&limit=-1`,
-    );
+    const { data } = await directusGet<
+      { id: string; width?: number | null; height?: number | null }[]
+    >(`/files?filter[id][_in]=${ids.join(',')}&fields=id,width,height&limit=-1`);
     for (const f of data) {
       if (f.width && f.height) sizes.set(f.id.toLowerCase(), { w: f.width, h: f.height });
     }
