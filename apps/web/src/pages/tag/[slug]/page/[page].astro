@@ -31,7 +31,6 @@ const { items, currentPage, totalPages, tagName } = Astro.props;
 <Base
   title={`#${tagName} — Trang ${currentPage} — ${siteName}`}
   description={`Các bài viết gắn thẻ ${tagName} trên ${siteName} — Trang ${currentPage}.`}
-  wide
 >
   <PostListView
     heading={`Thẻ: #${tagName}`}

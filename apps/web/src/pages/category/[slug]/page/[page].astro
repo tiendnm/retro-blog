@@ -32,7 +32,6 @@ const { items, currentPage, totalPages, categoryName } = Astro.props;
 <Base
   title={`${categoryName} — Trang ${currentPage} — ${siteName}`}
   description={`Các bài viết thuộc chuyên mục ${categoryName} trên ${siteName} — Trang ${currentPage}.`}
-  wide
 >
   <PostListView
     heading={`Chuyên mục: ${categoryName}`}

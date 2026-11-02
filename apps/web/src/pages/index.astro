@@ -11,7 +11,7 @@ const { items, pageInfo } = await listPublishedPosts({ page: 1 });
 const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
 ---
 
-<Base title={`${siteName} — Bài viết mới nhất`} description={description} wide>
+<Base title={`${siteName} — Bài viết mới nhất`} description={description}>
   <PostListView
     heading="Bài viết mới nhất"
     items={items}

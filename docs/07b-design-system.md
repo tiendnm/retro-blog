@@ -68,10 +68,10 @@ Chưa định nghĩa: bóng đổ/hiệu ứng (chờ chốt phong cách).
 ### 3.4. Độ rộng · breakpoint
 | Token | Giá trị | Dùng cho |
 |---|---|---|
-| `--container-max` | 880 px | bề rộng trang, cột đọc |
-| `--container-wide` | 1080 px | trang danh sách (lưới thẻ) |
+| `--container-max` | 1080 px | bề rộng mọi trang (danh sách lẫn bài; đồng bộ từ 2026-11-02) |
+| `--container-wide` | 1080 px | = `--container-max` (giữ tương thích) |
 | `--container-pad-x` | 1,25 rem | đệm ngang |
-| `--reading-width` | 100 % | cột đọc = bề rộng vùng nội dung (840 px), thẳng hàng với đầu/chân trang |
+| `--reading-width` | 100 % | cột đọc = bề rộng vùng nội dung (1040 px), thẳng hàng với đầu/chân trang |
 
 Breakpoint dùng trong mã: **860 px** (lưới thẻ rút cột), **560 px** (xếp dọc thành phần danh sách), **600 px** (lightbox). Ba mốc này là *giá trị* chứ không phải token (CSS không cho dùng biến trong điều kiện media); đổi thì sửa ở cả nơi dùng.
 

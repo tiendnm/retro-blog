@@ -50,10 +50,10 @@
   --space-16: 4rem;
 
   /* ---- Container / width ------------------------------------------------ */
-  --container-max: 880px; /* bề rộng trang (cột đọc) */
-  --container-wide: 1080px; /* trang list: lưới ảnh (Sprint 8) */
+  --container-max: 1080px; /* bề rộng MỌI trang (list lẫn bài) — đồng bộ, đầu/chân trang không nhảy khi chuyển trang */
+  --container-wide: 1080px; /* giữ cho tương thích (= --container-max) */
   --container-pad-x: 1.25rem;
-  --reading-width: 100%; /* cột đọc = đúng bề rộng <main> (840px), thẳng hàng header/footer; trước đây 50rem lệch 40px */
+  --reading-width: 100%; /* cột đọc = đúng bề rộng <main> (1040px), thẳng hàng header/footer; trước đây 50rem lệch 40px */
 
   /* ---- Chất giấy (Sprint 16) — cường độ 0–1; --paper-fx: 0 tắt toàn bộ ------- */
   --paper-fx: 1; /* công tắc tổng: 0 = không texture */
@@ -99,10 +99,6 @@ body::before {
   body::before {
     display: none;
   }
-}
-
-body.wide {
-  max-width: var(--container-wide);
 }
 
 a {

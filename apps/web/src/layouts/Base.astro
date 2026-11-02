@@ -27,12 +27,10 @@ interface Props {
   image?: string;
   /** og:type — 'article' cho trang chi tiết, 'website' cho phần còn lại. */
   type?: 'website' | 'article';
-  /** Trang list: nới container (~1080px) cho lưới ảnh; mặc định cột đọc hẹp. */
-  wide?: boolean;
   /** Trang không nên vào chỉ mục công cụ tìm kiếm (vd /search) → <meta robots noindex,follow>. */
   noindex?: boolean;
 }
-const { title, description, image, type = 'website', wide = false, noindex = false } = Astro.props;
+const { title, description, image, type = 'website', noindex = false } = Astro.props;
 
 // Cấu hình site từ CMS (ADR-0012; có fallback mặc định).
 const settings = await getSiteSettings();
@@ -89,7 +87,7 @@ const ogImage = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
     {/* Metadata bổ sung theo trang (article:*, JSON-LD…) — trang chi tiết inject qua đây */}
     <slot name="head" />
   </head>
-  <body class:list={{ wide }}>
+  <body>
     <a class="skip-link" href="#main">Bỏ qua tới nội dung</a>
     <Header />
     <main id="main">
