@@ -189,3 +189,42 @@ describe('site settings', () => {
     await expect(getSiteSettings()).rejects.toMatchObject({ code: 'system' });
   });
 });
+
+describe('getPostBySlug — kích thước ảnh chèn bằng preset editor', () => {
+  const ID = '123e4567-e89b-12d3-a456-426614174000';
+  const post = {
+    id: 'p1',
+    title: 'T',
+    slug: 't',
+    body: `<p><img src="https://cms.example.com/assets/${ID}.jpg?key=editor" alt="a"></p>`,
+  };
+
+  it('hỏi /files một lần và điền width/height vào ảnh', async () => {
+    const fn = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ data: [post] })))
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: [{ id: ID, width: 4000, height: 3000 }] })),
+      );
+    vi.stubGlobal('fetch', fn);
+    const { getPostBySlug } = await loadClient();
+    const p = await getPostBySlug('t');
+    expect(p?.body).toContain('width="4000" height="3000"');
+    expect(fn).toHaveBeenCalledTimes(2);
+    expect(String(fn.mock.calls[1][0])).toContain('/files?filter[id][_in]=' + ID);
+  });
+
+  it('thiếu quyền đọc /files (403): vẫn trả bài, ảnh không có width/height', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce(new Response(JSON.stringify({ data: [post] })))
+        .mockResolvedValueOnce(new Response('{}', { status: 403 })),
+    );
+    const { getPostBySlug } = await loadClient();
+    const p = await getPostBySlug('t');
+    expect(p?.body).toContain('srcset=');
+    expect(p?.body).not.toMatch(/\swidth="/);
+  });
+});

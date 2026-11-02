@@ -14,13 +14,19 @@ for arg in "$@"; do
 done
 
 cd "$(dirname "$0")/.."
+
+# Kéo code TRƯỚC khi nạp lib/common.sh, rồi chạy lại chính script bằng bản mới. Nếu pull sau khi đã nạp thì tiến trình này
+# vẫn dùng hàm CŨ trong bộ nhớ (và bash còn đọc dở file update.sh đã bị ghi đè) → bước mới thêm bị bỏ qua (đã gặp 2 lần: 2026-11-03).
+if [ -z "${RETRO_UPDATE_REEXEC:-}" ]; then
+  printf '\033[1m==> Kéo code mới\033[0m\n'
+  git pull --ff-only
+  RETRO_UPDATE_REEXEC=1 exec bash scripts/update.sh "$@"
+fi
+
 # shellcheck source=lib/common.sh
 . scripts/lib/common.sh
 
 [ -f "$ENV_FILE" ] || die "Chưa có $ENV_FILE — chạy ./scripts/deploy-home.sh trước."
-
-say "Kéo code mới"
-git pull --ff-only
 
 say "Build lại image (web, ops, preview)"
 dc build web ops preview

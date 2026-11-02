@@ -67,7 +67,7 @@
 | `categories` | read (mọi hàng); field: `id,name,slug,description` | create · read · update · delete | full |
 | `tags` | read — **chỉ thẻ có ≥ 1 bài `status=published`**; field: `id,name,slug` | create · read · update · delete | full |
 | `posts_tags` | read — **chỉ dòng nối của bài `status=published` AND `published_at ≤ $NOW`**; field: `id,posts_id,tags_id` | create · read · update · delete | full |
-| `directus_files` | read (mọi hàng); field: `id,alt` *(đủ cho `/assets/<id>` + a11y)* | create · read · update · delete | full |
+| `directus_files` | read (mọi hàng); field: `id,alt,width,height` *(`/assets/<id>` + a11y + kích thước ảnh để điền `width`/`height` lúc build)* | create · read · update · delete | full |
 | `directus_users`, `directus_roles`, `directus_policies` | — | — *(chỉ app-baseline: xem hồ sơ của chính mình; **không** tạo/sửa/xoá)* | full |
 
 - **`$NOW`** = biến thời gian động của Directus → thực thi được yêu cầu "chỉ nội dung đã publish **và đã tới giờ**" (lịch phát hành cơ bản) ngay trong rule, không cần job nền.
@@ -130,3 +130,4 @@ Site công khai là tĩnh và chỉ chứa bài đã xuất bản, nên bản nh
 - **Kéo thả đổi cỡ ảnh:** bật `object_resizing: img`. **Directus không nạp CSS nội dung mặc định của TinyMCE**, nên 4 tay nắm (`.mce-resizehandle`) có trong DOM nhưng cao 0px, người dùng chỉ thấy ảnh bị tô xanh mà không kéo được; `content_style` phải tự khai kiểu cho tay nắm, khung bóng khi kéo và viền ảnh đang chọn. TinyMCE ghi `width`/`height` lên `<img>` (bộ lọc đã cho phép). `optimizeBodyImages` giữ hai thuộc tính này khi tác giả đã đặt, nếu không mới lấy cỡ gốc từ `?width=&height=` của URL.
 - Bài cũ không bị ảnh hưởng (không có class thì hiển thị như trước). Áp bằng `directus schema apply` (có trong `update.sh`).
 - **Ảnh gốc rất lớn (vd. 4000×3000) làm editor giật:** khi chèn ảnh, ở hộp thoại "Add/Edit Image" chọn **Transformation Preset Key = `editor`**. Ảnh trong bài thành `/assets/<id>.jpg?key=editor`, editor chỉ tải bản ≤1200px WebP. Preset do `apply-asset-presets.mjs` tạo (có trong `update.sh`; chạy riêng: `pnpm presets:apply`). Site không đổi: `optimizeBodyImages` bỏ query và tự sinh srcset từ file gốc. Chưa chọn preset thì ảnh vẫn chèn bình thường (chỉ editor nặng hơn).
+- **Kích thước ảnh chèn bằng preset:** URL `?key=editor` không mang kích thước, nên lúc build `getPostBySlug` hỏi Directus `/files?filter[id][_in]=…&fields=id,width,height` (một lần/bài) và điền `width`/`height` vào `<img>` để trình duyệt giữ chỗ. Thiếu quyền hay file không có kích thước thì ảnh vẫn hiện, chỉ không giữ chỗ. Ưu tiên: `width`/`height` do tác giả kéo → `?width=&height=` trong URL → kích thước file.

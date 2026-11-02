@@ -12,7 +12,7 @@ const ALLOW = {
   categories: ['id', 'name', 'slug', 'description'],
   tags: ['id', 'name', 'slug'],
   posts_tags: ['id', 'posts_id', 'tags_id'],
-  directus_files: ['id', 'alt'],
+  directus_files: ['id', 'alt', 'width', 'height'],
   site_settings: ['site_name', 'description', 'footer_text', 'default_og_image'],
 };
 

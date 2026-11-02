@@ -25,7 +25,7 @@ import type {
   TagRef,
 } from './types';
 import { type ArchiveMonth, groupByMonth, monthRange } from './archive';
-import { optimizeBodyImages, rewriteAssetUrls } from './rewrite-assets';
+import { type AssetSize, assetIdsNeedingSize, optimizeBodyImages, rewriteAssetUrls } from './rewrite-assets';
 import type { SearchDoc } from './search-index';
 import { sanitizeBody } from './sanitize-body';
 
@@ -207,13 +207,39 @@ export function getSiteSettings(): Promise<SiteSettings> {
   return p;
 }
 
-function toDetail(p: RawPost): PostDetail {
+/**
+ * Kích thước thật của các file ảnh (Directus `/files`: width/height — Public được đọc, xem apply-permissions.sh) để điền
+ * `width`/`height` cho ảnh chèn bằng preset (`?key=editor`, URL không mang kích thước) → trình duyệt giữ chỗ, hết xô lệch layout.
+ * Thiếu quyền (not_found): trả map rỗng — ảnh vẫn hiển thị, chỉ không giữ chỗ. Lỗi hệ thống vẫn nổi lên như các hàm khác.
+ */
+async function fetchAssetSizes(ids: string[]): Promise<Map<string, AssetSize>> {
+  const sizes = new Map<string, AssetSize>();
+  if (!ids.length) return sizes;
+  try {
+    const { data } = await directusGet<{ id: string; width?: number | null; height?: number | null }[]>(
+      `/files?filter[id][_in]=${ids.join(',')}&fields=id,width,height&limit=-1`,
+    );
+    for (const f of data) {
+      if (f.width && f.height) sizes.set(f.id.toLowerCase(), { w: f.width, h: f.height });
+    }
+  } catch (e) {
+    if (!(e instanceof DirectusError && e.code === 'not_found')) throw e;
+  }
+  return sizes;
+}
+
+async function renderBody(raw: string): Promise<string> {
+  const html = rewriteAssetUrls(sanitizeBody(raw), PUBLIC_URL);
+  return optimizeBodyImages(html, await fetchAssetSizes(assetIdsNeedingSize(html)));
+}
+
+async function toDetail(p: RawPost): Promise<PostDetail> {
   return {
     id: p.id,
     title: p.title,
     slug: p.slug,
     excerpt: p.excerpt ?? null,
-    body: p.body ? optimizeBodyImages(rewriteAssetUrls(sanitizeBody(p.body), PUBLIC_URL)) : null,
+    body: p.body ? await renderBody(p.body) : null,
     publishedAt: p.published_at ?? null,
     author: toAuthorDetail(p.author),
     category: toCategory(p.category),
@@ -258,7 +284,7 @@ export async function getPostBySlug(slug: string): Promise<PostDetail | null> {
     const { data } = await directusGet<RawPost[]>(
       `/items/posts?filter[slug][_eq]=${encodeURIComponent(slug)}&fields=${DETAIL_FIELDS}&limit=1`,
     );
-    return data.length ? toDetail(data[0]) : null;
+    return data.length ? await toDetail(data[0]) : null;
   } catch (e) {
     if (e instanceof DirectusError && e.code === 'not_found') return null;
     throw e;

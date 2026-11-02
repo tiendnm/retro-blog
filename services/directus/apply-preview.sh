@@ -53,7 +53,7 @@ perm authors '["id","name","slug","bio","avatar"]'
 perm categories '["id","name","slug","description"]'
 perm tags '["id","name","slug"]'
 perm posts_tags '["id","posts_id","tags_id"]'
-perm directus_files '["id","alt"]'
+perm directus_files '["id","alt","width","height"]'
 perm site_settings '["site_name","description","footer_text","default_og_image"]'
 echo "-> Preview permissions: chỉ read, $(api GET "/permissions?filter[policy][_eq]=$POL&aggregate[count]=id" | val count id) collection"
 

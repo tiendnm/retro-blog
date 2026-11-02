@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { formatDate } from '../src/lib/format';
-import { optimizeBodyImages, rewriteAssetUrls } from '../src/lib/rewrite-assets';
+import {
+  assetIdsNeedingSize,
+  optimizeBodyImages,
+  rewriteAssetUrls,
+} from '../src/lib/rewrite-assets';
 import { sanitizeBody } from '../src/lib/sanitize-body';
 
 const ID = '123e4567-e89b-12d3-a456-426614174000';
@@ -104,6 +108,30 @@ describe('optimizeBodyImages', () => {
     expect(out).not.toContain('key=editor');
     expect(out).toContain(`${base}?width=1600&amp;quality=80&amp;format=webp 1600w`);
     expect(out).not.toMatch(/\swidth="/);
+  });
+
+  it('điền width/height từ kích thước file khi URL không mang kích thước (preset editor)', () => {
+    const sizes = new Map([[ID, { w: 4000, h: 3000 }]]);
+    const out = optimizeBodyImages(`<img src="${base}.jpg?key=editor" alt="a">`, sizes);
+    expect(out).toContain('width="4000" height="3000"');
+  });
+
+  it('kích thước tác giả kéo và kích thước trong URL thắng kích thước file', () => {
+    const sizes = new Map([[ID, { w: 4000, h: 3000 }]]);
+    expect(
+      optimizeBodyImages(`<img src="${base}.jpg?key=editor" width="400" height="300">`, sizes),
+    ).toContain('width="400" height="300"');
+    expect(optimizeBodyImages(`<img src="${base}.jpg?width=800&amp;height=600">`, sizes)).toContain(
+      'width="800" height="600"',
+    );
+  });
+
+  it('assetIdsNeedingSize: chỉ ảnh asset chưa có kích thước nào, không trùng', () => {
+    const html =
+      `<img src="${base}.jpg?key=editor"><img src="${base}.jpg?key=editor">` +
+      `<img src="${base}?width=800&amp;height=600"><img src="${base}" width="10" height="10">` +
+      '<img src="https://x.com/a.png">';
+    expect(assetIdsNeedingSize(html)).toEqual([ID]);
   });
 
   it('không đụng ảnh ngoài asset Directus', () => {

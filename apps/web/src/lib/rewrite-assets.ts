@@ -29,7 +29,31 @@ function intrinsicSize(query: string | undefined): { w: number; h: number } | nu
   return Number.isInteger(w) && Number.isInteger(h) && w > 0 && h > 0 ? { w, h } : null;
 }
 
-export function optimizeBodyImages(html: string): string {
+export interface AssetSize {
+  w: number;
+  h: number;
+}
+
+const ASSET_ID = /\/assets\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
+const hasAuthorSize = (attrs: string) =>
+  /\swidth=(["'])\d+/i.test(attrs) && /\sheight=(["'])\d+/i.test(attrs);
+
+/**
+ * Id các ảnh asset trong body mà thẻ `<img>` chưa có kích thước nào (không width/height do tác giả kéo, không `?width=&height=` trong URL
+ * — gặp khi chèn bằng preset `?key=editor`). Caller tra kích thước thật của file trên Directus rồi truyền vào `optimizeBodyImages`.
+ */
+export function assetIdsNeedingSize(html: string): string[] {
+  const ids = new Set<string>();
+  for (const m of html.matchAll(IMG_ASSET)) {
+    const [, before, , base, query, after] = m;
+    if (hasAuthorSize(`${before}${after}`) || intrinsicSize(query)) continue;
+    const id = ASSET_ID.exec(base)?.[1];
+    if (id) ids.add(id.toLowerCase());
+  }
+  return [...ids];
+}
+
+export function optimizeBodyImages(html: string, sizes?: ReadonlyMap<string, AssetSize>): string {
   return html.replace(
     IMG_ASSET,
     (_m, before: string, q: string, base: string, query: string | undefined, after: string) => {
@@ -38,10 +62,11 @@ export function optimizeBodyImages(html: string): string {
       const src = variant(BODY_IMG_WIDTHS[1]);
       // Kích thước gốc nằm trong query TinyMCE (?width=&height=) → đặt width/height để trình duyệt giữ chỗ, hết giật layout.
       // Tác giả đã kéo đổi cỡ ảnh trong trình soạn thảo (TinyMCE ghi width+height) → giữ nguyên, không đè bằng cỡ gốc.
-      const authorSized =
-        /\swidth=(["'])\d+/i.test(`${before}${after}`) &&
-        /\sheight=(["'])\d+/i.test(`${before}${after}`);
-      const dims = authorSized ? null : intrinsicSize(query);
+      const dims = hasAuthorSize(`${before}${after}`)
+        ? null
+        : (intrinsicSize(query) ??
+          sizes?.get(ASSET_ID.exec(base)?.[1]?.toLowerCase() ?? '') ??
+          null);
       const strip = dims
         ? /\s(srcset|sizes|decoding|width|height)=(["'])[^"']*\2/gi
         : /\s(srcset|sizes|decoding)=(["'])[^"']*\2/gi;

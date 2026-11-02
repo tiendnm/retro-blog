@@ -47,8 +47,8 @@ if [ "${HAS_PUB:-0}" = "0" ] || [ -z "$HAS_PUB" ]; then
   # authors/categories: dữ liệu tham chiếu để render (bio/description là văn bản hiển thị công khai; KHÔNG lộ parent).
   api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"authors\",\"action\":\"read\",\"fields\":[\"id\",\"name\",\"slug\",\"bio\",\"avatar\"],\"permissions\":{}}" >/dev/null
   api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"categories\",\"action\":\"read\",\"fields\":[\"id\",\"name\",\"slug\",\"description\"],\"permissions\":{}}" >/dev/null
-  # directus_files: chỉ id (dựng URL /assets/<id>) + alt (a11y).
-  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"directus_files\",\"action\":\"read\",\"fields\":[\"id\",\"alt\"],\"permissions\":{}}" >/dev/null
+  # directus_files: id (dựng URL /assets/<id>) + alt (a11y) + width/height (điền kích thước ảnh lúc build, tránh xô lệch layout).
+  api POST /permissions "{\"policy\":\"$PUB\",\"collection\":\"directus_files\",\"action\":\"read\",\"fields\":[\"id\",\"alt\",\"width\",\"height\"],\"permissions\":{}}" >/dev/null
   echo "   done public"
 else
   echo "-> Public permissions đã có, bỏ qua"
@@ -83,7 +83,8 @@ fi
 # Cả hai là văn bản giới thiệu do Editor viết để HIỂN THỊ CÔNG KHAI → thêm vào allowlist (permission authors/categories đã có
 # từ trước → cập nhật tại chỗ, idempotent). `parent` (categories) vẫn KHÔNG lộ.
 # posts.previous_slugs: slug cũ của bài, để dựng trang chuyển hướng /posts/<slug-cũ> (đã nằm trong URL công khai cũ → không nhạy cảm).
-for spec in "authors:bio" "categories:description" "posts:previous_slugs"; do
+# directus_files.width/height: kích thước ảnh (metadata không nhạy cảm) để điền width/height cho ảnh chèn bằng preset `editor`.
+for spec in "authors:bio" "categories:description" "posts:previous_slugs" "directus_files:width" "directus_files:height"; do
   COL="${spec%%:*}"; FLD="${spec#*:}"
   PERM=$(api GET "/permissions?filter[policy][_eq]=$PUB&filter[collection][_eq]=$COL&fields=id,fields" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const f=process.argv[1];const r=JSON.parse(d).data[0];if(r&&!r.fields.includes(f))process.stdout.write(r.id+' '+JSON.stringify([...r.fields,f]))}catch(e){}})" "$FLD")
   if [ -n "$PERM" ]; then
