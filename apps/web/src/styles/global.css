@@ -700,6 +700,27 @@ main {
   border: var(--border-width) solid var(--color-border);
 }
 
+/* Căn lề do toolbar trình soạn thảo (class, không style inline vì CSP). Ảnh luôn là block nên căn bằng margin auto. */
+.prose .align-left {
+  text-align: left;
+}
+.prose .align-center {
+  text-align: center;
+}
+.prose .align-right {
+  text-align: right;
+}
+.prose img.align-left {
+  margin-right: auto;
+}
+.prose img.align-center {
+  margin-left: auto;
+  margin-right: auto;
+}
+.prose img.align-right {
+  margin-left: auto;
+}
+
 /* Horizontal rule */
 .prose hr {
   border: 0;

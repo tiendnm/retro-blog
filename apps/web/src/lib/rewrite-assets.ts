@@ -37,7 +37,11 @@ export function optimizeBodyImages(html: string): string {
       const srcset = BODY_IMG_WIDTHS.map((w) => `${variant(w)} ${w}w`).join(', ');
       const src = variant(BODY_IMG_WIDTHS[1]);
       // Kích thước gốc nằm trong query TinyMCE (?width=&height=) → đặt width/height để trình duyệt giữ chỗ, hết giật layout.
-      const dims = intrinsicSize(query);
+      // Tác giả đã kéo đổi cỡ ảnh trong trình soạn thảo (TinyMCE ghi width+height) → giữ nguyên, không đè bằng cỡ gốc.
+      const authorSized =
+        /\swidth=(["'])\d+/i.test(`${before}${after}`) &&
+        /\sheight=(["'])\d+/i.test(`${before}${after}`);
+      const dims = authorSized ? null : intrinsicSize(query);
       const strip = dims
         ? /\s(srcset|sizes|decoding|width|height)=(["'])[^"']*\2/gi
         : /\s(srcset|sizes|decoding)=(["'])[^"']*\2/gi;

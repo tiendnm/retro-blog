@@ -3,6 +3,8 @@
 // hr, code). Chạy lúc build (SSG), thuần JS, không phụ thuộc Directus.
 import sanitizeHtml from 'sanitize-html';
 
+const ALIGN = /^align-(left|center|right)$/;
+
 const OPTIONS: sanitizeHtml.IOptions = {
   allowedTags: [
     'h2',
@@ -44,17 +46,31 @@ const OPTIONS: sanitizeHtml.IOptions = {
   ],
   allowedAttributes: {
     a: ['href', 'title', 'target', 'rel'],
-    img: ['src', 'alt', 'title', 'width', 'height', 'loading'],
+    img: ['src', 'alt', 'title', 'width', 'height', 'loading', 'class'],
     code: ['class'],
     pre: ['class'],
-    th: ['colspan', 'rowspan', 'scope'],
-    td: ['colspan', 'rowspan'],
+    p: ['class'],
+    h2: ['class'],
+    h3: ['class'],
+    h4: ['class'],
+    blockquote: ['class'],
+    li: ['class'],
+    th: ['colspan', 'rowspan', 'scope', 'class'],
+    td: ['colspan', 'rowspan', 'class'],
     col: ['span'],
     colgroup: ['span'],
     '*': ['id'],
   },
-  // Chỉ cho class dạng language-xxx (highlight code); chặn mọi class khác.
-  allowedClasses: { code: [/^language-[\w-]+$/], pre: [/^language-[\w-]+$/] },
+  // Chỉ cho class dạng language-xxx (highlight code) và 3 class căn lề của toolbar (align-left|center|right,
+  // services/directus/apply-editor.sh / schema `tinymceOverrides`); chặn mọi class khác. Căn lề bằng class (không
+  // style inline) vì CSP `style-src 'self'` chặn style inline.
+  allowedClasses: {
+    code: [/^language-[\w-]+$/],
+    pre: [/^language-[\w-]+$/],
+    ...Object.fromEntries(
+      ['p', 'h2', 'h3', 'h4', 'blockquote', 'li', 'th', 'td', 'img'].map((t) => [t, [ALIGN]]),
+    ),
+  },
   allowedSchemes: ['http', 'https', 'mailto', 'tel'],
   allowedSchemesByTag: { img: ['http', 'https'] },
   allowProtocolRelative: false,

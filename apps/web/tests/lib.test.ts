@@ -91,8 +91,42 @@ describe('optimizeBodyImages', () => {
     expect(out).not.toMatch(/\swidth="/);
   });
 
+  it('giữ width/height tác giả đã kéo đổi cỡ, không đè bằng cỡ gốc', () => {
+    const html = `<img src="${base}.jpg?width=4000&amp;height=3000" alt="a" width="400" height="300">`;
+    const out = optimizeBodyImages(html);
+    expect(out).toContain('width="400"');
+    expect(out).toContain('height="300"');
+    expect(out).not.toContain('width="4000"');
+  });
+
   it('không đụng ảnh ngoài asset Directus', () => {
     const html = '<img src="https://x.com/a.png" alt="x">';
     expect(optimizeBodyImages(html)).toBe(html);
+  });
+});
+
+describe('sanitizeBody — căn lề bằng class', () => {
+  it('giữ class align-left|center|right trên đoạn, tiêu đề, trích dẫn, danh sách, ô bảng và ảnh', () => {
+    const html =
+      '<p class="align-center">a</p><h2 class="align-right">b</h2><blockquote class="align-left">c</blockquote>' +
+      '<ul><li class="align-center">d</li></ul><table><tr><td class="align-right">e</td></tr></table>' +
+      '<p><img src="https://x.com/a.png" alt="" class="align-center"></p>';
+    const out = sanitizeBody(html);
+    expect(out).toContain('<p class="align-center">a</p>');
+    expect(out).toContain('<h2 class="align-right">b</h2>');
+    expect(out).toContain('<blockquote class="align-left">c</blockquote>');
+    expect(out).toContain('<li class="align-center">d</li>');
+    expect(out).toContain('<td class="align-right">e</td>');
+    expect(out).toContain('class="align-center"');
+  });
+
+  it('vẫn chặn class lạ và style inline', () => {
+    const out = sanitizeBody(
+      '<p class="align-center evil" style="text-align:center">a</p><p class="x">b</p>',
+    );
+    expect(out).toContain('<p class="align-center">a</p>');
+    expect(out).toContain('<p>b</p>');
+    expect(out).not.toContain('style');
+    expect(out).not.toContain('evil');
   });
 });

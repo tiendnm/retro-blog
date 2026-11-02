@@ -25,7 +25,7 @@
 | title | string | input | required |
 | slug | string | input | **unique**; **để trống khi tạo mới → tự sinh từ `title`** (xem §6 "Tự sinh slug"); `required: false` ở giao diện nhưng cột DB vẫn NOT NULL; auto-slugify khi gõ tay (`options.slug`) + help note |
 | excerpt | text | input-multiline | help note: dùng cho list + SEO description (S6.5) |
-| body | text | input-rich-text-html (WYSIWYG) | lưu **HTML**; toolbar giới hạn, không h1 ([ADR-0011](./adr/0011-body-stored-as-html-wysiwyg.md)) |
+| body | text | input-rich-text-html (WYSIWYG) | lưu **HTML**; toolbar giới hạn, không h1 ([ADR-0011](./adr/0011-body-stored-as-html-wysiwyg.md)); có căn trái/giữa/phải cho chữ và ảnh, kéo thả đổi cỡ ảnh (xem dưới) |
 | status | string | select-dropdown | choices **draft/published**, default `draft`; help note (S6.5) |
 | published_at | timestamp | datetime | help note: để trống → auto-set khi publish (Flow C1, S6.5) |
 | author | uuid (M2O) | select-dropdown-m2o → `authors` | required; on_delete NO ACTION |
@@ -122,3 +122,10 @@ Site công khai là tĩnh và chỉ chứa bài đã xuất bản, nên bản nh
 ## 7. Cấu hình & Môi trường (không chứa secret)
 
 - Biến môi trường ở [`.env.example`](../.env.example) (DB, KEY/SECRET, ADMIN_*). Secrets: [12-security](./12-security.md).
+
+### Căn lề và đổi cỡ ảnh trong trình soạn thảo
+
+- **Căn lề bằng class, không bằng style inline.** CSP của site có `style-src 'self'` và bộ lọc HTML gỡ thuộc tính `style`, nên nếu để TinyMCE căn lề mặc định (`style="text-align:center"`) thì ra site mất. `tinymceOverrides.formats` (khai ở `posts.body` trong `schema.yaml`) buộc 3 nút căn lề gắn `align-left|align-center|align-right`: lên `<p>`, `<h2-4>`, `<blockquote>`, `<li>`, `<td>`, `<th>` cho chữ và lên chính `<img>` cho ảnh. Ảnh là block nên căn bằng `margin auto`; không có chữ chảy quanh ảnh.
+- **Hai nơi phải khớp:** `sanitize-body.ts` chỉ cho đúng 3 class này (class lạ vẫn bị gỡ) và `global.css` (`.prose .align-*`). `content_style` trong `schema.yaml` là bản CSS cho khung soạn thảo, để hiển thị trong CMS giống ngoài site; đổi CSS ở một nơi thì sửa nơi kia.
+- **Kéo thả đổi cỡ ảnh:** bật `object_resizing: img`. TinyMCE ghi `width`/`height` lên `<img>` (bộ lọc đã cho phép). `optimizeBodyImages` giữ hai thuộc tính này khi tác giả đã đặt, nếu không mới lấy cỡ gốc từ `?width=&height=` của URL.
+- Bài cũ không bị ảnh hưởng (không có class thì hiển thị như trước). Áp bằng `directus schema apply` (có trong `update.sh`).
