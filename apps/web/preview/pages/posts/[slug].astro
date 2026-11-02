@@ -1,0 +1,14 @@
+---
+// MÁY CHỦ XEM TRƯỚC BẢN NHÁP (SSR) — cấu hình: astro.preview.config.mjs. Render ĐÚNG MỘT bài theo slug mỗi lần xem,
+// bằng token chỉ-đọc của vai Preview (DIRECTUS_PREVIEW_TOKEN) nên thấy cả bài nháp. KHÔNG có trong site công khai.
+// Truy cập được chặn ở Caddy (basic auth) — xem Caddyfile và docs/05-cms §4.
+import PostPage from '../../../src/components/PostPage.astro';
+import { getPostBySlug } from '../../../src/lib/directus';
+
+const post = await getPostBySlug(Astro.params.slug ?? '');
+if (!post) return new Response('Không tìm thấy bài (hoặc token Preview thiếu quyền).', { status: 404 });
+// Không để trình duyệt/proxy giữ bản cũ: Editor sửa xong bấm tải lại phải thấy ngay.
+Astro.response.headers.set('Cache-Control', 'no-store');
+---
+
+<PostPage post={post} preview />

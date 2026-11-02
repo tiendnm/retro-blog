@@ -60,6 +60,8 @@ services:
       SESSION_COOKIE_SECURE: "true"
       # Tắt trợ lý AI tích hợp (Directus ≥11.14): không dùng, bớt bề mặt tấn công và tính năng ngoài ý muốn.
       AI_ENABLED: "false"
+      # Live Preview (khung xem trước trong trang soạn bài) nhúng máy chủ xem trước: mở frame-src cho đúng origin đó.
+      CONTENT_SECURITY_POLICY_DIRECTIVES__FRAME_SRC: "'self' https://${PREVIEW_DOMAIN:-preview.invalid}"
       # Rate limiting theo IP client (bộ nhớ trong tiến trình — 1 instance). Mặc định cho phép ~10 req/s kéo dài, đủ cho
       # trang tải nhiều ảnh /assets; vượt → 429. IP thật lấy từ CF-Connecting-IP (Cloudflare luôn ghi đè header này, và
       # Caddy không publish cổng nên chỉ tunnel tới được — không giả mạo được). Chỉnh bằng RATE_LIMITER_POINTS/DURATION.
@@ -131,6 +133,38 @@ services:
       driver: json-file
       options: {max-size: "10m", max-file: "3"}
 
+  # Máy chủ XEM TRƯỚC bản nháp (SSR) — docs/05-cms §4. Render từng bài theo yêu cầu bằng token chỉ-đọc của vai Preview
+  # (thấy cả nháp). KHÔNG publish cổng; Caddy (PREVIEW_ADDRESS) đứng trước, chặn bằng basic auth. Directus nhúng nó
+  # vào khung Live Preview của trang soạn bài.
+  preview:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile.preview
+    image: retro-preview:prod
+    restart: unless-stopped
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      DIRECTUS_INTERNAL_URL: ${DIRECTUS_INTERNAL_URL}
+      PUBLIC_DIRECTUS_URL: ${PUBLIC_DIRECTUS_URL}
+      PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}
+      DIRECTUS_PREVIEW_TOKEN: ${DIRECTUS_PREVIEW_TOKEN:?cần DIRECTUS_PREVIEW_TOKEN (openssl rand -hex 32) — token của user Preview trong Directus}
+    networks:
+      - retro-net
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('net').connect(4322,'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      directus:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+
   # Vận hành định kỳ (ADR-0017): scheduler.sh → backup.sh (03:30) + healthcheck.sh (5 phút). Cũng dùng cho tác vụ
   # chạy một lần khi dựng server:  docker compose run --rm ops <lệnh>  (node, bash, curl, pg_dump có sẵn).
   ops:
@@ -177,6 +211,9 @@ services:
       CMS_URL: ${HEALTHCHECK_CMS_URL:-https://${CMS_DOMAIN}}
       HEALTHCHECK_PING_URL: ${HEALTHCHECK_PING_URL:-}
       HEALTHCHECK_INTERVAL: ${HEALTHCHECK_INTERVAL:-300}
+      # Vai Preview (apply-preview.sh): token của user Preview + domain máy chủ xem trước (đặt preview_url cho posts).
+      DIRECTUS_PREVIEW_TOKEN: ${DIRECTUS_PREVIEW_TOKEN:-}
+      PREVIEW_DOMAIN: ${PREVIEW_DOMAIN:-}
       # Dùng cho tác vụ một lần (apply-*.mjs, apply-permissions.sh) khi chạy trong container.
       DIRECTUS_URL: http://directus:8055
     volumes:
@@ -205,6 +242,8 @@ services:
         condition: service_healthy
       directus:
         condition: service_healthy
+      preview:
+        condition: service_healthy
     ports:
       - "80:80"
       - "443:443"
@@ -222,6 +261,12 @@ services:
       # Địa chỉ lắng nghe của Caddy: mặc định = domain (auto-TLS). Tunnel override thành http://<domain>.
       SITE_ADDRESS: ${SITE_ADDRESS:-${SITE_DOMAIN}}
       CMS_ADDRESS: ${CMS_ADDRESS:-${CMS_DOMAIN}}
+      # Xem trước bản nháp: địa chỉ + basic auth (băm bcrypt: `caddy hash-password`; trong .env đặt trong nháy đơn vì có `$`).
+      PREVIEW_DOMAIN: ${PREVIEW_DOMAIN:-preview.invalid}
+      PREVIEW_ADDRESS: ${PREVIEW_ADDRESS:-${PREVIEW_DOMAIN:-http://preview.invalid}}
+      PREVIEW_AUTH_USER: ${PREVIEW_AUTH_USER:-editor}
+      # Mặc định = băm của một mật khẩu ngẫu nhiên đã vứt (từ chối mọi người) → chưa cấu hình thì không ai vào được.
+      PREVIEW_AUTH_HASH: ${PREVIEW_AUTH_HASH:-$$2a$$14$$e4bAG3Gc5mRXzjcH8qmNue1lmvunpWP10VtXKZp6TzK6J5NjnsGuW}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - site_dist:/srv/site:ro

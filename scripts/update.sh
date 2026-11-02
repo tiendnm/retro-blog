@@ -22,8 +22,8 @@ cd "$(dirname "$0")/.."
 say "Kéo code mới"
 git pull --ff-only
 
-say "Build lại image (web, ops)"
-dc build web ops
+say "Build lại image (web, ops, preview)"
+dc build web ops preview
 
 if [ "$WEB_ONLY" = 1 ]; then
   say "Khởi động lại stack"

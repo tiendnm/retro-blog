@@ -1,0 +1,18 @@
+# ── Máy chủ XEM TRƯỚC bản nháp (SSR, Node) — docs/05-cms §4 ─────────────────────────────────────────────
+# Khác ảnh `web` (SSG chạy lúc runtime): ở đây build SSR được NẤU VÀO ảnh (không cần Directus lúc build — nội dung
+# được lấy khi mỗi lượt xem). Chạy không-root, chỉ lắng nghe trong mạng compose; Caddy đứng trước và chặn bằng basic auth.
+FROM node:26.13.0-alpine
+
+WORKDIR /app
+ENV CI=1
+RUN npm i -g pnpm@10.33.2
+RUN chown node:node /app
+USER node
+COPY --chown=node:node package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+COPY --chown=node:node . .
+RUN pnpm exec astro build --config astro.preview.config.mjs
+
+ENV HOST=0.0.0.0 PORT=4322 NODE_ENV=production PREVIEW_SERVER=1
+EXPOSE 4322
+CMD ["node", "dist-preview/server/entry.mjs"]

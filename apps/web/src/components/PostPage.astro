@@ -1,0 +1,89 @@
+---
+// Hiển thị MỘT bài viết (tiêu đề, meta, ảnh bìa, thân bài). Dùng chung cho trang tĩnh /posts/[slug] (SSG) và máy chủ
+// xem trước bản nháp (`preview/`, SSR) — hai nơi KHÔNG được lệch nhau về giao diện.
+// Chỉ nhận DTO PostDetail; KHÔNG gọi Directus trực tiếp.
+import Base from '../layouts/Base.astro';
+import CoverImage from './CoverImage.astro';
+import TagList from './TagList.astro';
+import AuthorName from './AuthorName.astro';
+import { formatDate } from '../lib/format';
+import { buildPostJsonLd, serializeJsonLd } from '../lib/json-ld';
+import { getSiteSettings } from '../lib/directus';
+import type { PostDetail } from '../lib/types';
+
+interface Props {
+  post: PostDetail;
+  /** Máy chủ xem trước: hiện dải "bản xem trước" và không cho công cụ tìm kiếm lập chỉ mục. */
+  preview?: boolean;
+}
+const { post, preview = false } = Astro.props;
+const { siteName, defaultOgImage } = await getSiteSettings();
+
+// body là HTML do CMS lưu (input-rich-text-html, ADR-0011). Nội dung do Editor tin cậy
+// nhập; đã sanitize (allowlist) trong toDetail → sanitizeBody (ADR-0013, 12-security §8).
+const bodyHtml = post.body ?? '';
+
+// URL/ảnh tuyệt đối cho structured data + article meta (Sprint 6.5).
+const site = Astro.site;
+const pageUrl = site ? new URL(`/posts/${post.slug}`, site).href : `/posts/${post.slug}`;
+const imageAbs = post.cover?.url
+  ? (site ? new URL(post.cover.url, site).href : post.cover.url)
+  : (site ? new URL(defaultOgImage?.url ?? '/og-default.png', site).href : (defaultOgImage?.url ?? '/og-default.png'));
+
+// JSON-LD BlogPosting (logic ở lib/json-ld.ts, có unit test).
+const jsonLdScript = serializeJsonLd(
+  buildPostJsonLd(post, { site, siteName, imageAbs, pageUrl }),
+);
+---
+
+<Base
+  noindex={preview}
+  title={`${post.title} — ${siteName}`}
+  description={post.excerpt ?? undefined}
+  type="article"
+  image={post.cover?.url}
+>
+  <Fragment slot="head">
+    {post.publishedAt && <meta property="article:published_time" content={post.publishedAt} />}
+    <meta property="article:author" content={post.author.name} />
+    {post.category && <meta property="article:section" content={post.category.name} />}
+    {post.tags.map((t) => <meta property="article:tag" content={t.name} />)}
+    <script type="application/ld+json" is:inline set:html={jsonLdScript} />
+  </Fragment>
+  {
+    post.cover && (
+      <CoverImage
+        class="post__cover"
+        src={post.cover.url}
+        alt={post.cover.alt}
+        widths={[640, 960, 1200]}
+        sizes="(min-width: 1080px) 1040px, calc(100vw - 2.5rem)"
+        eager
+      />
+    )
+  }
+  {preview && <p class="preview-banner" role="note">Bản xem trước — có thể là bài nháp, chưa xuất bản.</p>}
+  <article class="post">
+    <header class="post__header">
+      <h1>{post.title}</h1>
+      <p class="meta">
+        Bởi <AuthorName author={post.author} />
+        {
+          post.category && (
+            <>
+              {' · '}
+              <a href={`/category/${post.category.slug}`}>{post.category.name}</a>
+            </>
+          )
+        }
+        {post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
+      </p>
+      <TagList tags={post.tags} />
+    </header>
+    <div class="prose" set:html={bodyHtml}></div>
+  </article>
+</Base>
+
+<script>
+  import '../scripts/lightbox';
+</script>

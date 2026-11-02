@@ -1,17 +1,12 @@
 ---
 // Trang CHI TIẾT bài viết. Route tĩnh dựng từ danh sách slug đã publish (SSG,
 // ADR-0006). Chỉ dùng thin client → DTO PostDetail; KHÔNG gọi Directus trực tiếp.
-import Base from '../../layouts/Base.astro';
-import CoverImage from '../../components/CoverImage.astro';
-import TagList from '../../components/TagList.astro';
-import AuthorName from '../../components/AuthorName.astro';
-import { formatDate } from '../../lib/format';
-import { buildPostJsonLd, serializeJsonLd } from '../../lib/json-ld';
+// Phần hiển thị nằm ở PostPage (dùng chung với máy chủ xem trước bản nháp — `preview/`).
+import PostPage from '../../components/PostPage.astro';
 import {
   getAllPublishedPostSlugs,
   getPostBySlug,
   getPostSlugRedirects,
-  getSiteSettings,
 } from '../../lib/directus';
 
 export async function getStaticPaths() {
@@ -27,74 +22,10 @@ const { slug } = Astro.params;
 const { redirectTo } = Astro.props;
 // Bản build tĩnh: Astro.redirect sinh trang <meta http-equiv="refresh"> + canonical (không cần script → hợp CSP).
 if (redirectTo) return Astro.redirect(`/posts/${redirectTo}`, 301);
-const { siteName, defaultOgImage } = await getSiteSettings();
+
 const post = await getPostBySlug(slug!);
 // getStaticPaths chỉ sinh slug hợp lệ ⇒ nhánh này chỉ là chốt an toàn khi build.
 if (!post) throw new Error(`Không tìm thấy bài đã xuất bản: ${slug}`);
-
-// body là HTML do CMS lưu (input-rich-text-html, ADR-0011). Nội dung do Editor tin cậy
-// nhập; đã sanitize (allowlist) trong toDetail → sanitizeBody (ADR-0013, 12-security §8).
-const bodyHtml = post.body ?? '';
-
-// URL/ảnh tuyệt đối cho structured data + article meta (Sprint 6.5).
-const site = Astro.site;
-const pageUrl = site ? new URL(`/posts/${post.slug}`, site).href : `/posts/${post.slug}`;
-const imageAbs = post.cover?.url
-  ? (site ? new URL(post.cover.url, site).href : post.cover.url)
-  : (site ? new URL(defaultOgImage?.url ?? '/og-default.png', site).href : (defaultOgImage?.url ?? '/og-default.png'));
-
-// JSON-LD BlogPosting (logic ở lib/json-ld.ts, có unit test).
-const jsonLdScript = serializeJsonLd(
-  buildPostJsonLd(post, { site, siteName, imageAbs, pageUrl }),
-);
 ---
 
-<Base
-  title={`${post.title} — ${siteName}`}
-  description={post.excerpt ?? undefined}
-  type="article"
-  image={post.cover?.url}
->
-  <Fragment slot="head">
-    {post.publishedAt && <meta property="article:published_time" content={post.publishedAt} />}
-    <meta property="article:author" content={post.author.name} />
-    {post.category && <meta property="article:section" content={post.category.name} />}
-    {post.tags.map((t) => <meta property="article:tag" content={t.name} />)}
-    <script type="application/ld+json" is:inline set:html={jsonLdScript} />
-  </Fragment>
-  {
-    post.cover && (
-      <CoverImage
-        class="post__cover"
-        src={post.cover.url}
-        alt={post.cover.alt}
-        widths={[640, 960, 1200]}
-        sizes="(min-width: 1080px) 1040px, calc(100vw - 2.5rem)"
-        eager
-      />
-    )
-  }
-  <article class="post">
-    <header class="post__header">
-      <h1>{post.title}</h1>
-      <p class="meta">
-        Bởi <AuthorName author={post.author} />
-        {
-          post.category && (
-            <>
-              {' · '}
-              <a href={`/category/${post.category.slug}`}>{post.category.name}</a>
-            </>
-          )
-        }
-        {post.publishedAt && ` · ${formatDate(post.publishedAt)}`}
-      </p>
-      <TagList tags={post.tags} />
-    </header>
-    <div class="prose" set:html={bodyHtml}></div>
-  </article>
-</Base>
-
-<script>
-  import '../../scripts/lightbox';
-</script>
+<PostPage post={post} />

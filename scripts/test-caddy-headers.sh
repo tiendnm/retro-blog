@@ -18,6 +18,8 @@ NAME="caddy-hdr-test-$$"
 PORT="${CADDY_TEST_PORT:-18080}"
 SITE_HOST="site.test"
 CMS_HOST="cms.test"
+PREVIEW_HOST="preview.test"
+PREVIEW_PASS="mat-khau-thu-nghiem"
 WORK="$(mktemp -d)"
 
 cleanup() {
@@ -33,11 +35,15 @@ chmod -R a+rX "$WORK"
 
 # `docker cp` thay vì bind-mount: chạy giống nhau trên Linux/macOS/Git Bash (không lỗi chuyển đường dẫn).
 # tmpfs cho /data,/config để uid 1000 ghi được (prod dùng volume đã chown).
+# Băm bcrypt cho basic auth của máy chủ xem trước (cùng image Caddy).
+PREVIEW_HASH="$(docker run --rm "$IMAGE" caddy hash-password --plaintext "$PREVIEW_PASS")"
+
 docker create --name "$NAME" \
   --user 1000:1000 --cap-drop ALL --cap-add NET_BIND_SERVICE --security-opt no-new-privileges:true \
   --tmpfs /data:uid=1000,gid=1000 --tmpfs /config:uid=1000,gid=1000 \
   -e SITE_ADDRESS="http://$SITE_HOST" -e CMS_ADDRESS="http://$CMS_HOST" \
   -e SITE_DOMAIN="$SITE_HOST" -e CMS_DOMAIN="$CMS_HOST" -e ACME_EMAIL=test@example.test \
+  -e PREVIEW_ADDRESS="http://$PREVIEW_HOST" -e PREVIEW_AUTH_USER=editor -e PREVIEW_AUTH_HASH="$PREVIEW_HASH" \
   -p "127.0.0.1:$PORT:80" \
   "$IMAGE" >/dev/null
 docker cp "$CADDYFILE" "$NAME:/etc/caddy/Caddyfile"
@@ -99,6 +105,23 @@ echo "▶ Site 404 phục vụ trang 404.html"
 BODY="$(curl -s -H "Host: $SITE_HOST" "http://127.0.0.1:$PORT/khong-co-trang-nay")"
 if [[ "$BODY" == *trang-404-cua-site* ]]; then ok "nội dung là 404.html"; else fail "404 không phục vụ 404.html (thấy '$BODY')"; fi
 check "CMS 502 (Directus down, handle_errors)" "$CMS_HOST" /server/ping 502 cms
+
+# Máy chủ xem trước: KHÔNG có thông tin đăng nhập → 401 (bài nháp không được lộ), sai mật khẩu → 401, đúng → qua auth
+# (502 vì upstream `preview` không chạy trong bài test). Header: noindex + chỉ CMS được nhúng khung.
+echo "▶ Preview chặn khi thiếu/sai mật khẩu"
+for creds in "" "editor:sai-mat-khau"; do
+  H="$(curl -s -D - -o /dev/null ${creds:+-u "$creds"} -H "Host: $PREVIEW_HOST" "http://127.0.0.1:$PORT/posts/ban-nhap")"
+  s="$(printf '%s\n' "$H" | head -1 | awk '{print $2}')"
+  if [ "$s" = 401 ]; then ok "401 với thông tin '${creds:-<không có>}'"; else fail "preview mong 401 với '${creds:-<không có>}', thấy '$s'"; fi
+done
+echo "▶ Preview qua auth + header"
+HEADERS="$(curl -s -D - -o /dev/null -u "editor:$PREVIEW_PASS" -H "Host: $PREVIEW_HOST" "http://127.0.0.1:$PORT/posts/ban-nhap")"
+s="$(printf '%s\n' "$HEADERS" | head -1 | awk '{print $2}')"
+if [ "$s" = 502 ]; then ok "đúng mật khẩu → qua auth (502: upstream giả không chạy)"; else fail "preview đúng mật khẩu mong 502, thấy '$s'"; fi
+expect_has X-Robots-Tag noindex
+expect_has Content-Security-Policy "frame-ancestors https://$CMS_HOST"
+expect_eq Cache-Control no-store
+expect_absent Server
 
 echo
 if [ "$FAILS" -gt 0 ]; then

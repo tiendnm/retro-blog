@@ -44,7 +44,7 @@
 | RSS / Atom feed | FR-R5 (Should) | |
 | Lên lịch xuất bản (Scheduled) | FR-E3 (phần "schedule"); [03b §4](./03b-domain-model.md) nhánh *Scheduled* | "Publish" là Must; "schedule" là Nice |
 | Trạng thái *Chờ duyệt* (In Review) | [03b §4](./03b-domain-model.md) | Chỉ cần khi nhiều biên tập viên |
-| Xem trước bản nháp trên site | FR-E2b | Hạ từ Must 2026-11-02 ([10 §5](./10-decisions.md)); chưa hiện thực — Editor xem trong trình soạn của CMS ([05 §4](./05-cms.md)) |
+| Xem trước bản nháp trên site | FR-E2b | Hạ từ Must 2026-11-02 ([10 §5](./10-decisions.md)); sau đó hiện thực bằng máy chủ xem trước SSR riêng + Live Preview của Directus ([05 §4](./05-cms.md)) |
 
 > ✂️ Các mục này **có thể cắt khỏi v1** mà không hoãn launch.
 

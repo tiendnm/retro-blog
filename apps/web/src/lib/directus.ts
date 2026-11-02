@@ -3,7 +3,8 @@
 // Page/component KHÔNG gọi Directus trực tiếp; chỉ import các hàm ở đây và
 // nhận về DTO ([types.ts] / hợp đồng 03d). Không nhúng secret.
 //
-// - Fetch server-side qua DIRECTUS_INTERNAL_URL, KHÔNG gửi token ⇒ vai Public.
+// - Fetch server-side qua DIRECTUS_INTERNAL_URL, KHÔNG gửi token ⇒ vai Public
+//   (ngoại lệ DUY NHẤT: máy chủ xem trước đặt DIRECTUS_PREVIEW_TOKEN ⇒ vai Preview, chỉ đọc, thấy cả bài nháp).
 //   ⇒ Directus tự áp Public permission: chỉ posts đã publish & đã tới giờ,
 //     và CHỈ field trong allowlist (05-cms §2). Bảo mật nằm ở tầng permission.
 // - Field yêu cầu ở dưới PHẢI là tập con của Public allowlist, nếu không
@@ -32,6 +33,13 @@ import { sanitizeBody } from './sanitize-body';
 const INTERNAL_URL = process.env.DIRECTUS_INTERNAL_URL ?? 'http://directus:8055';
 // URL công khai để BROWSER tải asset (ảnh) — nhúng vào HTML lúc render.
 const PUBLIC_URL = process.env.PUBLIC_DIRECTUS_URL ?? 'http://localhost:8055';
+
+// Token chỉ-đọc của vai Preview — CHỈ đặt ở máy chủ xem trước bản nháp (preview/, docs/05 §4). Site công khai (SSG) không
+// có biến này nên vẫn gọi Directus với vai Public. Không bao giờ nhúng vào HTML.
+// Chỉ có hiệu lực khi PREVIEW_SERVER=1 (Dockerfile.preview đặt): token lọt vào môi trường của một lần build SSG
+// (vd chạy test trên máy có sẵn biến) cũng KHÔNG làm bài nháp lọt vào site công khai.
+const PREVIEW_TOKEN =
+  process.env.PREVIEW_SERVER === '1' ? process.env.DIRECTUS_PREVIEW_TOKEN?.trim() || undefined : undefined;
 
 // Giới hạn thời gian mỗi request: Directus treo thì build lỗi rõ ràng thay vì treo vô hạn.
 const REQUEST_TIMEOUT_MS = 15_000;
@@ -96,7 +104,9 @@ async function directusGet<T>(path: string): Promise<DirectusList<T>> {
   let res: Response;
   try {
     res = await fetch(`${INTERNAL_URL}${path}`, {
-      headers: { Accept: 'application/json' },
+      headers: PREVIEW_TOKEN
+        ? { Accept: 'application/json', Authorization: `Bearer ${PREVIEW_TOKEN}` }
+        : { Accept: 'application/json' },
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
   } catch (e) {

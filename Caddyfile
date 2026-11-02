@@ -78,6 +78,37 @@
 	}
 }
 
+# ── Máy chủ xem trước bản nháp (SSR — docs/05-cms §4) ───────────────────────
+# Bài nháp KHÔNG được lộ: basic auth BẮT BUỘC ở đây (mặc định băm của mật khẩu đã vứt ⇒ chưa cấu hình thì không ai vào
+# được; PREVIEW_DOMAIN mặc định `preview.invalid` không resolve được). Cho phép nhúng khung CHỈ từ CMS (Live Preview của
+# Directus) nên không dùng snippet site_headers (đang cấm mọi frame); còn lại giữ nguyên. noindex ở cả header.
+(preview_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://{$CMS_DOMAIN}; font-src 'self'; connect-src 'self'; media-src 'self' https://{$CMS_DOMAIN}; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors https://{$CMS_DOMAIN}"
+		X-Robots-Tag "noindex, nofollow"
+		Cache-Control "no-store"
+		-Server
+	}
+}
+
+{$PREVIEW_ADDRESS:http://preview.invalid} {
+	import preview_headers
+
+	basic_auth {
+		{$PREVIEW_AUTH_USER:editor} {$PREVIEW_AUTH_HASH}
+	}
+	reverse_proxy preview:4322
+
+	handle_errors {
+		import preview_headers
+		respond "{err.status_code} {err.status_text}"
+	}
+}
+
 # ── Directus: admin UI + REST API + /assets ────────────────────────────────
 {$CMS_ADDRESS} {
 	import cms_headers

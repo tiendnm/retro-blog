@@ -44,13 +44,16 @@ jobs:
       - run: pnpm exec biome format .
       - run: pnpm typecheck
       - run: pnpm test
+      # Máy chủ xem trước bản nháp (SSR): phải build được — không nạp nội dung lúc build nên không cần Directus.
+      - name: Build máy chủ xem trước (SSR)
+        run: pnpm exec astro build --config astro.preview.config.mjs
       # Test hạ tầng (webhook rebuild) — Node thuần, không cần cài deps.
       - name: Compose config hợp lệ (prod + tunnel)
         working-directory: .
         run: docker compose --env-file .env.production.example config -q
       - name: Shellcheck (script triển khai & vận hành)
         working-directory: .
-        run: shellcheck -S warning -x --source-path=SCRIPTDIR scripts/*.sh scripts/lib/*.sh services/ops/*.sh services/rebuild/*.sh services/directus/apply-permissions.sh
+        run: shellcheck -S warning -x --source-path=SCRIPTDIR scripts/*.sh scripts/lib/*.sh services/ops/*.sh services/rebuild/*.sh services/directus/apply-permissions.sh services/directus/apply-preview.sh
       - name: Ops tests (webhook)
         working-directory: .
         run: node --test services/rebuild/webhook.test.mjs
@@ -129,6 +132,11 @@ jobs:
         run: docker exec directus npx directus schema apply --yes /directus/snapshots/schema.yaml
       - name: Apply permissions
         run: bash services/directus/apply-permissions.sh
+      # Vai Preview (xem trước bản nháp). Token CHỈ đặt ở bước này và bước test quyền — KHÔNG ở bước Build (bài nháp không được vào site).
+      - name: Apply Preview role
+        env:
+          DIRECTUS_PREVIEW_TOKEN: ci-only-preview-token-0123456789abcdef0123456789abcdef
+        run: bash services/directus/apply-preview.sh
       # Cài deps web TRƯỚC seed: seed dùng `marked` từ apps/web (services/directus/lib/md-to-html.mjs).
       - name: Install web deps
         working-directory: apps/web
@@ -150,7 +158,9 @@ jobs:
 
       # Kiểm cấu hình quyền + luồng publish → build trên Directus thật (Sprint 11 §E). Chạy TUẦN TỰ (dùng chung tiền tố bài thử).
       # Đỏ vì lộ dữ liệu = dừng và báo Product (cổng bảo mật).
-      - name: Quyền Public + luồng publish → build
+      - name: Quyền Public/Preview + luồng publish → build
+        env:
+          DIRECTUS_PREVIEW_TOKEN: ci-only-preview-token-0123456789abcdef0123456789abcdef
         run: node --test --test-concurrency=1 scripts/integration/
 
       - name: Directus logs (on failure)

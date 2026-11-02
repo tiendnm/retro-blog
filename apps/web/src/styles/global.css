@@ -1005,3 +1005,13 @@ dialog.lightbox::backdrop {
 .category-list p {
   margin: 0 0 var(--space-1);
 }
+
+/* Dải báo "bản xem trước" ở máy chủ xem trước bản nháp (preview/) — không xuất hiện trên site công khai. */
+.preview-banner {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) dashed var(--color-accent);
+  color: var(--color-text);
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-sm, 0.875rem);
+}

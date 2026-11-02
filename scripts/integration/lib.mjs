@@ -89,3 +89,9 @@ export async function cleanup() {
   const r = await admin('GET', `/items/posts?filter[slug][_starts_with]=${PREFIX}&fields=id&limit=-1`);
   for (const p of r.json?.data ?? []) await admin('DELETE', `/items/posts/${p.id}`);
 }
+
+/** Request với token tĩnh cho trước (vd vai Preview). */
+export const withToken = (token, method, path, body) => call(method, path, { token, body });
+
+/** Token vai Preview (DIRECTUS_PREVIEW_TOKEN) — cùng giá trị apply-preview.sh gán cho user Preview. */
+export const previewToken = () => need('DIRECTUS_PREVIEW_TOKEN');

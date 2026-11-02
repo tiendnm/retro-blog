@@ -57,6 +57,8 @@ setup_cms() {
   dc exec -T directus npx directus schema apply --yes /directus/snapshots/schema.yaml
   say "Áp quyền (Roles/Policies/Permissions)"
   ops_run bash services/directus/apply-permissions.sh
+  say "Áp vai Preview (xem trước bản nháp)"
+  ops_run bash services/directus/apply-preview.sh
   say "Áp Flow rebuild-on-publish"
   ops_run node services/directus/apply-rebuild-flow.mjs
   say "Áp Flow tự sinh slug"

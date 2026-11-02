@@ -19,6 +19,7 @@ node_modules/
 
 # ─── Astro ───
 apps/web/dist/
+apps/web/dist-preview/
 apps/web/.astro/
 .output/
 
