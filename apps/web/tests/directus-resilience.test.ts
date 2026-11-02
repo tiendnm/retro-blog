@@ -4,6 +4,7 @@ import { loadClient, mockFetch } from './helpers';
 // Sprint 11 §F — độ bền thin client: Directus lỗi/hỏng/chậm không được làm build treo hay rò chi tiết.
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
@@ -31,6 +32,63 @@ describe('Directus trả lỗi 5xx', () => {
     mockFetch({}, 503);
     const { getAllPublishedPostSlugs } = await loadClient();
     await expect(getAllPublishedPostSlugs()).rejects.toMatchObject({ code: 'system' });
+  });
+});
+
+describe('Directus trả HTTP 429 (rate limit)', () => {
+  const ok = () => new Response(JSON.stringify({ data: [] }), { status: 200 });
+  const limited = (retryAfter?: string) =>
+    new Response('{}', { status: 429, headers: retryAfter ? { 'retry-after': retryAfter } : {} });
+
+  it('chờ theo Retry-After rồi thử lại, lần sau thành công thì trả kết quả', async () => {
+    vi.useFakeTimers();
+    const fn = vi.fn().mockResolvedValueOnce(limited('3')).mockResolvedValueOnce(ok());
+    vi.stubGlobal('fetch', fn);
+    const { getAllPublishedPostSlugs } = await loadClient();
+    const pending = getAllPublishedPostSlugs();
+    await vi.advanceTimersByTimeAsync(2_999);
+    expect(fn).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(await pending).toEqual([]);
+    expect(fn).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
+  });
+
+  it('không có Retry-After → chờ tăng dần, vẫn thử lại được', async () => {
+    vi.useFakeTimers();
+    const fn = vi.fn().mockResolvedValueOnce(limited()).mockResolvedValueOnce(limited()).mockResolvedValueOnce(ok());
+    vi.stubGlobal('fetch', fn);
+    const { getAllPublishedPostSlugs } = await loadClient();
+    const pending = getAllPublishedPostSlugs();
+    await vi.advanceTimersByTimeAsync(2_000 + 4_000);
+    expect(await pending).toEqual([]);
+    expect(fn).toHaveBeenCalledTimes(3);
+    vi.useRealTimers();
+  });
+
+  it('429 kéo dài → hết lượt thử thì DirectusError(system), không treo', async () => {
+    vi.useFakeTimers();
+    const fn = vi.fn(async () => limited('1'));
+    vi.stubGlobal('fetch', fn);
+    const { getAllPublishedPostSlugs, DirectusError } = await loadClient();
+    const pending = getAllPublishedPostSlugs().catch((e) => e);
+    await vi.advanceTimersByTimeAsync(60_000);
+    const err = await pending;
+    expect(err).toBeInstanceOf(DirectusError);
+    expect(err.code).toBe('system');
+    expect(fn).toHaveBeenCalledTimes(7); // 1 lần đầu + 6 lần thử lại
+    vi.useRealTimers();
+  });
+
+  it('Retry-After quá lớn bị chặn trần, không chờ vô hạn', async () => {
+    vi.useFakeTimers();
+    const fn = vi.fn().mockResolvedValueOnce(limited('3600')).mockResolvedValueOnce(ok());
+    vi.stubGlobal('fetch', fn);
+    const { getAllPublishedPostSlugs } = await loadClient();
+    const pending = getAllPublishedPostSlugs();
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(await pending).toEqual([]);
+    vi.useRealTimers();
   });
 });
 

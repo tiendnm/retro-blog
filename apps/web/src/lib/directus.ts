@@ -44,6 +44,11 @@ const PREVIEW_TOKEN =
 // Giới hạn thời gian mỗi request: Directus treo thì build lỗi rõ ràng thay vì treo vô hạn.
 const REQUEST_TIMEOUT_MS = 15_000;
 
+// HTTP 429 (Directus rate limit, mặc định 100 yêu cầu/10 giây theo IP): thử lại tối đa N lần, mỗi lần chờ ≤ MAX.
+const RATE_LIMIT_MAX_RETRIES = 6;
+const RATE_LIMIT_BASE_DELAY_MS = 2_000;
+const RATE_LIMIT_MAX_DELAY_MS = 10_000;
+
 const DEFAULT_PAGE_SIZE = 10; // 03d §4
 const MAX_PAGE_SIZE = 50;
 
@@ -100,17 +105,29 @@ export class DirectusError extends Error {
   }
 }
 
+/** Thời gian chờ trước lần thử lại sau HTTP 429: ưu tiên `Retry-After` (giây) của Directus, không thì tăng dần. */
+function retryDelayMs(res: Response, attempt: number): number {
+  const seconds = Number(res.headers.get('retry-after'));
+  const ms = Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : RATE_LIMIT_BASE_DELAY_MS * (attempt + 1);
+  return Math.min(ms, RATE_LIMIT_MAX_DELAY_MS);
+}
+
 async function directusGet<T>(path: string): Promise<DirectusList<T>> {
   let res: Response;
-  try {
-    res = await fetch(`${INTERNAL_URL}${path}`, {
-      headers: PREVIEW_TOKEN
-        ? { Accept: 'application/json', Authorization: `Bearer ${PREVIEW_TOKEN}` }
-        : { Accept: 'application/json' },
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-    });
-  } catch (e) {
-    throw new DirectusError('system', `Directus không truy cập được: ${(e as Error).message}`);
+  for (let attempt = 0; ; attempt++) {
+    try {
+      res = await fetch(`${INTERNAL_URL}${path}`, {
+        headers: PREVIEW_TOKEN
+          ? { Accept: 'application/json', Authorization: `Bearer ${PREVIEW_TOKEN}` }
+          : { Accept: 'application/json' },
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      });
+    } catch (e) {
+      throw new DirectusError('system', `Directus không truy cập được: ${(e as Error).message}`);
+    }
+    // Rate limit của Directus (RATE_LIMITER_*): build SSG gọi dày nên chờ rồi thử lại, hết lượt mới báo lỗi.
+    if (res.status !== 429 || attempt >= RATE_LIMIT_MAX_RETRIES) break;
+    await new Promise((resolve) => setTimeout(resolve, retryDelayMs(res, attempt)));
   }
   if (!res.ok) {
     // 401/403/404 với vai Public ⇒ quy về not_found (không lộ sự tồn tại — 03d §5).
