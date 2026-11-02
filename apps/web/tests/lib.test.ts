@@ -99,6 +99,13 @@ describe('optimizeBodyImages', () => {
     expect(out).not.toContain('width="4000"');
   });
 
+  it('ảnh chèn với preset editor (?key=editor): srcset sinh từ file gốc, không mang key, không bịa kích thước', () => {
+    const out = optimizeBodyImages(`<img src="${base}.jpg?key=editor" alt="a">`);
+    expect(out).not.toContain('key=editor');
+    expect(out).toContain(`${base}?width=1600&amp;quality=80&amp;format=webp 1600w`);
+    expect(out).not.toMatch(/\swidth="/);
+  });
+
   it('không đụng ảnh ngoài asset Directus', () => {
     const html = '<img src="https://x.com/a.png" alt="x">';
     expect(optimizeBodyImages(html)).toBe(html);

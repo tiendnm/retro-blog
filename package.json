@@ -24,6 +24,7 @@
     "fixtures:reset": "node services/directus/fixtures/loader/reset.mjs",
     "rebuild:flow": "node services/directus/apply-rebuild-flow.mjs",
     "theme:apply": "node services/directus/apply-theme.mjs",
+    "presets:apply": "node services/directus/apply-asset-presets.mjs",
     "rebuild:run": "sh services/rebuild/rebuild.sh",
     "docs:check": "node scripts/check-docs.mjs",
     "backup": "sh services/ops/backup.sh",

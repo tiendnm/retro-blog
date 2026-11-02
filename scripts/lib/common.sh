@@ -65,6 +65,8 @@ setup_cms() {
   ops_run node services/directus/apply-slug-flow.mjs
   say "Áp theme/branding admin"
   ops_run node services/directus/apply-theme.mjs
+  say "Áp preset ảnh cho trình soạn thảo"
+  ops_run node services/directus/apply-asset-presets.mjs
 }
 
 # Smoke test sau khi dựng. Trả về số lỗi.
