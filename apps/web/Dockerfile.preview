@@ -1,6 +1,6 @@
 # ── Máy chủ XEM TRƯỚC bản nháp (SSR, Node) — docs/05-cms §4 ─────────────────────────────────────────────
 # Khác ảnh `web` (SSG chạy lúc runtime): ở đây build SSR được NẤU VÀO ảnh (không cần Directus lúc build — nội dung
-# được lấy khi mỗi lượt xem). Chạy không-root, chỉ lắng nghe trong mạng compose; Caddy đứng trước và chặn bằng basic auth.
+# được lấy khi mỗi lượt xem). Chạy không-root, chỉ lắng nghe trong mạng compose; Caddy đứng trước (/preview/* của domain CMS) và chặn bằng phiên đăng nhập Directus.
 FROM node:26.13.0-alpine
 
 WORKDIR /app

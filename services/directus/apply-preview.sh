@@ -7,15 +7,15 @@
 # - posts: đọc MỌI trạng thái (kể cả nháp) — khác Public. Field allowlist = field thin client cần (không '*').
 # - User "preview@retro.example.com" mang static token DIRECTUS_PREVIEW_TOKEN (cùng giá trị với container `preview`).
 #   Token này CHỈ đặt ở container preview + .env.production; không bao giờ vào site công khai.
-# - Đặt preview_url cho collection posts → nút/khung Live Preview trong trang soạn bài (cần PREVIEW_DOMAIN).
-# Env: DIRECTUS_URL, ADMIN_EMAIL, ADMIN_PASSWORD, DIRECTUS_PREVIEW_TOKEN (>= 32 ký tự), PREVIEW_DOMAIN (tuỳ chọn).
+# - Đặt preview_url cho collection posts → nút/khung Live Preview trong trang soạn bài (cần PREVIEW_URL_BASE).
+# Env: DIRECTUS_URL, ADMIN_EMAIL, ADMIN_PASSWORD, DIRECTUS_PREVIEW_TOKEN (>= 32 ký tự), PREVIEW_URL_BASE (vd https://retro.tiendnm.com/preview; tuỳ chọn).
 # ============================================================================
 set -uo pipefail
 BASE="${DIRECTUS_URL:-http://localhost:8055}"
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 if [ -z "${ADMIN_EMAIL:-}" ] || [ -z "${ADMIN_PASSWORD:-}" ] || [ -z "${DIRECTUS_PREVIEW_TOKEN:-}" ]; then
   # shellcheck disable=SC1090
-  if [ -f "$ROOT/.env" ]; then source <(grep -E '^(ADMIN_EMAIL|ADMIN_PASSWORD|DIRECTUS_PREVIEW_TOKEN|PREVIEW_DOMAIN)=' "$ROOT/.env"); fi
+  if [ -f "$ROOT/.env" ]; then source <(grep -E '^(ADMIN_EMAIL|ADMIN_PASSWORD|DIRECTUS_PREVIEW_TOKEN|PREVIEW_URL_BASE)=' "$ROOT/.env"); fi
 fi
 ADMIN_EMAIL="${ADMIN_EMAIL:?}"; ADMIN_PASSWORD="${ADMIN_PASSWORD:?}"
 if [ -z "${DIRECTUS_PREVIEW_TOKEN:-}" ]; then echo "-> DIRECTUS_PREVIEW_TOKEN trống: bỏ qua vai Preview"; exit 0; fi
@@ -69,8 +69,8 @@ fi
 api PATCH "/users/$PU" "{\"role\":\"$ROLE\",\"status\":\"active\",\"token\":\"$DIRECTUS_PREVIEW_TOKEN\"}" >/dev/null
 
 # ---- Live Preview: preview_url của posts ----
-if [ -n "${PREVIEW_DOMAIN:-}" ]; then
-  api PATCH /collections/posts "{\"meta\":{\"preview_url\":\"https://$PREVIEW_DOMAIN/posts/{{slug}}\"}}" >/dev/null
-  echo "-> posts.preview_url = https://$PREVIEW_DOMAIN/posts/{{slug}}"
+if [ -n "${PREVIEW_URL_BASE:-}" ]; then
+  api PATCH /collections/posts "{\"meta\":{\"preview_url\":\"$PREVIEW_URL_BASE/posts/{{slug}}\"}}" >/dev/null
+  echo "-> posts.preview_url = $PREVIEW_URL_BASE/posts/{{slug}}"
 fi
 echo "DONE"

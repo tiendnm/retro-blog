@@ -18,12 +18,13 @@ NAME="caddy-hdr-test-$$"
 PORT="${CADDY_TEST_PORT:-18080}"
 SITE_HOST="site.test"
 CMS_HOST="cms.test"
-PREVIEW_HOST="preview.test"
-PREVIEW_PASS="mat-khau-thu-nghiem"
 WORK="$(mktemp -d)"
+NET="caddy-hdr-net-$$"
+STUB="caddy-hdr-stub-$$"
 
 cleanup() {
-  docker rm -f "$NAME" >/dev/null 2>&1 || true
+  docker rm -f "$NAME" "$STUB" >/dev/null 2>&1 || true
+  docker network rm "$NET" >/dev/null 2>&1 || true
   rm -rf "$WORK"
 }
 trap cleanup EXIT
@@ -35,15 +36,12 @@ chmod -R a+rX "$WORK"
 
 # `docker cp` thay vì bind-mount: chạy giống nhau trên Linux/macOS/Git Bash (không lỗi chuyển đường dẫn).
 # tmpfs cho /data,/config để uid 1000 ghi được (prod dùng volume đã chown).
-# Băm bcrypt cho basic auth của máy chủ xem trước (cùng image Caddy).
-PREVIEW_HASH="$(docker run --rm "$IMAGE" caddy hash-password --plaintext "$PREVIEW_PASS")"
-
-docker create --name "$NAME" \
+docker network create "$NET" >/dev/null
+docker create --name "$NAME" --network "$NET" \
   --user 1000:1000 --cap-drop ALL --cap-add NET_BIND_SERVICE --security-opt no-new-privileges:true \
   --tmpfs /data:uid=1000,gid=1000 --tmpfs /config:uid=1000,gid=1000 \
   -e SITE_ADDRESS="http://$SITE_HOST" -e CMS_ADDRESS="http://$CMS_HOST" \
   -e SITE_DOMAIN="$SITE_HOST" -e CMS_DOMAIN="$CMS_HOST" -e ACME_EMAIL=test@example.test \
-  -e PREVIEW_ADDRESS="http://$PREVIEW_HOST" -e PREVIEW_AUTH_USER=editor -e PREVIEW_AUTH_HASH="$PREVIEW_HASH" \
   -p "127.0.0.1:$PORT:80" \
   "$IMAGE" >/dev/null
 docker cp "$CADDYFILE" "$NAME:/etc/caddy/Caddyfile"
@@ -106,22 +104,57 @@ BODY="$(curl -s -H "Host: $SITE_HOST" "http://127.0.0.1:$PORT/khong-co-trang-nay
 if [[ "$BODY" == *trang-404-cua-site* ]]; then ok "nội dung là 404.html"; else fail "404 không phục vụ 404.html (thấy '$BODY')"; fi
 check "CMS 502 (Directus down, handle_errors)" "$CMS_HOST" /server/ping 502 cms
 
-# Máy chủ xem trước: KHÔNG có thông tin đăng nhập → 401 (bài nháp không được lộ), sai mật khẩu → 401, đúng → qua auth
-# (502 vì upstream `preview` không chạy trong bài test). Header: noindex + chỉ CMS được nhúng khung.
-echo "▶ Preview chặn khi thiếu/sai mật khẩu"
-for creds in "" "editor:sai-mat-khau"; do
-  H="$(curl -s -D - -o /dev/null ${creds:+-u "$creds"} -H "Host: $PREVIEW_HOST" "http://127.0.0.1:$PORT/posts/ban-nhap")"
-  s="$(printf '%s\n' "$H" | head -1 | awk '{print $2}')"
-  if [ "$s" = 401 ]; then ok "401 với thông tin '${creds:-<không có>}'"; else fail "preview mong 401 với '${creds:-<không có>}', thấy '$s'"; fi
-done
-echo "▶ Preview qua auth + header"
-HEADERS="$(curl -s -D - -o /dev/null -u "editor:$PREVIEW_PASS" -H "Host: $PREVIEW_HOST" "http://127.0.0.1:$PORT/posts/ban-nhap")"
-s="$(printf '%s\n' "$HEADERS" | head -1 | awk '{print $2}')"
-if [ "$s" = 502 ]; then ok "đúng mật khẩu → qua auth (502: upstream giả không chạy)"; else fail "preview đúng mật khẩu mong 502, thấy '$s'"; fi
+# Máy chủ xem trước dưới /preview/* của domain CMS, chặn bằng PHIÊN Directus (forward_auth → /users/me). Dựng upstream giả
+# (cùng image Caddy) có alias `directus` và `preview`: /users/me trả 200 khi cookie có directus_session_token=hop-le, ngược lại 401.
+cat >"$WORK/stub.Caddyfile" <<'STUBEOF'
+{
+	auto_https off
+}
+:8055 {
+	@ok header Cookie *directus_session_token=hop-le*
+	handle @ok {
+		respond `{"data":{"id":"u1"}}` 200
+	}
+	handle {
+		respond `{"errors":[{"message":"Invalid credentials."}]}` 401
+	}
+}
+:4322 {
+	respond "PREVIEW-OK" 200
+}
+STUBEOF
+docker create --name "$STUB" --network "$NET" --network-alias directus --network-alias preview   --user 1000:1000 --tmpfs /data:uid=1000,gid=1000 --tmpfs /config:uid=1000,gid=1000 "$IMAGE" >/dev/null
+docker cp "$WORK/stub.Caddyfile" "$STUB:/etc/caddy/Caddyfile"
+docker start "$STUB" >/dev/null
+sleep 2
+
+# preview_get <cookie|""> → "<status> <body>" của /preview/posts/ban-nhap trên domain CMS; header ghi ở $WORK/h.txt
+# (hàm chạy trong $(...) nên KHÔNG gán được HEADERS — gọi load_headers sau đó).
+preview_get() {
+  local cookie="$1" out
+  out="$(curl -s -D "$WORK/h.txt" -o "$WORK/b.txt" ${cookie:+-H "Cookie: $cookie"} -H "Host: $CMS_HOST" "http://127.0.0.1:$PORT/preview/posts/ban-nhap" -w '%{http_code}')"
+  printf '%s %s' "$out" "$(cat "$WORK/b.txt")"
+}
+load_headers() { HEADERS="$(cat "$WORK/h.txt")"; }
+echo "▶ Preview: chưa đăng nhập Directus → 401 (không lộ bản nháp)"
+r="$(preview_get "")"
+if [ "${r%% *}" = 401 ] && [[ "$r" != *PREVIEW-OK* ]]; then ok "không cookie → 401, không tới upstream"; else fail "không cookie: mong 401 và không có nội dung, thấy '$r'"; fi
+r="$(preview_get "directus_session_token=het-han")"
+if [ "${r%% *}" = 401 ] && [[ "$r" != *PREVIEW-OK* ]]; then ok "cookie không hợp lệ → 401"; else fail "cookie sai: mong 401, thấy '$r'"; fi
+load_headers
 expect_has X-Robots-Tag noindex
-expect_has Content-Security-Policy "frame-ancestors https://$CMS_HOST"
+echo "▶ Preview: có phiên Directus hợp lệ → qua tới máy chủ xem trước + header"
+r="$(preview_get "directus_session_token=hop-le")"
+if [ "${r%% *}" = 200 ] && [[ "$r" == *PREVIEW-OK* ]]; then ok "cookie hợp lệ → 200 từ máy chủ xem trước"; else fail "cookie hợp lệ: mong 200 PREVIEW-OK, thấy '$r'"; fi
+load_headers
+expect_has X-Robots-Tag noindex
+expect_has Content-Security-Policy "frame-ancestors 'self'"
 expect_eq Cache-Control no-store
 expect_absent Server
+expect_absent X-Frame-Options
+echo "▶ Preview KHÔNG có trên domain site công khai"
+r="$(curl -s -o /dev/null -w '%{http_code}' -H "Host: $SITE_HOST" "http://127.0.0.1:$PORT/preview/posts/ban-nhap")"
+if [ "$r" = 404 ]; then ok "site công khai /preview/* → 404"; else fail "site công khai /preview/* mong 404, thấy $r"; fi
 
 echo
 if [ "$FAILS" -gt 0 ]; then

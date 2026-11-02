@@ -1,7 +1,7 @@
 ---
 // MÁY CHỦ XEM TRƯỚC BẢN NHÁP (SSR) — cấu hình: astro.preview.config.mjs. Render ĐÚNG MỘT bài theo slug mỗi lần xem,
 // bằng token chỉ-đọc của vai Preview (DIRECTUS_PREVIEW_TOKEN) nên thấy cả bài nháp. KHÔNG có trong site công khai.
-// Truy cập được chặn ở Caddy (basic auth) — xem Caddyfile và docs/05-cms §4.
+// Truy cập được chặn ở Caddy (forward_auth bằng phiên Directus, <CMS_DOMAIN>/preview) — xem Caddyfile và docs/05-cms §4.
 import PostPage from '../../../src/components/PostPage.astro';
 import { getPostBySlug } from '../../../src/lib/directus';
 

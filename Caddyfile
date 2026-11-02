@@ -47,6 +47,24 @@
 	}
 }
 
+# ── Xem trước bản nháp (SSR — docs/05-cms §4): /preview/* của domain CMS ──────────────────────────────────
+# Phục vụ ở ĐÚNG origin của Directus để dùng chung phiên đăng nhập admin: trình duyệt tự gửi cookie `directus_session_token`,
+# Caddy `forward_auth` hỏi Directus (/users/me) — có phiên hợp lệ mới cho qua, không có mật khẩu riêng. Khung Live Preview
+# trong trang soạn bài cùng origin nên không bị chặn cookie bên thứ ba. Bài nháp KHÔNG được lộ: chưa đăng nhập ⇒ 401.
+# Header riêng (noindex, no-store, CSP chặt; chỉ chính origin được nhúng khung), không dùng site_headers.
+(preview_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://{$CMS_DOMAIN}; font-src 'self'; connect-src 'self'; media-src 'self' https://{$CMS_DOMAIN}; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
+		X-Robots-Tag "noindex, nofollow"
+		Cache-Control "no-store"
+		-Server
+	}
+}
+
 # ── Site tĩnh (SSG — ADR-0006) ─────────────────────────────────────────────
 {$SITE_ADDRESS} {
 	import site_headers
@@ -78,41 +96,21 @@
 	}
 }
 
-# ── Máy chủ xem trước bản nháp (SSR — docs/05-cms §4) ───────────────────────
-# Bài nháp KHÔNG được lộ: basic auth BẮT BUỘC ở đây (mặc định băm của mật khẩu đã vứt ⇒ chưa cấu hình thì không ai vào
-# được; PREVIEW_DOMAIN mặc định `preview.invalid` không resolve được). Cho phép nhúng khung CHỈ từ CMS (Live Preview của
-# Directus) nên không dùng snippet site_headers (đang cấm mọi frame); còn lại giữ nguyên. noindex ở cả header.
-(preview_headers) {
-	header {
-		Strict-Transport-Security "max-age=31536000; includeSubDomains"
-		X-Content-Type-Options "nosniff"
-		Referrer-Policy "no-referrer"
-		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
-		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://{$CMS_DOMAIN}; font-src 'self'; connect-src 'self'; media-src 'self' https://{$CMS_DOMAIN}; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors https://{$CMS_DOMAIN}"
-		X-Robots-Tag "noindex, nofollow"
-		Cache-Control "no-store"
-		-Server
-	}
-}
-
-{$PREVIEW_ADDRESS:http://preview.invalid} {
-	import preview_headers
-
-	basic_auth {
-		{$PREVIEW_AUTH_USER:editor} {$PREVIEW_AUTH_HASH}
-	}
-	reverse_proxy preview:4322
-
-	handle_errors {
-		import preview_headers
-		respond "{err.status_code} {err.status_text}"
-	}
-}
-
 # ── Directus: admin UI + REST API + /assets ────────────────────────────────
 {$CMS_ADDRESS} {
-	import cms_headers
-	reverse_proxy directus:8055
+	# /preview/* → máy chủ xem trước (Astro `base: /preview`, không cắt tiền tố), CHỈ khi Directus xác nhận phiên đăng nhập.
+	handle /preview/* {
+		import preview_headers
+		forward_auth directus:8055 {
+			uri /users/me?fields=id
+		}
+		reverse_proxy preview:4322
+	}
+
+	handle {
+		import cms_headers
+		reverse_proxy directus:8055
+	}
 
 	handle_errors {
 		import cms_headers

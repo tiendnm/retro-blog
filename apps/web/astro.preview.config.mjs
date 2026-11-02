@@ -11,6 +11,8 @@ export default defineConfig({
   publicDir: './public',
   outDir: './dist-preview',
   site: process.env.PUBLIC_SITE_URL ?? 'http://localhost:4321',
+  // Phục vụ dưới /preview của site chính (Caddy chuyển tiếp /preview/* KHÔNG cắt tiền tố) → link tài nguyên có base.
+  base: '/preview',
   output: 'server',
   adapter: node({ mode: 'standalone' }),
   vite: { build: { assetsInlineLimit: 0 } },

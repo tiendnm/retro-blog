@@ -60,8 +60,6 @@ services:
       SESSION_COOKIE_SECURE: "true"
       # Tắt trợ lý AI tích hợp (Directus ≥11.14): không dùng, bớt bề mặt tấn công và tính năng ngoài ý muốn.
       AI_ENABLED: "false"
-      # Live Preview (khung xem trước trong trang soạn bài) nhúng máy chủ xem trước: mở frame-src cho đúng origin đó.
-      CONTENT_SECURITY_POLICY_DIRECTIVES__FRAME_SRC: "'self' https://${PREVIEW_DOMAIN:-preview.invalid}"
       # Rate limiting theo IP client (bộ nhớ trong tiến trình — 1 instance). Mặc định cho phép ~10 req/s kéo dài, đủ cho
       # trang tải nhiều ảnh /assets; vượt → 429. IP thật lấy từ CF-Connecting-IP (Cloudflare luôn ghi đè header này, và
       # Caddy không publish cổng nên chỉ tunnel tới được — không giả mạo được). Chỉnh bằng RATE_LIMITER_POINTS/DURATION.
@@ -134,7 +132,7 @@ services:
       options: {max-size: "10m", max-file: "3"}
 
   # Máy chủ XEM TRƯỚC bản nháp (SSR) — docs/05-cms §4. Render từng bài theo yêu cầu bằng token chỉ-đọc của vai Preview
-  # (thấy cả nháp). KHÔNG publish cổng; Caddy (PREVIEW_ADDRESS) đứng trước, chặn bằng basic auth. Directus nhúng nó
+  # (thấy cả nháp). KHÔNG publish cổng; Caddy chuyển /preview/* của domain CMS tới đây (forward_auth bằng phiên Directus). Directus nhúng nó
   # vào khung Live Preview của trang soạn bài.
   preview:
     build:
@@ -213,7 +211,7 @@ services:
       HEALTHCHECK_INTERVAL: ${HEALTHCHECK_INTERVAL:-300}
       # Vai Preview (apply-preview.sh): token của user Preview + domain máy chủ xem trước (đặt preview_url cho posts).
       DIRECTUS_PREVIEW_TOKEN: ${DIRECTUS_PREVIEW_TOKEN:-}
-      PREVIEW_DOMAIN: ${PREVIEW_DOMAIN:-}
+      PREVIEW_URL_BASE: https://${CMS_DOMAIN}/preview
       # Dùng cho tác vụ một lần (apply-*.mjs, apply-permissions.sh) khi chạy trong container.
       DIRECTUS_URL: http://directus:8055
     volumes:
@@ -261,12 +259,6 @@ services:
       # Địa chỉ lắng nghe của Caddy: mặc định = domain (auto-TLS). Tunnel override thành http://<domain>.
       SITE_ADDRESS: ${SITE_ADDRESS:-${SITE_DOMAIN}}
       CMS_ADDRESS: ${CMS_ADDRESS:-${CMS_DOMAIN}}
-      # Xem trước bản nháp: địa chỉ + basic auth (băm bcrypt: `caddy hash-password`; trong .env đặt trong nháy đơn vì có `$`).
-      PREVIEW_DOMAIN: ${PREVIEW_DOMAIN:-preview.invalid}
-      PREVIEW_ADDRESS: ${PREVIEW_ADDRESS:-${PREVIEW_DOMAIN:-http://preview.invalid}}
-      PREVIEW_AUTH_USER: ${PREVIEW_AUTH_USER:-editor}
-      # Mặc định = băm của một mật khẩu ngẫu nhiên đã vứt (từ chối mọi người) → chưa cấu hình thì không ai vào được.
-      PREVIEW_AUTH_HASH: ${PREVIEW_AUTH_HASH:-$$2a$$14$$e4bAG3Gc5mRXzjcH8qmNue1lmvunpWP10VtXKZp6TzK6J5NjnsGuW}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - site_dist:/srv/site:ro
