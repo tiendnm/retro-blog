@@ -16,8 +16,7 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:2026.10.6
     restart: unless-stopped
-    # http2 (TCP) thay QUIC mặc định: bộ đệm UDP của host nhỏ (208 kiB < 7168 kiB cloudflared muốn)
-    # nên QUIC chập chờn, request qua tunnel treo >10s làm healthcheck báo DOWN (2026-11-03).
+    # http2 (TCP) thay QUIC: bộ đệm UDP của host nhỏ (208 kiB < 7168 kiB cloudflared muốn) → QUIC dễ rớt gói.
     command: ["tunnel", "--no-autoupdate", "--protocol", "http2", "run"]
     # DNS công cộng: cloudflared tra bản ghi SRV (region1.v2.argotunnel.com); DNS nhúng của Docker
     # chuyển tiếp lên router nhà, nhiều router không xử lý SRV → "server misbehaving", container restart mãi.
@@ -37,3 +36,9 @@ services:
       - caddy
     networks:
       - retro-net
+
+  ops:
+    environment:
+      # Healthcheck kiểm site/Directus thẳng vào Caddy (HTTP nội bộ, kèm header Host); đường công khai chỉ
+      # còn probe "/" có thử lại — đường nhà→Cloudflare từng mất gói làm báo DOWN giả (2026-11-03).
+      HEALTHCHECK_ORIGIN_URL: http://caddy
