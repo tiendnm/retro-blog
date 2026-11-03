@@ -10,7 +10,7 @@
 ## 1. Nguyên tắc thiết kế & Định vị thương hiệu (Brand)
 
 - **Hướng (provisional — CHƯA khóa):** vintage print / máy đánh chữ — nền giấy ngả vàng, phông monospace, đường kẻ nét đứt, bảng màu ấm trầm. Chủ đề nội dung: máy tính một thời ([00 §1](./00-project.md)).
-- ⚠️ **Phong cách thị giác cuối cùng chưa chốt**; hoàn thiện dần sau khi review giao diện thực tế với Product Owner ([sprint-3 plan §4](./sprints/sprint-3.md)). Hướng kế tiếp (giấy cũ, nếp gấp): [Sprint 16](./sprints/sprint-16.md).
+- ⚠️ **Phong cách thị giác cuối cùng chưa chốt**; hoàn thiện dần sau khi review giao diện thực tế với Product Owner ([sprint-3 plan §4](./sprints/sprint-3.md)). Chất giấy (grain) đã làm ở [Sprint 16](./sprints/sprint-16.md).
 - **Không có nguồn thiết kế ngoài (không Figma):** thiết kế sống trong code; token và hợp đồng thành phần ở [07b](./07b-design-system.md). Ý đồ thiết kế mô tả ở tài liệu này.
 
 ## 2. Bố cục & thành phần cấp trang

@@ -43,7 +43,7 @@ Nguồn sự thật về phạm vi v1 là [01a-mvp-scope](./01a-mvp-scope.md); d
 - Bình luận, newsletter, analytics dashboard, related posts, CDN/tối ưu ảnh nâng cao.
 
 **Sẽ cân nhắc sau (Later / Maybe):**
-- Đa ngôn ngữ (i18n), trạng thái *Chờ duyệt*/*Lên lịch*/*Lưu trữ*, dark/light mode, hiệu ứng giấy cũ (grain/crease — Sprint 16).
+- Đa ngôn ngữ (i18n), trạng thái *Chờ duyệt*/*Lên lịch*/*Lưu trữ*, dark/light mode, hiệu ứng nếp gấp/crease (đã thử ở Sprint 16, Product loại; grain giấy đã làm).
 
 ## 6. Đối tượng người dùng (Personas)
 

@@ -2,7 +2,7 @@
 
 > Một blog headless mang phong cách retro — **Astro** (site) + **Directus** (headless CMS) + **PostgreSQL**, đóng gói bằng **Docker**.
 
-> **Trạng thái:** 🟢 Đang chạy production trên server tại nhà qua Cloudflare Tunnel; CI (`quality` + `build`) bắt buộc trên `main`. Sprint 0–14 xong. Chi tiết: [docs/sprints](./docs/sprints/) · [roadmap](./docs/02-roadmap.md).
+> **Trạng thái:** 🟢 Đang chạy production trên server tại nhà qua Cloudflare Tunnel; CI (`quality` + `build`) bắt buộc trên `main`. Sprint 0–16 xong. Chi tiết: [docs/sprints](./docs/sprints/) · [roadmap](./docs/02-roadmap.md).
 
 ---
 
@@ -64,8 +64,11 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
    pnpm permissions:apply    # cấu hình Roles/Policies/Permissions (Public/Editor)
    pnpm seed:dev             # (tuỳ chọn) dữ liệu mẫu dev: 1 author, 2 category, 3 bài + 1 draft
    pnpm seed:showcase        # (tuỳ chọn, sau seed:dev) +17 bài có ảnh, 4 chuyên mục, 2 tác giả, avatar — xem blog "đủ ảnh"
+   pnpm preview:apply        # vai Preview + nút Live Preview ở trang soạn bài (xem "Xem trước bản nháp")
+   pnpm presets:apply        # preset ảnh 'editor' (≤1200px WebP) để chèn ảnh lớn không làm TinyMCE giật
+   pnpm theme:apply          # giao diện Directus theo phong cách retro
    ```
-   > Chỉ cần khi Directus còn trống (volume mới). Cả ba **idempotent** — chạy lại an toàn.
+   > Chỉ cần khi Directus còn trống (volume mới). Tất cả đều **idempotent** — chạy lại an toàn.
    > Artifacts: `services/directus/snapshots/schema.yaml` · `services/directus/apply-permissions.sh` · `services/directus/seed/seed-dev.mjs`.
    > `permissions:apply` / `seed:dev` cần `ADMIN_EMAIL`/`ADMIN_PASSWORD` trong `.env` (dùng Admin API; `seed:dev` cần Node 18+ trên host).
 
@@ -96,6 +99,10 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
 | Gỡ container (giữ dữ liệu) | `pnpm down` | `docker compose down` |
 
 > **Dữ liệu bền:** named volumes `pgdata`, `directus_uploads` tồn tại qua `stop`/`down` (chỉ mất khi `docker compose down -v`).
+
+### Xem trước bản nháp
+
+Site công khai là tĩnh và chỉ chứa bài đã xuất bản, nên bản nháp được render theo yêu cầu bởi container `preview` (Astro SSR, một route `/posts/[slug]`). Ở production phục vụ tại `https://<CMS_DOMAIN>/preview/` và **dùng chung phiên đăng nhập Directus** (chưa đăng nhập ⇒ 401). Trong trang soạn bài, Live Preview hiện cạnh form; dùng **Ctrl+S** (lưu và ở lại) để làm mới. Thiết lập và đánh đổi: [05-cms §4](./docs/05-cms.md).
 
 ### Kiểm tra chất lượng (giống CI job `quality`)
 
@@ -155,7 +162,8 @@ Bắt đầu từ [docs/README.md](./docs/README.md).
 | Sprint 12 | Vận hành & quan sát (runbook, restore drill) | 🟢 Hoàn thành ([sprint-12](./docs/sprints/sprint-12.md)) |
 | Sprint 13 | Bảo mật bổ sung & cổng CI | 🟢 Hoàn thành ([sprint-13](./docs/sprints/sprint-13.md)) |
 | Sprint 14 | Nợ tài liệu (dọn placeholder, script `check-docs`) | 🟢 Hoàn thành ([sprint-14](./docs/sprints/sprint-14.md)) |
-| Sprint 15–16 | Refactor docs Đợt 3 · Visual Polish | 📋 Kế hoạch ([roadmap](./docs/02-roadmap.md)) |
+| Sprint 15 | Refactor docs Đợt 3 (IA của site, Design System, topology một nguồn) | 🟢 Hoàn thành ([sprint-15](./docs/sprints/sprint-15.md)) |
+| Sprint 16 | Visual Polish (chất giấy procedural, không nếp gáy) | 🟢 Hoàn thành ([sprint-16](./docs/sprints/sprint-16.md)) |
 
 ## License
 

@@ -5,7 +5,7 @@
 
 ---
 
-> ℹ️ **Phong cách retro chưa khóa** — giá trị dưới đây là *nền*, tinh chỉnh dần sau review thực tế ([07 §1](./07-ui-ux.md)). Hướng cải thiện thị giác (giấy cũ, nếp gấp) ở [Sprint 16](./sprints/sprint-16.md).
+> ℹ️ **Phong cách retro chưa khóa** — giá trị dưới đây là *nền*, tinh chỉnh dần sau review thực tế ([07 §1](./07-ui-ux.md)). Chất giấy đã làm ở [Sprint 16](./sprints/sprint-16.md) (§3.5).
 >
 > 🧭 **§1–§6 trung lập framework** (chỉ nói về giá trị và hợp đồng). **§7 là RÌA:** nơi các giá trị này hiện thực trong mã.
 
