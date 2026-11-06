@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { buildPostJsonLd, serializeJsonLd } from '../src/lib/json-ld';
+import {
+  buildPostJsonLd,
+  buildWebSiteJsonLd,
+  buildBreadcrumbJsonLd,
+  serializeJsonLd,
+} from '../src/lib/json-ld';
 import { pageCells } from '../src/lib/pagination';
 import type { PostDetail } from '../src/lib/types';
 
@@ -114,5 +119,31 @@ describe('serializeJsonLd', () => {
     const out = serializeJsonLd({ headline: '</script><script>alert(1)</script>' });
     expect(out).not.toContain('<');
     expect(JSON.parse(out).headline).toBe('</script><script>alert(1)</script>');
+  });
+});
+
+describe('buildWebSiteJsonLd / buildBreadcrumbJsonLd', () => {
+  it('WebSite có name, url, inLanguage; description chỉ khi có', () => {
+    expect(buildWebSiteJsonLd('Retro Blog', 'https://blog.example.test/', 'Mô tả')).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Retro Blog',
+      url: 'https://blog.example.test/',
+      inLanguage: 'vi',
+      description: 'Mô tả',
+    });
+    expect(buildWebSiteJsonLd('Retro Blog', 'https://blog.example.test/', null)).not.toHaveProperty(
+      'description',
+    );
+  });
+
+  it('BreadcrumbList đánh số position từ 1', () => {
+    const ld = buildBreadcrumbJsonLd([
+      { name: 'Trang chủ', url: 'https://blog.example.test/' },
+      { name: 'Bài', url: 'https://blog.example.test/posts/a' },
+    ]);
+    expect(ld['@type']).toBe('BreadcrumbList');
+    expect(ld.itemListElement.map((i) => i.position)).toEqual([1, 2]);
+    expect(ld.itemListElement[1].item).toBe('https://blog.example.test/posts/a');
   });
 });

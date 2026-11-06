@@ -36,6 +36,38 @@ export function buildPostJsonLd(
   };
 }
 
+/** JSON-LD WebSite — trang chủ, giúp Google hiểu tên site. */
+export function buildWebSiteJsonLd(siteName: string, siteUrl: string, description?: string | null) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteName,
+    url: siteUrl,
+    inLanguage: 'vi',
+    ...(description ? { description } : {}),
+  };
+}
+
+export interface Crumb {
+  name: string;
+  /** URL tuyệt đối. */
+  url: string;
+}
+
+/** JSON-LD BreadcrumbList — vị trí đánh số từ 1 theo thứ tự truyền vào. */
+export function buildBreadcrumbJsonLd(crumbs: Crumb[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.name,
+      item: c.url,
+    })),
+  };
+}
+
 /** Escape '<' để chuỗi JSON không thể phá vỡ ngữ cảnh <script> (nội dung tin cậy, vẫn hardening). */
 export const serializeJsonLd = (data: unknown): string =>
   JSON.stringify(data).replace(/</g, '\\u003c');

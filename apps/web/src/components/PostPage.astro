@@ -7,7 +7,7 @@ import CoverImage from './CoverImage.astro';
 import TagList from './TagList.astro';
 import AuthorName from './AuthorName.astro';
 import { formatDate } from '../lib/format';
-import { buildPostJsonLd, serializeJsonLd } from '../lib/json-ld';
+import { buildPostJsonLd, buildBreadcrumbJsonLd, serializeJsonLd } from '../lib/json-ld';
 import { getSiteSettings } from '../lib/directus';
 import type { PostDetail } from '../lib/types';
 
@@ -34,6 +34,19 @@ const imageAbs = post.cover?.url
 const jsonLdScript = serializeJsonLd(
   buildPostJsonLd(post, { site, siteName, imageAbs, pageUrl }),
 );
+
+// Breadcrumb: Trang chủ › Chuyên mục (nếu có) › Bài. Cần `site` để có URL tuyệt đối.
+const breadcrumbScript = site
+  ? serializeJsonLd(
+      buildBreadcrumbJsonLd([
+        { name: siteName, url: new URL('/', site).href },
+        ...(post.category
+          ? [{ name: post.category.name, url: new URL(`/category/${post.category.slug}`, site).href }]
+          : []),
+        { name: post.title, url: pageUrl },
+      ]),
+    )
+  : null;
 ---
 
 <Base
@@ -49,6 +62,7 @@ const jsonLdScript = serializeJsonLd(
     {post.category && <meta property="article:section" content={post.category.name} />}
     {post.tags.map((t) => <meta property="article:tag" content={t.name} />)}
     <script type="application/ld+json" is:inline set:html={jsonLdScript} />
+    {breadcrumbScript && <script type="application/ld+json" is:inline set:html={breadcrumbScript} />}
   </Fragment>
   {
     post.cover && (

@@ -4,14 +4,19 @@
 import Base from '../layouts/Base.astro';
 import PostListView from '../components/PostListView.astro';
 import { getSiteSettings, listCategories, listPublishedPosts } from '../lib/directus';
+import { buildWebSiteJsonLd, serializeJsonLd } from '../lib/json-ld';
 
 const { siteName, description } = await getSiteSettings();
+const webSiteScript = Astro.site
+  ? serializeJsonLd(buildWebSiteJsonLd(siteName, new URL('/', Astro.site).href, description))
+  : null;
 const categories = await listCategories();
 const { items, pageInfo } = await listPublishedPosts({ page: 1 });
 const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
 ---
 
 <Base title={`${siteName} — Bài viết mới nhất`} description={description}>
+  {webSiteScript && <script slot="head" type="application/ld+json" is:inline set:html={webSiteScript} />}
   <PostListView
     heading="Bài viết mới nhất"
     items={items}

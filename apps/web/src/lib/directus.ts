@@ -475,6 +475,16 @@ export async function getAllPublishedPostSlugs(): Promise<string[]> {
   return data.map((p) => p.slug);
 }
 
+/** Slug + ngày xuất bản của mọi bài đã xuất bản — dùng cho `<lastmod>` trong sitemap. */
+export async function listPostSitemapEntries(): Promise<
+  { slug: string; publishedAt: string | null }[]
+> {
+  const { data } = await directusGet<{ slug: string; published_at?: string | null }[]>(
+    `/items/posts?fields=slug,published_at&sort=-published_at&limit=-1`,
+  );
+  return data.map((p) => ({ slug: p.slug, publishedAt: p.published_at ?? null }));
+}
+
 export interface SlugRedirect {
   from: string;
   to: string;

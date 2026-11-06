@@ -60,7 +60,9 @@ const ogImage = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     {metaDescription && <meta name="description" content={metaDescription} />}
-    {noindex && <meta name="robots" content="noindex,follow" />}
+    {noindex
+      ? <meta name="robots" content="noindex,follow" />
+      : <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />}
     <link rel="canonical" href={canonical} />
     {/* Favicon: SVG pixel-art (trình duyệt hiện đại) + .ico 32px (dự phòng, cũng là đích của /favicon.ico mặc định) */}
     <link rel="icon" href="/favicon.ico" sizes="32x32" />

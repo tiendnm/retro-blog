@@ -4,53 +4,48 @@
 // LOẠI pagination (/page/N, /category/<slug>/page/N): là điều hướng, không
 //   canonical → tránh loãng crawl budget. Pagination vẫn index được nhờ
 //   self-canonical + rel=prev/next (Base.astro / Pagination.astro).
-// Nguồn URL: getAllPublishedPostSlugs / getAllCategorySlugs (thin client sẵn có,
-//   KHÔNG đổi hợp đồng). Địa chỉ tuyệt đối lấy từ `site` (= PUBLIC_SITE_URL).
+// `<lastmod>`: bài = published_at; trang chủ = ngày bài mới nhất (field date_updated không nằm trong
+//   quyền đọc Public nên không dùng). Trang danh sách khác không gắn lastmod.
+// Nguồn URL: thin client sẵn có (KHÔNG đổi hợp đồng). Địa chỉ tuyệt đối lấy từ `site` (= PUBLIC_SITE_URL).
 import type { APIRoute } from 'astro';
 import {
-  getAllPublishedPostSlugs,
+  listPostSitemapEntries,
   getAllCategorySlugs,
   getAllAuthorSlugs,
   getAllTagSlugs,
   getArchiveMonths,
 } from '../lib/directus';
 import { monthPath } from '../lib/archive';
-
-// Escape ký tự đặc biệt XML trong <loc>. Slug hiện là [a-z0-9-] nên hiếm khi
-// cần, nhưng giữ an toàn nếu quy ước slug đổi.
-const xmlEscape = (s: string): string =>
-  s.replace(/[&<>"']/g, (c) =>
-    c === '&' ? '&amp;' : c === '<' ? '&lt;' : c === '>' ? '&gt;' : c === '"' ? '&quot;' : '&#39;',
-  );
+import { buildSitemapXml, type SitemapEntry } from '../lib/sitemap';
 
 export const GET: APIRoute = async ({ site }) => {
   const base = (site?.href ?? 'http://localhost:4321/').replace(/\/$/, '');
-  const [postSlugs, categorySlugs, tagSlugs, authorSlugs, months] = await Promise.all([
-    getAllPublishedPostSlugs(),
+  const [posts, categorySlugs, tagSlugs, authorSlugs, months] = await Promise.all([
+    listPostSitemapEntries(),
     getAllCategorySlugs(),
     getAllTagSlugs(),
     getAllAuthorSlugs(),
     getArchiveMonths(),
   ]);
 
-  const paths = [
-    '/',
-    ...postSlugs.map((s) => `/posts/${s}`),
-    ...categorySlugs.map((s) => `/category/${s}`),
-    ...tagSlugs.map((s) => `/tag/${s}`),
-    '/categories',
-    ...authorSlugs.map((s) => `/author/${s}`),
-    '/archive',
-    ...months.map((m) => monthPath(m.year, m.month)),
-  ];
+  // Danh sách đã sắp mới nhất trước → bài đầu có ngày là bài mới nhất.
+  const newest = posts.find((p) => p.publishedAt)?.publishedAt ?? null;
 
-  const body = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${paths.map((p) => `  <url><loc>${xmlEscape(base + p)}</loc></url>`).join('\n')}
-</urlset>
-`;
+  const entries: SitemapEntry[] = [
+    { path: '/', lastmod: newest },
+    ...posts.map((p) => ({ path: `/posts/${p.slug}`, lastmod: p.publishedAt })),
+    ...categorySlugs.map((s) => ({ path: `/category/${s}` })),
+    ...tagSlugs.map((s) => ({ path: `/tag/${s}` })),
+    { path: '/categories' },
+    ...authorSlugs.map((s) => ({ path: `/author/${s}` })),
+    { path: '/archive' },
+    ...months.map((m) => ({ path: monthPath(m.year, m.month) })),
+  ].map(({ path, lastmod }: { path: string; lastmod?: string | null }) => ({
+    loc: base + path,
+    lastmod,
+  }));
 
-  return new Response(body, {
+  return new Response(buildSitemapXml(entries), {
     headers: { 'Content-Type': 'application/xml; charset=utf-8' },
   });
 };
