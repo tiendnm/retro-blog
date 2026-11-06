@@ -2,6 +2,8 @@
 
 > Một blog headless mang phong cách retro — **Astro** (site) + **Directus** (headless CMS) + **PostgreSQL**, đóng gói bằng **Docker**.
 
+> **Xem trực tiếp:** <https://retro.tiendnm.com>
+
 > **Trạng thái:** 🟢 Đang chạy production trên server tại nhà qua Cloudflare Tunnel; CI (`quality` + `build`) bắt buộc trên `main`. Sprint 0–16 xong. Chi tiết: [docs/sprints](./docs/sprints/) · [roadmap](./docs/02-roadmap.md).
 
 ---
