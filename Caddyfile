@@ -107,6 +107,14 @@
 		reverse_proxy preview:4322
 	}
 
+	# robots.txt riêng: Directus mặc định `Disallow: /` ⇒ Googlebot không tải được ảnh bài viết (/assets/*, phục vụ từ domain
+	# CMS) → Search Console báo "bị chặn bởi robots.txt". Cho phép /assets/ (quy tắc dài hơn thắng), chặn admin/API.
+	handle /robots.txt {
+		import cms_headers
+		header Content-Type "text/plain; charset=utf-8"
+		respond "User-agent: *\nAllow: /assets/\nDisallow: /\n" 200
+	}
+
 	handle {
 		import cms_headers
 		reverse_proxy directus:8055

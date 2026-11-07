@@ -103,6 +103,11 @@ echo "▶ Site 404 phục vụ trang 404.html"
 BODY="$(curl -s -H "Host: $SITE_HOST" "http://127.0.0.1:$PORT/khong-co-trang-nay")"
 if [[ "$BODY" == *trang-404-cua-site* ]]; then ok "nội dung là 404.html"; else fail "404 không phục vụ 404.html (thấy '$BODY')"; fi
 check "CMS 502 (Directus down, handle_errors)" "$CMS_HOST" /server/ping 502 cms
+# robots.txt của domain CMS do Caddy trả (không qua Directus): cho Googlebot tải ảnh /assets/, chặn phần còn lại.
+check "CMS robots.txt" "$CMS_HOST" /robots.txt 200 cms
+echo "▶ CMS robots.txt cho phép /assets/ và chặn phần còn lại"
+ROBOTS="$(curl -s -H "Host: $CMS_HOST" "http://127.0.0.1:$PORT/robots.txt")"
+if [[ "$ROBOTS" == *"Allow: /assets/"* && "$ROBOTS" == *"Disallow: /"* ]]; then ok "nội dung robots.txt"; else fail "robots.txt sai nội dung (thấy '$ROBOTS')"; fi
 
 # Máy chủ xem trước dưới /preview/* của domain CMS, chặn bằng PHIÊN Directus (forward_auth → /users/me). Dựng upstream giả
 # (cùng image Caddy) có alias `directus` và `preview`: /users/me trả 200 khi cookie có directus_session_token=hop-le, ngược lại 401.
