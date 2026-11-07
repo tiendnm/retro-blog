@@ -89,6 +89,9 @@ check() {
       "base-uri 'self'" "form-action 'self'" "frame-ancestors 'none'"; do
       expect_has Content-Security-Policy "$d"
     done
+    # Cloudflare Web Analytics: chỉ nới đúng hai nguồn này (script beacon + gửi số liệu).
+    expect_has Content-Security-Policy "https://static.cloudflareinsights.com"
+    expect_has Content-Security-Policy "https://cloudflareinsights.com"
   else
     expect_eq X-Frame-Options SAMEORIGIN
     # CMS: Caddy KHÔNG được đè CSP (Directus tự phát cho admin UI) — 502 do Caddy sinh nên phải không có.

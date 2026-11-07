@@ -19,6 +19,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { getSiteSettings } from '../lib/directus';
+import { CF_BEACON_SRC, cfBeaconAttr } from '../lib/analytics';
 
 interface Props {
   title: string;
@@ -51,6 +52,8 @@ const imagePath = image ?? DEFAULT_OG_IMAGE;
 // Trang không có mô tả riêng → mô tả mặc định của site (trước đây: không có thẻ).
 const metaDescription = description ?? settings.description;
 const ogImage = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
+// Đếm lượt xem (Cloudflare Web Analytics): chỉ khi có token và không phải trang noindex/xem trước.
+const cfBeacon = noindex ? null : cfBeaconAttr(process.env.PUBLIC_CF_BEACON_TOKEN);
 ---
 
 <!doctype html>
@@ -88,6 +91,7 @@ const ogImage = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
 
     {/* Metadata bổ sung theo trang (article:*, JSON-LD…) — trang chi tiết inject qua đây */}
     <slot name="head" />
+    {cfBeacon && <script is:inline defer src={CF_BEACON_SRC} data-cf-beacon={cfBeacon} />}
   </head>
   <body>
     <a class="skip-link" href="#main">Bỏ qua tới nội dung</a>

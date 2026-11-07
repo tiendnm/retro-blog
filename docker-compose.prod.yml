@@ -104,6 +104,8 @@ services:
       DIRECTUS_INTERNAL_URL: ${DIRECTUS_INTERNAL_URL}
       PUBLIC_DIRECTUS_URL: ${PUBLIC_DIRECTUS_URL}
       PUBLIC_SITE_URL: ${PUBLIC_SITE_URL}
+      # Token Cloudflare Web Analytics (tuỳ chọn; trống ⇒ không chèn beacon).
+      PUBLIC_CF_BEACON_TOKEN: ${PUBLIC_CF_BEACON_TOKEN:-}
       KEEP_BUILDS: ${KEEP_BUILDS:-5}
       # Máy nhỏ: giới hạn heap Node để astro build không ăn hết RAM.
       NODE_OPTIONS: ${BUILD_NODE_OPTIONS:---max-old-space-size=1536}
