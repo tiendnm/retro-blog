@@ -107,7 +107,10 @@ check "CMS 502 (Directus down, handle_errors)" "$CMS_HOST" /server/ping 502 cms
 check "CMS robots.txt" "$CMS_HOST" /robots.txt 200 cms
 echo "▶ CMS robots.txt cho phép /assets/ và chặn phần còn lại"
 ROBOTS="$(curl -s -H "Host: $CMS_HOST" "http://127.0.0.1:$PORT/robots.txt")"
-if [[ "$ROBOTS" == *"Allow: /assets/"* && "$ROBOTS" == *"Disallow: /"* ]]; then ok "nội dung robots.txt"; else fail "robots.txt sai nội dung (thấy '$ROBOTS')"; fi
+# So từng DÒNG (không so chuỗi con): "\n" literal trong respond từng lọt qua kiểu kiểm tra chuỗi con.
+if [ "$(printf '%s\n' "$ROBOTS" | sed -n 1p)" = "User-agent: *" ] \
+  && [ "$(printf '%s\n' "$ROBOTS" | sed -n 2p)" = "Allow: /assets/" ] \
+  && [ "$(printf '%s\n' "$ROBOTS" | sed -n 3p)" = "Disallow: /" ]; then ok "nội dung robots.txt"; else fail "robots.txt sai nội dung (thấy '$ROBOTS')"; fi
 
 # Máy chủ xem trước dưới /preview/* của domain CMS, chặn bằng PHIÊN Directus (forward_auth → /users/me). Dựng upstream giả
 # (cùng image Caddy) có alias `directus` và `preview`: /users/me trả 200 khi cookie có directus_session_token=hop-le, ngược lại 401.

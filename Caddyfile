@@ -112,7 +112,11 @@
 	handle /robots.txt {
 		import cms_headers
 		header Content-Type "text/plain; charset=utf-8"
-		respond "User-agent: *\nAllow: /assets/\nDisallow: /\n" 200
+		respond <<ROBOTS
+			User-agent: *
+			Allow: /assets/
+			Disallow: /
+			ROBOTS 200
 	}
 
 	handle {
