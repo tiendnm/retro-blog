@@ -14,7 +14,7 @@ services:
     ports: !reset []
 
   cloudflared:
-    image: cloudflare/cloudflared:2026.10.6
+    image: cloudflare/cloudflared:2026.10.7
     restart: unless-stopped
     # http2 (TCP) thay QUIC: bộ đệm UDP của host nhỏ (208 kiB < 7168 kiB cloudflared muốn) → QUIC dễ rớt gói.
     command: ["tunnel", "--no-autoupdate", "--protocol", "http2", "run"]
