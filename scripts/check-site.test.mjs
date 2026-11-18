@@ -15,6 +15,7 @@ afterEach(() => {
 const page = ({ canonical, body = '', head = '' }) =>
   `<!doctype html><html lang="vi"><head><link rel="canonical" href="${canonical}">${head}</head><body>${body}</body></html>`;
 
+const NOINDEX = '<meta name="robots" content="noindex,follow">';
 const LD = '{"@context":"https://schema.org","@type":"BlogPosting","headline":"A"}';
 
 /** Dựng dist hợp lệ; `patch` ghi đè/xoá file (null = xoá) để tạo đột biến. */
@@ -32,12 +33,12 @@ function makeDist(patch = {}) {
       body: '<a href="/">home</a><a href="../../archive/">rel</a>',
       head: `<script type="application/ld+json">${LD}</script>`,
     }),
-    'archive/index.html': page({ canonical: `${SITE}/archive`, body: '<a href="/">h</a>' }),
+    'archive/index.html': page({ canonical: `${SITE}/archive`, body: '<a href="/">h</a>', head: NOINDEX }),
     '404.html': page({ canonical: `${SITE}/404`, body: '<a href="/">h</a>' }),
-    'search/index.html': page({ canonical: `${SITE}/search` }),
+    'search/index.html': page({ canonical: `${SITE}/search`, head: NOINDEX }),
     'og-default.png': 'png',
     'robots.txt': `User-agent: *\nSitemap: ${SITE}/sitemap.xml\n`,
-    'sitemap.xml': `<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${SITE}/</loc></url><url><loc>${SITE}/posts/a</loc></url><url><loc>${SITE}/archive</loc></url></urlset>`,
+    'sitemap.xml': `<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${SITE}/</loc></url><url><loc>${SITE}/posts/a</loc></url></urlset>`,
     'rss.xml': `<?xml version="1.0"?><rss version="2.0"><channel><title>T &amp; U</title><item><title>A</title><link>${SITE}/posts/a</link></item></channel></rss>`,
     ...patch,
   };
@@ -87,21 +88,31 @@ describe('check-site', () => {
 
   it('sitemap trỏ tới trang không có → lỗi', () => {
     const res = run({
-      'sitemap.xml': `<urlset><url><loc>${SITE}/</loc></url><url><loc>${SITE}/posts/a</loc></url><url><loc>${SITE}/archive</loc></url><url><loc>${SITE}/ma</loc></url></urlset>`,
+      'sitemap.xml': `<urlset><url><loc>${SITE}/</loc></url><url><loc>${SITE}/posts/a</loc></url><url><loc>${SITE}/ma</loc></url></urlset>`,
     });
     assert.ok(has(res, /\/ma không có trang/));
   });
 
-  it('trang có trong dist nhưng thiếu trong sitemap → lỗi (trừ 404, search)', () => {
+  it('trang có trong dist, thiếu trong sitemap và không noindex → lỗi (404 và trang noindex được vắng)', () => {
     const res = run({
-      'sitemap.xml': `<urlset><url><loc>${SITE}/</loc></url><url><loc>${SITE}/archive</loc></url></urlset>`,
+      'sitemap.xml': `<urlset><url><loc>${SITE}/</loc></url></urlset>`,
     });
-    assert.ok(has(res, /\/posts\/a: có trong dist nhưng thiếu/));
-    assert.ok(!has(res, /\/404|\/search/));
+    assert.ok(has(res, /\/posts\/a: có trong dist nhưng thiếu trong sitemap\.xml và không noindex/));
+    assert.ok(!has(res, /\/404|\/search|\/archive/));
   });
 
-  it('trang phân trang không bắt buộc có trong sitemap', () => {
-    const res = run({ 'page/2/index.html': page({ canonical: `${SITE}/page/2` }) });
+  it('trang có trong sitemap mà gắn noindex → lỗi', () => {
+    const res = run({
+      'posts/a/index.html': page({
+        canonical: `${SITE}/posts/a`,
+        head: `${NOINDEX}<script type="application/ld+json">${LD}</script>`,
+      }),
+    });
+    assert.ok(has(res, /\/posts\/a: có trong sitemap\.xml nhưng gắn noindex/));
+  });
+
+  it('trang phân trang (noindex) không cần có trong sitemap', () => {
+    const res = run({ 'page/2/index.html': page({ canonical: `${SITE}/page/2`, head: NOINDEX }) });
     assert.deepEqual(res.errors, []);
   });
 

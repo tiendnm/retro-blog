@@ -85,6 +85,7 @@ describe('buildPostJsonLd', () => {
       headline: 'Máy Apple II',
       description: 'Tóm tắt',
       datePublished: '2026-10-01T00:00:00.000Z',
+      dateModified: '2026-10-01T00:00:00.000Z',
       author: {
         '@type': 'Person',
         name: 'Tác giả',
@@ -103,7 +104,13 @@ describe('buildPostJsonLd', () => {
       { ...post, excerpt: null, publishedAt: null, category: null, tags: [] },
       ctx,
     );
-    for (const k of ['description', 'datePublished', 'articleSection', 'keywords']) {
+    for (const k of [
+      'description',
+      'datePublished',
+      'dateModified',
+      'articleSection',
+      'keywords',
+    ]) {
       expect(ld).not.toHaveProperty(k);
     }
   });

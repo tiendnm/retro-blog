@@ -6,8 +6,8 @@
 // SEO baseline (Sprint 5 Phase 2): canonical + OpenGraph + Twitter card.
 // - Địa chỉ tuyệt đối dẫn xuất từ `Astro.site` (= PUBLIC_SITE_URL ở astro.config).
 // - Canonical = SELF-REFERENCING: mỗi trang (kể cả pagination /page/N) trỏ về
-//   CHÍNH URL của nó — trang pagination là danh sách riêng, cần index được để
-//   độc giả tới mọi bài. Sitemap chỉ liệt kê canonical *content* URL (S5-P0).
+//   CHÍNH URL của nó. Chỉ mục: trang chủ + bài viết (+ chuyên mục đủ bài) được index; mọi trang danh sách mỏng
+//   (thẻ, lưu trữ, tác giả, phân trang…) truyền `noindex` → `noindex,follow` và không vào sitemap (lib/indexing.ts).
 // Font self-host (IBM Plex Mono — nét dày hơn Courier New, đủ dấu tiếng Việt).
 import '@fontsource/ibm-plex-mono/latin-400.css';
 import '@fontsource/ibm-plex-mono/latin-700.css';
@@ -30,8 +30,10 @@ interface Props {
   type?: 'website' | 'article';
   /** Trang không nên vào chỉ mục công cụ tìm kiếm (vd /search) → <meta robots noindex,follow>. */
   noindex?: boolean;
+  /** Không chèn beacon đếm lượt xem (bản xem trước, trang tìm kiếm). Tách khỏi noindex: trang danh sách mỏng vẫn cần đếm. */
+  noBeacon?: boolean;
 }
-const { title, description, image, type = 'website', noindex = false } = Astro.props;
+const { title, description, image, type = 'website', noindex = false, noBeacon = false } = Astro.props;
 
 // Cấu hình site từ CMS (ADR-0012; có fallback mặc định).
 const settings = await getSiteSettings();
@@ -52,8 +54,8 @@ const imagePath = image ?? DEFAULT_OG_IMAGE;
 // Trang không có mô tả riêng → mô tả mặc định của site (trước đây: không có thẻ).
 const metaDescription = description ?? settings.description;
 const ogImage = Astro.site ? new URL(imagePath, Astro.site).href : imagePath;
-// Đếm lượt xem (Cloudflare Web Analytics): chỉ khi có token và không phải trang noindex/xem trước.
-const cfBeacon = noindex ? null : cfBeaconAttr(process.env.PUBLIC_CF_BEACON_TOKEN);
+// Đếm lượt xem (Cloudflare Web Analytics): chỉ khi có token và không phải trang xem trước/tìm kiếm.
+const cfBeacon = noBeacon ? null : cfBeaconAttr(process.env.PUBLIC_CF_BEACON_TOKEN);
 ---
 
 <!doctype html>

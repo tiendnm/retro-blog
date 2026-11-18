@@ -1036,3 +1036,8 @@ dialog.lightbox::backdrop {
   font-family: var(--font-mono, monospace);
   font-size: var(--text-sm, 0.875rem);
 }
+
+/* Bài liên quan (cuối trang bài viết) — dùng lại .dir-heading + .post-list */
+.related {
+  margin-top: var(--space-6);
+}

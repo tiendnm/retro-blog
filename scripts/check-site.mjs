@@ -13,8 +13,11 @@ import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from '
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// Trang có trong dist nhưng KHÔNG thuộc sitemap theo chính sách (xem src/pages/sitemap.xml.ts).
-const NOT_IN_SITEMAP = [/^\/404$/, /^\/search$/, /(^|\/)page\/\d+$/];
+// Trang được phép vắng trong sitemap mà KHÔNG cần noindex (404 trả mã lỗi). Mọi trang khác vắng trong sitemap phải
+// gắn `noindex`; trang có trong sitemap thì không được noindex (xem src/pages/sitemap.xml.ts, src/lib/indexing.ts).
+const NOT_IN_SITEMAP = [/^\/404$/];
+const hasNoindex = (html) =>
+  /<meta\b[^>]*\bname=["']robots["'][^>]*\bcontent=["'][^"']*\bnoindex\b/i.test(html);
 // Namespace XML hợp lệ chứa "http://".
 const HTTP_ALLOWED = /http:\/\/(www\.w3\.org|www\.sitemaps\.org|purl\.org|www\.rssboard\.org)\b/g;
 const TEXT_EXT = /\.(html|xml|txt|json|webmanifest)$/i;
@@ -193,9 +196,11 @@ export function checkSite(distDir, { siteUrl } = {}) {
       inSitemap.add(p);
       if (!pageUrls.has(p)) errors.push(`sitemap.xml: ${loc} không có trang tương ứng trong dist`);
     }
-    for (const p of pageUrls.keys()) {
+    for (const [p, f] of pageUrls) {
       if (redirectUrls.has(p) || NOT_IN_SITEMAP.some((re) => re.test(p))) continue;
-      if (!inSitemap.has(p)) errors.push(`${p}: có trong dist nhưng thiếu trong sitemap.xml`);
+      const noindex = hasNoindex(readFileSync(f, 'utf8'));
+      if (inSitemap.has(p) && noindex) errors.push(`${p}: có trong sitemap.xml nhưng gắn noindex`);
+      if (!inSitemap.has(p) && !noindex) errors.push(`${p}: có trong dist nhưng thiếu trong sitemap.xml và không noindex`);
     }
   }
 

@@ -82,9 +82,10 @@ fi
 # ---- PUBLIC: authors.bio + categories.description (Sprint 11 — trang tác giả / chuyên mục) ----
 # Cả hai là văn bản giới thiệu do Editor viết để HIỂN THỊ CÔNG KHAI → thêm vào allowlist (permission authors/categories đã có
 # từ trước → cập nhật tại chỗ, idempotent). `parent` (categories) vẫn KHÔNG lộ.
+# posts.date_updated: ngày sửa gần nhất (hệ thống tự đặt) → <lastmod> sitemap + dateModified JSON-LD; không nhạy cảm.
 # posts.previous_slugs: slug cũ của bài, để dựng trang chuyển hướng /posts/<slug-cũ> (đã nằm trong URL công khai cũ → không nhạy cảm).
 # directus_files.width/height: kích thước ảnh (metadata không nhạy cảm) để điền width/height cho ảnh chèn bằng preset `editor`.
-for spec in "authors:bio" "categories:description" "posts:previous_slugs" "directus_files:width" "directus_files:height"; do
+for spec in "authors:bio" "categories:description" "posts:previous_slugs" "posts:date_updated" "directus_files:width" "directus_files:height"; do
   COL="${spec%%:*}"; FLD="${spec#*:}"
   PERM=$(api GET "/permissions?filter[policy][_eq]=$PUB&filter[collection][_eq]=$COL&fields=id,fields" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const f=process.argv[1];const r=JSON.parse(d).data[0];if(r&&!r.fields.includes(f))process.stdout.write(r.id+' '+JSON.stringify([...r.fields,f]))}catch(e){}})" "$FLD")
   if [ -n "$PERM" ]; then

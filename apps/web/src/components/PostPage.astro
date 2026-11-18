@@ -4,11 +4,13 @@
 // Chỉ nhận DTO PostDetail; KHÔNG gọi Directus trực tiếp.
 import Base from '../layouts/Base.astro';
 import CoverImage from './CoverImage.astro';
+import PostCard from './PostCard.astro';
 import TagList from './TagList.astro';
 import AuthorName from './AuthorName.astro';
 import { formatDate } from '../lib/format';
 import { buildPostJsonLd, buildBreadcrumbJsonLd, serializeJsonLd } from '../lib/json-ld';
-import { getSiteSettings } from '../lib/directus';
+import { getSiteSettings, listPublishedPosts } from '../lib/directus';
+import { pickRelatedPosts } from '../lib/related';
 import type { PostDetail } from '../lib/types';
 
 interface Props {
@@ -22,6 +24,9 @@ const { siteName, defaultOgImage } = await getSiteSettings();
 // body là HTML do CMS lưu (input-rich-text-html, ADR-0011). Nội dung do Editor tin cậy
 // nhập; đã sanitize (allowlist) trong toDetail → sanitizeBody (ADR-0013, 12-security §8).
 const bodyHtml = post.body ?? '';
+
+// "Bài liên quan": link nội bộ giữa các bài (cùng chuyên mục/thẻ trước, rồi bài mới nhất) để bot và độc giả đi tiếp.
+const related = pickRelatedPosts(post, (await listPublishedPosts({ page: 1, pageSize: 20 })).items);
 
 // URL/ảnh tuyệt đối cho structured data + article meta (Sprint 6.5).
 const site = Astro.site;
@@ -51,6 +56,7 @@ const breadcrumbScript = site
 
 <Base
   noindex={preview}
+  noBeacon={preview}
   title={`${post.title} — ${siteName}`}
   description={post.excerpt ?? undefined}
   type="article"
@@ -96,6 +102,14 @@ const breadcrumbScript = site
     </header>
     <div class="prose" set:html={bodyHtml}></div>
   </article>
+  {
+    related.length > 0 && (
+      <section class="related" aria-labelledby="related-heading">
+        <h2 class="dir-heading" id="related-heading">Bài liên quan</h2>
+        <ul class="post-list">{related.map((r) => <PostCard post={r} />)}</ul>
+      </section>
+    )
+  }
 </Base>
 
 <script>

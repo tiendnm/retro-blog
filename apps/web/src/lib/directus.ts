@@ -64,7 +64,7 @@ const SUMMARY_FIELDS =
   'id,title,slug,excerpt,published_at,author.name,author.slug,' +
   'category.name,category.slug,cover.id,cover.alt,tags.tags_id.name,tags.tags_id.slug';
 const DETAIL_FIELDS =
-  'id,title,slug,excerpt,body,published_at,' +
+  'id,title,slug,excerpt,body,published_at,date_updated,' +
   'author.name,author.slug,author.avatar.id,author.avatar.alt,' +
   'category.name,category.slug,cover.id,cover.alt,tags.tags_id.name,tags.tags_id.slug';
 
@@ -92,6 +92,7 @@ interface RawPost {
   excerpt?: string | null;
   body?: string | null;
   published_at?: string | null;
+  date_updated?: string | null;
   author?: RawAuthor | null;
   category?: RawCategory | null;
   cover?: RawFile | null;
@@ -268,6 +269,7 @@ async function toDetail(p: RawPost): Promise<PostDetail> {
     excerpt: p.excerpt ?? null,
     body: p.body ? await renderBody(p.body) : null,
     publishedAt: p.published_at ?? null,
+    updatedAt: p.date_updated ?? null,
     author: toAuthorDetail(p.author),
     category: toCategory(p.category),
     cover: toMedia(p.cover),
@@ -477,12 +479,16 @@ export async function getAllPublishedPostSlugs(): Promise<string[]> {
 
 /** Slug + ngày xuất bản của mọi bài đã xuất bản — dùng cho `<lastmod>` trong sitemap. */
 export async function listPostSitemapEntries(): Promise<
-  { slug: string; publishedAt: string | null }[]
+  { slug: string; publishedAt: string | null; updatedAt: string | null }[]
 > {
-  const { data } = await directusGet<{ slug: string; published_at?: string | null }[]>(
-    `/items/posts?fields=slug,published_at&sort=-published_at&limit=-1`,
-  );
-  return data.map((p) => ({ slug: p.slug, publishedAt: p.published_at ?? null }));
+  const { data } = await directusGet<
+    { slug: string; published_at?: string | null; date_updated?: string | null }[]
+  >(`/items/posts?fields=slug,published_at,date_updated&sort=-published_at&limit=-1`);
+  return data.map((p) => ({
+    slug: p.slug,
+    publishedAt: p.published_at ?? null,
+    updatedAt: p.date_updated ?? null,
+  }));
 }
 
 export interface SlugRedirect {

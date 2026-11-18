@@ -20,7 +20,9 @@ export function buildPostJsonLd(
     '@type': 'BlogPosting',
     headline: post.title,
     ...(post.excerpt ? { description: post.excerpt } : {}),
-    ...(post.publishedAt ? { datePublished: post.publishedAt } : {}),
+    ...(post.publishedAt
+      ? { datePublished: post.publishedAt, dateModified: post.updatedAt ?? post.publishedAt }
+      : {}),
     author: {
       '@type': 'Person',
       name: post.author.name,

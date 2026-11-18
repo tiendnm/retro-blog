@@ -66,6 +66,8 @@ export interface PostDetail {
   excerpt: string | null;
   body: string | null;
   publishedAt: string | null;
+  /** Ngày sửa gần nhất (date_updated); `null` nếu bài chưa từng sửa sau khi tạo. */
+  updatedAt?: string | null;
   author: AuthorDetail;
   category: CategoryRef | null;
   cover: MediaRef | null;

@@ -29,6 +29,7 @@ const { items, currentPage, totalPages, tagName } = Astro.props;
 ---
 
 <Base
+  noindex
   title={`#${tagName} — Trang ${currentPage} — ${siteName}`}
   description={`Các bài viết gắn thẻ ${tagName} trên ${siteName} — Trang ${currentPage}.`}
 >

@@ -5,6 +5,7 @@ import Base from '../../layouts/Base.astro';
 import PostListView from '../../components/PostListView.astro';
 import { getAllCategorySlugs, getCategoryBySlug, getSiteSettings, listCategories, listCategoryInfos, listPostsByCategory } from '../../lib/directus';
 import { paragraphs } from '../../lib/format';
+import { isCategoryIndexable } from '../../lib/indexing';
 
 export async function getStaticPaths() {
   const slugs = await getAllCategorySlugs();
@@ -24,6 +25,7 @@ const totalPages = Math.max(1, Math.ceil(pageInfo.total / pageInfo.pageSize));
 ---
 
 <Base
+  noindex={!isCategoryIndexable(pageInfo.total)}
   title={`${category.name} — ${siteName}`}
   description={`Các bài viết thuộc chuyên mục ${category.name} trên ${siteName}.`}
 >
