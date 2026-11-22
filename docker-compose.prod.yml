@@ -235,7 +235,7 @@ services:
 
   # Caddy edge: TLS tự động (hoặc HTTP sau Cloudflare Tunnel), phục vụ static, proxy Directus.
   caddy:
-    image: caddy:2.10-alpine
+    image: caddy:2.11-alpine
     restart: unless-stopped
     depends_on:
       web:
