@@ -10,6 +10,8 @@ function setOpen(open: boolean): void {
 }
 
 if (header && button) {
+  // theme-init.js thường đã thêm class này; thêm lại ở đây phòng khi CDN còn giữ bản theme-init.js cũ (cache 4 giờ).
+  document.documentElement.classList.add('js');
   button.hidden = false;
   button.addEventListener('click', () => setOpen(!header.classList.contains('is-open')));
   header.addEventListener('keydown', (e) => {
