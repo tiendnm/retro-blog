@@ -44,6 +44,7 @@
 | 15 | [SEO & Accessibility](./15-seo-accessibility.md) | — | SEO & a11y cho blog | Trước launch |
 | 16 | [Glossary](./16-glossary.md) | — | Ngôn ngữ chung | ✅ (seed) |
 | 17 | [Contributing](./17-contributing.md) | — | Quy trình đóng góp & viết docs | Nên |
+| 17a | [Môi trường dev](./17a-dev-environment.md) | ⚙️ RÌA | Dựng môi trường dev local, kéo dữ liệu prod về review | Nên |
 | — | [ADR/](./adr/) | — | Kho Architecture Decision Record | ✅ |
 | — | [reviews/](./reviews/) | — | Review & change report | — |
 | — | [sprints/](./sprints/) | — | Kế hoạch triển khai theo sprint | — |

@@ -92,6 +92,8 @@ const cfBeacon = noBeacon ? null : cfBeaconAttr(process.env.PUBLIC_CF_BEACON_TOK
     <meta name="twitter:image" content={ogImage} />
 
     {/* Metadata bổ sung theo trang (article:*, JSON-LD…) — trang chi tiết inject qua đây */}
+    {/* Áp theme đã chọn trước khi vẽ (nạp chặn, file ngoài — hợp CSP) */}
+    <script is:inline src="/theme-init.js"></script>
     <slot name="head" />
     {cfBeacon && <script is:inline defer src={CF_BEACON_SRC} data-cf-beacon={cfBeacon} />}
   </head>

@@ -7,14 +7,19 @@
 
 :root {
   /* ---- Color — kiểm tương phản trên --color-bg (AA ≥ 4.5:1) ------------- */
-  --color-bg: #f4f1e8; /* nền giấy */
-  --color-surface: #efe8d6; /* nền phụ (khối/card) */
-  --color-text: #2b2b2b; /* chữ chính  — ~12.6:1 (AAA) */
-  --color-muted: #595959; /* chữ phụ    — ~6.2:1  (AA)  */
-  --color-accent: #7b2d26; /* nhấn/link  — ~8.3:1  (AAA) */
-  --color-accent-strong: #5c211c;
-  --color-border: #d9d2c0;
-  --color-card: #faf7ee; /* nền thẻ giấy (sáng hơn --color-surface) */
+  /* Theme MẶC ĐỊNH "Platinum" (sáng, xám nhạt kiểu Mac cổ / Windows 3.1, thanh tiêu đề xanh navy).
+     Theme khác ghi đè bằng :root[data-theme="…"] ngay bên dưới. */
+  --color-bg: #c0c0c0;
+  --color-surface: #d4d0c8; /* nền phụ (khối/card) */
+  --color-text: #141414; /* chữ chính  — ~10:1 (AAA) */
+  --color-muted: #4a4a4a; /* chữ phụ    — ~4.9:1 (AA, cả trên surface/card) */
+  --color-accent: #000080; /* nhấn/link  — ~8.8:1 (AAA) */
+  --color-accent-strong: #00004d;
+  --color-border: #808080;
+  --color-card: #e4e4e4; /* nền thẻ (sáng hơn --color-surface) */
+  --color-lightbox: #e4e4e4; /* chữ/viền nút trên phông lightbox (luôn tối) */
+  --fx-rgb: 255 176 0; /* màu vệt quét CRT ở theme tối (không dùng ở theme sáng) */
+  --img-tint: #b4bfd8; /* màu phủ nhẹ lên ảnh danh sách (xem khối "Ảnh trong danh sách") */
 
   /* ---- Typography ------------------------------------------------------- */
   --font-mono: "IBM Plex Mono", "Courier New", Courier, monospace;
@@ -64,6 +69,172 @@
   --radius-sm: 2px;
 }
 
+/* ---- Theme (chọn bằng <html data-theme="…">; xem scripts/theme.ts + public/theme-init.js) --------
+   Mọi theme chỉ ghi đè token màu; bố cục/typography dùng chung. Chữ chính ≥ AAA, chữ phụ ≥ AA trên --color-bg.
+   Theme mặc định "Giấy" nằm ở :root; thêm theme mới = thêm khối ở đây + mục trong THEMES (scripts/theme.ts)
+   + chuỗi trong public/theme-init.js + selector body::before phía trên. */
+/* Sáng: Giấy — nền giấy ngà, chữ đỏ nâu, có grain sợi giấy (theme gốc của site) */
+:root[data-theme="paper"] {
+  --color-bg: #f4f1e8;
+  --color-surface: #efe8d6;
+  --color-text: #2b2b2b; /* ~12.6:1 */
+  --color-muted: #595959; /* ~6.2:1 */
+  --color-accent: #7b2d26; /* ~8.3:1 */
+  --color-accent-strong: #5c211c;
+  --color-border: #d9d2c0;
+  --color-card: #faf7ee;
+  --color-lightbox: #faf7ee;
+}
+:root[data-theme="amber"] {
+  color-scheme: dark;
+  --color-bg: #0d0a06;
+  --color-surface: #17110a;
+  --color-text: #bf8625; /* ~6.2:1 */
+  --color-muted: #b07a1c; /* ~4.9:1 (cả trên card) */
+  --color-accent: #d9a640; /* ~8.8:1 */
+  --color-accent-strong: #e6c06f;
+  --color-border: #4d3911;
+  --color-card: #1c1409;
+  --color-lightbox: #d3b57a;
+  --fx-rgb: 255 176 0;
+}
+:root[data-theme="green"] {
+  color-scheme: dark;
+  --color-bg: #060d07;
+  --color-surface: #0b1a0e;
+  --color-text: #2fa747; /* ~6.2:1 */
+  --color-muted: #279a3e; /* ~4.7:1 (cả trên card) */
+  --color-accent: #46b45e; /* ~7.4:1 */
+  --color-accent-strong: #78cc8b;
+  --color-border: #1b4a25;
+  --color-card: #0f2013;
+  --color-lightbox: #8cc698;
+  --fx-rgb: 61 220 90;
+}
+:root[data-theme="blueprint"] {
+  color-scheme: dark;
+  --color-bg: #0b2545;
+  --color-surface: #0e2d54;
+  --color-text: #8aa8cf; /* ~6.3:1 */
+  --color-muted: #7a9cc6; /* ~4.7:1 (cả trên hero/surface/card) */
+  --color-accent: #62b5d9; /* ~6.7:1 */
+  --color-accent-strong: #92cde6;
+  --color-border: #2f5a96;
+  --color-card: #102f57;
+  --color-lightbox: #8aa8cf;
+  --fx-rgb: 139 224 255;
+}
+:root[data-theme="amiga"] {
+  color-scheme: dark;
+  --color-bg: #2a1f6e;
+  --color-surface: #2e2373;
+  --color-text: #aca6e6; /* ~6.1:1 */
+  --color-muted: #9f99dc; /* ~4.7:1 (cả trên card) */
+  --color-accent: #e0c95f; /* ~8.3:1 */
+  --color-accent-strong: #ead98a;
+  --color-border: #5446a8;
+  --color-card: #322778;
+  --color-lightbox: #beb9ee;
+  --fx-rgb: 184 176 255;
+}
+/* Tối: DOS — xám VGA trên nền đen, nhấn cyan */
+:root[data-theme="dos"] {
+  color-scheme: dark;
+  --color-bg: #000000;
+  --color-surface: #0f0f1a;
+  --color-text: #a0a0a0;
+  --color-muted: #808080;
+  --color-accent: #44cccc;
+  --color-accent-strong: #7fe0e0;
+  --color-border: #2b2b55;
+  --color-card: #14141f;
+  --color-lightbox: #c0c0c0;
+  --fx-rgb: 170 170 255;
+}
+/* Tối: CRT trắng — màn hình đơn sắc kiểu VT100 / Apple III, trắng xanh nhạt */
+:root[data-theme="mono"] {
+  color-scheme: dark;
+  --color-bg: #0b0d10;
+  --color-surface: #0f1318;
+  --color-text: #8d99a5;
+  --color-muted: #75818d;
+  --color-accent: #b0bcc7;
+  --color-accent-strong: #d0dae3;
+  --color-border: #2b333b;
+  --color-card: #12161b;
+  --color-lightbox: #b8c3cd;
+  --fx-rgb: 160 180 200;
+}
+
+/* ---- Ảnh trong danh sách (hero, thẻ, thumbnail) ở theme tối: phủ nhẹ màu theme + giảm chói ----
+   Lớp phủ ::after (multiply) đè lên wrapper đã có sẵn, không đổi HTML; rê chuột/tiêu điểm thì nhạt đi để xem ảnh đúng màu.
+   Theme Giấy không bị ảnh hưởng (loại bằng :not). Platinum (mặc định) lấy --img-tint ở :root. Chỉnh độ đậm bằng --img-tint-opacity. */
+:root[data-theme="amber"] {
+  --img-tint: #ffb94d;
+}
+:root[data-theme="green"] {
+  --img-tint: #4ade6a;
+}
+:root[data-theme="blueprint"] {
+  --img-tint: #5b9bd5;
+}
+:root[data-theme="amiga"] {
+  --img-tint: #8f86ff;
+}
+:root[data-theme="dos"] {
+  --img-tint: #8fa0c0;
+}
+:root[data-theme="mono"] {
+  --img-tint: #9fb4c8;
+}
+:is(.hero__img, .paper-card__img, .post-card__thumb) {
+  position: relative;
+}
+/* :where() → độ ưu tiên thấp, không đè các rule ảnh cụ thể hơn ở dưới (chỉ đặt filter nên không xung đột thuộc tính) */
+:where(:root:not([data-theme="paper"]) :is(.hero__img, .paper-card__img, .post-card__thumb)) img {
+  filter: saturate(0.85) brightness(0.9);
+}
+:root:not([data-theme="paper"]) :is(.hero__img, .paper-card__img, .post-card__thumb)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--img-tint, transparent);
+  mix-blend-mode: multiply;
+  opacity: var(--img-tint-opacity, 0.35);
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+:root:not([data-theme="paper"])
+  :is(.hero__img, .paper-card__img, .post-card__thumb):is(:hover, :focus-visible)::after {
+  opacity: 0.12;
+}
+@media (forced-colors: active), print {
+  :root:not([data-theme="paper"]) :is(.hero__img, .paper-card__img, .post-card__thumb)::after {
+    display: none;
+  }
+  :where(:root:not([data-theme="paper"]) :is(.hero__img, .paper-card__img, .post-card__thumb)) img {
+    filter: none;
+  }
+}
+
+/* ---- Nút chọn theme (Header). Ẩn tới khi JS gắn xong: không JS thì giữ theme mặc định, không có control chết ---- */
+.theme-picker {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+.theme-picker[hidden] {
+  display: none;
+}
+.theme-picker select {
+  font: inherit;
+  font-size: var(--text-xs);
+  color: var(--color-text);
+  background: var(--color-card);
+  border: 1.5px solid var(--color-accent);
+  padding: 1px var(--space-2);
+}
+
 /* ---- Base reset & element defaults (nền — chưa redesign component) ------- */
 *,
 *::before,
@@ -94,6 +265,24 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22160%22%20height%3D%22160%22%3E%3Cfilter%20id%3D%22n%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%22.9%22%20numOctaves%3D%222%22%20stitchTiles%3D%22stitch%22%2F%3E%3CfeColorMatrix%20values%3D%220%200%200%200%20.35%200%200%200%200%20.28%200%200%200%200%20.18%200%200%200%20.9%20-.35%22%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20filter%3D%22url(%23n)%22%2F%3E%3C%2Fsvg%3E");
   background-size: 160px 160px;
   opacity: calc(var(--paper-grain) * var(--paper-fx));
+}
+/* Grain giấy chỉ dành cho theme Giấy; các theme khác (kể cả Platinum mặc định, không có data-theme) không có nền hoa văn.
+   Phải đứng TRƯỚC khối theme tối bên dưới (cùng độ ưu tiên, đứng sau thì thắng). */
+:root:not([data-theme="paper"]) body::before {
+  background-image: none;
+}
+/* Theme tối: vệt quét CRT mờ + quầng sáng nhẹ giữa màn hình (màu theo --fx-rgb) */
+:root[data-theme="amber"] body::before,
+:root[data-theme="green"] body::before,
+:root[data-theme="blueprint"] body::before,
+:root[data-theme="amiga"] body::before,
+:root[data-theme="dos"] body::before,
+:root[data-theme="mono"] body::before {
+  background-image:
+    radial-gradient(ellipse at center, rgb(var(--fx-rgb) / 7%) 0%, transparent 70%),
+    repeating-linear-gradient(to bottom, rgb(var(--fx-rgb) / 5%) 0 1px, transparent 1px 3px);
+  background-size: auto;
+  opacity: calc(var(--paper-grain) * 2 * var(--paper-fx));
 }
 @media (prefers-contrast: more), (forced-colors: active), print {
   body::before {
@@ -781,7 +970,7 @@ dialog.lightbox {
   padding: var(--space-4);
   border: 0;
   background: transparent;
-  color: var(--color-card);
+  color: var(--color-lightbox);
 }
 dialog.lightbox[open] {
   display: grid;
@@ -840,7 +1029,7 @@ dialog.lightbox::backdrop {
 .lightbox__caption {
   font-size: var(--text-sm);
   text-align: center;
-  color: var(--color-card);
+  color: var(--color-lightbox);
 }
 .lightbox__btn {
   font-family: var(--font-mono);
@@ -848,15 +1037,16 @@ dialog.lightbox::backdrop {
   line-height: 1;
   min-width: 2.75rem;
   min-height: 2.75rem;
-  color: var(--color-card);
+  color: var(--color-lightbox);
   background: transparent;
-  border: var(--border-width) solid var(--color-card);
+  border: var(--border-width) solid var(--color-lightbox);
   border-radius: var(--radius-sm);
   cursor: pointer;
 }
 .lightbox__btn:hover,
 .lightbox__btn:focus-visible {
   background: var(--color-accent);
+  color: var(--color-bg);
   border-color: var(--color-accent);
   outline: none;
 }
@@ -880,7 +1070,8 @@ dialog.lightbox::backdrop {
 }
 .lightbox__btn:disabled:hover {
   background: transparent;
-  border-color: var(--color-card);
+  color: var(--color-lightbox);
+  border-color: var(--color-lightbox);
 }
 .lightbox__close {
   position: fixed;

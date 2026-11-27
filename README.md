@@ -36,6 +36,8 @@ Retro Blog là nền tảng blog **headless, content-driven**: nội dung quản
 - **Bắt buộc (để chạy stack):** Docker Engine + Docker Compose v2 (đã kiểm với Docker 29 / Compose v2). Stack chạy **hoàn toàn trong Docker** — *không* cần Node trên host để chạy.
 - **Tuỳ chọn (dev tooling trên host):** Node ≥ 22.23.4 (`.nvmrc` = 26, khớp container và CI) + pnpm 10 (để dùng các script `pnpm ...`, chạy test và IDE).
 
+> Muốn review trên **dữ liệu thật** (kéo bản sao DB + ảnh từ production về local) và các bẫy khi dev: xem [docs/17a-dev-environment](./docs/17a-dev-environment.md).
+
 ### Các bước
 
 1. **Clone**

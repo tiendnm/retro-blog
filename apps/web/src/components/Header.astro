@@ -13,5 +13,13 @@ const { siteName } = await getSiteSettings();
     <a href="/categories">Chuyên mục</a>
     <a href="/archive">Lưu trữ</a>
     <a href="/search">Tìm kiếm</a>
+    <div class="theme-picker" hidden>
+      <label for="theme-select">Giao diện</label>
+      <select id="theme-select"></select>
+    </div>
   </nav>
 </header>
+
+<script>
+  import '../scripts/theme';
+</script>

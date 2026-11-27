@@ -86,6 +86,29 @@ Texture sinh bằng thuật toán, nằm **dưới** nội dung (`z-index: -1`),
 - Tắt khi `prefers-contrast: more`, `forced-colors: active` và khi in.
 - Tương phản trên pixel tối nhất của grain (đo 2026-11-02): `text` 10,15 · `muted` 5,02 · `accent` 6,70. Mức "rõ" (0,85) làm `muted` < 4,5 nên không dùng.
 
+### 3.6. Nhiều giao diện (theme)
+Bảng màu §3.1 là theme **Giấy** (`data-theme="paper"`). Site có **8 theme**; mặc định là **Platinum** (xám nhạt kiểu Mac cổ / Windows 3.1, thanh tiêu đề xanh navy). Mọi theme chỉ ghi đè **token màu** — bố cục, typography, khoảng cách dùng chung.
+
+| Thứ tự | `data-theme` | Tên | Kiểu | `text`/`bg` | `muted` thấp nhất | `accent`/`bg` |
+|---|---|---|---|---|---|---|
+| 1 | *(không có — `:root`)* | Platinum (mặc định) | sáng | 10,1 | 4,9 | 8,8 |
+| 2 | `mono` | CRT trắng | tối | 6,7 | 4,6 | 10,1 |
+| 3 | `green` | CRT xanh lá | tối | 6,3 | 4,7 | 7,4 |
+| 4 | `dos` | DOS | tối | 8,0 | 4,6 | 10,8 |
+| 5 | `amber` | CRT hổ phách | tối | 6,3 | 4,9 | 8,9 |
+| 6 | `blueprint` | Bản vẽ | tối | 6,3 | 4,7 | 6,7 |
+| 7 | `amiga` | Amiga | tối | 6,2 | 4,8 | 8,4 |
+| 8 | `paper` | Giấy | sáng | 12,5 | 5,7 | 8,3 |
+
+(WCAG, đo 2026-11-27; "`muted` thấp nhất" là mức thấp nhất trên `bg`/`surface`/`card`. Mọi theme giữ chữ chính ≥ 6:1 và chữ phụ ≥ 4,5:1.)
+
+- **Chọn & lưu:** ô "Giao diện" ở header ([`scripts/theme.ts`](../apps/web/src/scripts/theme.ts)) đặt `<html data-theme>` và lưu `localStorage['retro-theme']`; [`public/theme-init.js`](../apps/web/public/theme-init.js) áp lại **trước khi vẽ** (chặn chớp màu). Cả hai là file ngoài — hợp CSP `script-src 'self'`. Không có JS → ô chọn ẩn, site giữ Platinum.
+- **Theme mặc định gỡ thuộc tính `data-theme`** (bộ màu nằm ở `:root`); theme khác đặt giá trị. Giấy là theme có tên như các theme còn lại.
+- **Hiệu ứng nền:** grain giấy (§3.5) **chỉ ở Giấy**. Theme tối có vệt quét CRT mờ + quầng sáng (`--fx-rgb`, `body::before`); Platinum không có nền hoa văn. Tắt khi `prefers-contrast: more`, `forced-colors`, in.
+- **Ảnh danh sách** (hero, thẻ, thumbnail): mọi theme trừ Giấy phủ nhẹ màu theme (`--img-tint`, lớp `::after` kiểu `multiply`, độ đậm `--img-tint-opacity` mặc định 0,35; rê chuột còn 0,12) và giảm chói (`saturate .85 brightness .9`). Ảnh bìa/thân bài giữ màu gốc.
+- **Lightbox** dùng `--color-lightbox` (chữ/viền nút trên phông tối) thay vì `--color-card`.
+- **Thêm theme:** (1) khối `:root[data-theme="x"]` đủ token + `--img-tint`; (2) mục trong `THEMES` (`theme.ts`, thứ tự = thứ tự trong ô chọn); (3) id trong mảng của `theme-init.js`; (4) với theme tối thêm vào selector vệt quét. Test `tests/theme.test.ts` bắt lệch giữa các nơi này. Tính lại tương phản trước khi dùng.
+
 ## 4. Hợp đồng thành phần cơ sở
 
 Mỗi thành phần phải thoả hợp đồng, bất kể cách hiện thực.
