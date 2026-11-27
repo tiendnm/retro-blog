@@ -16,7 +16,9 @@ export async function loadSamples(request) {
   let richPost;
   for (const p of posts) {
     const html = await (await request.get(p)).text();
-    if (/class="prose"[\s\S]*<img/.test(html)) {
+    // Chỉ xét phần thân bài: sau .prose còn "Bài liên quan" (PostCard có ảnh bìa) nên không được quét tới cuối trang.
+    const prose = html.split('class="prose"')[1]?.split('<section class="related"')[0] ?? '';
+    if (/<img/.test(prose)) {
       richPost = p;
       break;
     }
