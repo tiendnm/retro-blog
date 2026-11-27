@@ -105,8 +105,19 @@ test.describe('điểm cuối kỹ thuật', () => {
   });
 });
 
+// Mobile: menu thu gọn sau nút «Menu» (aria-expanded); màn rộng: nút ẩn, link luôn hiện.
+async function openNavIfCollapsed(page) {
+  const toggle = page.getByRole('button', { name: /Menu/ });
+  if (await toggle.isVisible()) {
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  }
+}
+
 test('điều hướng chính dùng được ở mọi viewport (kể cả mobile)', async ({ page }) => {
   await page.goto('/');
+  await openNavIfCollapsed(page);
   const nav = page.getByRole('navigation', { name: 'Điều hướng chính' });
   for (const name of ['Trang chủ', 'Chuyên mục', 'Lưu trữ', 'Tìm kiếm']) {
     await expect(nav.getByRole('link', { name })).toBeVisible();
@@ -115,6 +126,7 @@ test('điều hướng chính dùng được ở mọi viewport (kể cả mobil
   expect(overflow).toBeLessThanOrEqual(0);
   await nav.getByRole('link', { name: 'Chuyên mục' }).click();
   await expect(page).toHaveURL(/\/categories$/);
+  await openNavIfCollapsed(page);
   await page
     .getByRole('navigation', { name: 'Điều hướng chính' })
     .getByRole('link', { name: 'Lưu trữ' })
