@@ -16,7 +16,7 @@ name: retro-blog
 services:
   # ─── Content Store (ADR-0004/0014) ───
   postgres:
-    image: postgres:16.15-alpine
+    image: postgres:16.16-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER}
@@ -235,7 +235,7 @@ services:
 
   # Caddy edge: TLS tự động (hoặc HTTP sau Cloudflare Tunnel), phục vụ static, proxy Directus.
   caddy:
-    image: caddy:2.10-alpine
+    image: caddy:2.11-alpine
     restart: unless-stopped
     depends_on:
       web:
