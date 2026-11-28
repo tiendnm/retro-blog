@@ -77,8 +77,9 @@ else
 fi
 
 tls_ok() {
-  echo | openssl s_client -connect "$1:$2" -servername "$1" 2>/dev/null |
-    openssl x509 -noout -checkend "$((CERT_MIN_DAYS * 86400))" >/dev/null 2>&1
+  # timeout: openssl s_client có thể treo vô hạn khi kết nối TLS đứng (2026-11-27 làm scheduler treo 21 giờ).
+  echo | timeout 15 openssl s_client -connect "$1:$2" -servername "$1" 2>/dev/null |
+    timeout 15 openssl x509 -noout -checkend "$((CERT_MIN_DAYS * 86400))" >/dev/null 2>&1
 }
 
 # Chứng chỉ TLS: -checkend N → thoát != 0 nếu hết hạn trong N giây (portable, không cần parse ngày).

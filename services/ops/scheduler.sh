@@ -74,7 +74,8 @@ while :; do
 
   if [ $((now - last_health)) -ge "$INTERVAL" ]; then
     last_health=$now
-    if out=$(sh "$OPS_DIR/healthcheck.sh" 2>&1); then
+    # timeout: chặn healthcheck treo làm đứng cả vòng lặp (backup + ping) — quá hạn tính là FAIL.
+    if out=$(timeout "${HEALTHCHECK_MAX_SECS:-180}" sh "$OPS_DIR/healthcheck.sh" 2>&1); then
       if [ "$health_state" != ok ]; then
         log "health OK"
         health_state=ok
